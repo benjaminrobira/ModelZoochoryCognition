@@ -1,0 +1,309 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.2 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nyt/global//global/global}
+    \entry{adehabitatLT}{article}{}
+      \name{author}{1}{}{%
+        {{hash=102fccb91f7b4b9f7acffe813ab2228f}{%
+           family={Calenge},
+           familyi={C\bibinitperiod},
+           given={C.},
+           giveni={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{102fccb91f7b4b9f7acffe813ab2228f}
+      \strng{fullhash}{102fccb91f7b4b9f7acffe813ab2228f}
+      \strng{bibnamehash}{102fccb91f7b4b9f7acffe813ab2228f}
+      \strng{authorbibnamehash}{102fccb91f7b4b9f7acffe813ab2228f}
+      \strng{authornamehash}{102fccb91f7b4b9f7acffe813ab2228f}
+      \strng{authorfullhash}{102fccb91f7b4b9f7acffe813ab2228f}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Ecological Modelling}
+      \field{title}{The package adehabitat for the R software: tool for the analysis of space and habitat use by animals}
+      \field{volume}{197}
+      \field{year}{2006}
+      \field{pages}{1035}
+      \range{pages}{1}
+    \endentry
+    \entry{Rcpp2}{book}{}
+      \name{author}{1}{}{%
+        {{hash=19c16a29c7c1db67796fdee712478912}{%
+           family={Eddelbuettel},
+           familyi={E\bibinitperiod},
+           given={Dirk},
+           giveni={D\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {New York}%
+      }
+      \list{publisher}{1}{%
+        {Springer}%
+      }
+      \strng{namehash}{19c16a29c7c1db67796fdee712478912}
+      \strng{fullhash}{19c16a29c7c1db67796fdee712478912}
+      \strng{bibnamehash}{19c16a29c7c1db67796fdee712478912}
+      \strng{authorbibnamehash}{19c16a29c7c1db67796fdee712478912}
+      \strng{authornamehash}{19c16a29c7c1db67796fdee712478912}
+      \strng{authorfullhash}{19c16a29c7c1db67796fdee712478912}
+      \field{sortinit}{E}
+      \field{sortinithash}{8da8a182d344d5b9047633dfc0cc9131}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{ISBN 978-1-4614-6867-7}
+      \field{title}{Seamless {R} and {C++} Integration with {Rcpp}}
+      \field{year}{2013}
+      \verb{doi}
+      \verb 10.1007/978-1-4614-6868-4
+      \endverb
+    \endentry
+    \entry{Rcpp3}{article}{}
+      \name{author}{2}{}{%
+        {{hash=19c16a29c7c1db67796fdee712478912}{%
+           family={Eddelbuettel},
+           familyi={E\bibinitperiod},
+           given={Dirk},
+           giveni={D\bibinitperiod}}}%
+        {{hash=cb59a3b2b3c55a5b1b5f56b855d6530a}{%
+           family={Balamuta},
+           familyi={B\bibinitperiod},
+           given={James\bibnamedelima Joseph},
+           giveni={J\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+      }
+      \strng{namehash}{83abbf29d2725f256fec855f508a07e7}
+      \strng{fullhash}{83abbf29d2725f256fec855f508a07e7}
+      \strng{bibnamehash}{83abbf29d2725f256fec855f508a07e7}
+      \strng{authorbibnamehash}{83abbf29d2725f256fec855f508a07e7}
+      \strng{authornamehash}{83abbf29d2725f256fec855f508a07e7}
+      \strng{authorfullhash}{83abbf29d2725f256fec855f508a07e7}
+      \field{sortinit}{E}
+      \field{sortinithash}{8da8a182d344d5b9047633dfc0cc9131}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The American Statistician}
+      \field{number}{1}
+      \field{title}{{Extending 	extit{R} with 	extit{C++}: A Brief Introduction to 	extit{Rcpp}}}
+      \field{volume}{72}
+      \field{year}{2018}
+      \field{pages}{28\bibrangedash 36}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.1080/00031305.2017.1375990
+      \endverb
+    \endentry
+    \entry{Rcpp1}{article}{}
+      \name{author}{2}{}{%
+        {{hash=19c16a29c7c1db67796fdee712478912}{%
+           family={Eddelbuettel},
+           familyi={E\bibinitperiod},
+           given={Dirk},
+           giveni={D\bibinitperiod}}}%
+        {{hash=3bd2c624a8715b2aeffcecaa24f3d017}{%
+           family={François},
+           familyi={F\bibinitperiod},
+           given={Romain},
+           giveni={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{c9405437a9d3c5c4ca1e5058f31a0785}
+      \strng{fullhash}{c9405437a9d3c5c4ca1e5058f31a0785}
+      \strng{bibnamehash}{c9405437a9d3c5c4ca1e5058f31a0785}
+      \strng{authorbibnamehash}{c9405437a9d3c5c4ca1e5058f31a0785}
+      \strng{authornamehash}{c9405437a9d3c5c4ca1e5058f31a0785}
+      \strng{authorfullhash}{c9405437a9d3c5c4ca1e5058f31a0785}
+      \field{sortinit}{E}
+      \field{sortinithash}{8da8a182d344d5b9047633dfc0cc9131}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Statistical Software}
+      \field{number}{8}
+      \field{title}{{Rcpp}: Seamless {R} and {C++} Integration}
+      \field{volume}{40}
+      \field{year}{2011}
+      \field{pages}{1\bibrangedash 18}
+      \range{pages}{18}
+      \verb{doi}
+      \verb 10.18637/jss.v040.i08
+      \endverb
+    \endentry
+    \entry{lloyd1967mean}{article}{}
+      \name{author}{1}{}{%
+        {{hash=e4f2b62456a541096f2e9940b2e7354a}{%
+           family={Lloyd},
+           familyi={L\bibinitperiod},
+           given={Monte},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{e4f2b62456a541096f2e9940b2e7354a}
+      \strng{fullhash}{e4f2b62456a541096f2e9940b2e7354a}
+      \strng{bibnamehash}{e4f2b62456a541096f2e9940b2e7354a}
+      \strng{authorbibnamehash}{e4f2b62456a541096f2e9940b2e7354a}
+      \strng{authornamehash}{e4f2b62456a541096f2e9940b2e7354a}
+      \strng{authorfullhash}{e4f2b62456a541096f2e9940b2e7354a}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The Journal of Animal Ecology}
+      \field{title}{{Mean crowding}}
+      \field{year}{1967}
+      \field{pages}{1\bibrangedash 30}
+      \range{pages}{30}
+    \endentry
+    \entry{ape}{article}{}
+      \name{author}{2}{}{%
+        {{hash=8d39b18f7c127bd9791f0120f81a3483}{%
+           family={Paradis},
+           familyi={P\bibinitperiod},
+           given={E.},
+           giveni={E\bibinitperiod}}}%
+        {{hash=04067635feed4c1538b0d483b90e7d58}{%
+           family={Schliep},
+           familyi={S\bibinitperiod},
+           given={K.},
+           giveni={K\bibinitperiod}}}%
+      }
+      \strng{namehash}{55da349f7c13f0fbfdddaa80aa0e09de}
+      \strng{fullhash}{55da349f7c13f0fbfdddaa80aa0e09de}
+      \strng{bibnamehash}{55da349f7c13f0fbfdddaa80aa0e09de}
+      \strng{authorbibnamehash}{55da349f7c13f0fbfdddaa80aa0e09de}
+      \strng{authornamehash}{55da349f7c13f0fbfdddaa80aa0e09de}
+      \strng{authorfullhash}{55da349f7c13f0fbfdddaa80aa0e09de}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Bioinformatics}
+      \field{title}{ape 5.0: an environment for modern phylogenetics and evolutionary analyses in {R}}
+      \field{volume}{35}
+      \field{year}{2019}
+      \field{pages}{526\bibrangedash 528}
+      \range{pages}{3}
+    \endentry
+    \entry{Rsoftware}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=dcdebb6b35bff7c0568bf8c50ef8626d}{%
+           family={{R Core Team}},
+           familyi={R\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {R Foundation for Statistical Computing}%
+      }
+      \list{location}{1}{%
+        {Vienna, Austria}%
+      }
+      \strng{namehash}{dcdebb6b35bff7c0568bf8c50ef8626d}
+      \strng{fullhash}{dcdebb6b35bff7c0568bf8c50ef8626d}
+      \strng{bibnamehash}{dcdebb6b35bff7c0568bf8c50ef8626d}
+      \strng{authorbibnamehash}{dcdebb6b35bff7c0568bf8c50ef8626d}
+      \strng{authornamehash}{dcdebb6b35bff7c0568bf8c50ef8626d}
+      \strng{authorfullhash}{dcdebb6b35bff7c0568bf8c50ef8626d}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Genotype x environmental interaction (GxE) can lead to differences in performance of genotypes over environments. GxE analysis can be used to analyze the stability of genotypes and the value of test locations. We developed an Rlanguage program (RGxE) that computes univariate stability statistics, descriptive statistics, pooled ANOVA, genotype F ratio across location and environment, cluster analysis for location, and location correlation with average location performance. Univariate stability statistics calculated are regression slope (bi), deviation from regression (S2d), Shukla's variance ($\sigma$i2), S square Wricke's ecovalence (Wi), and Kang's yield stability (YSi). RGxE is free and intended for use by scientists studying performance of polygenic or quantitative traits over multiple environments. In the present paper we provide the RGxE program and its components along with an example input data and outputs. Additionally, the RGxE program along with associated files is also available on GitHub at https://github.com/mahendra1/RGxE, http://cucurbitbreeding.com/todd-wehner/publications/software-sas-r-project/ and http://cuke.hort.ncsu.edu/cucurbit/wehner/software.html.}
+      \field{booktitle}{R Foundation for Statistical Computing}
+      \field{title}{{R: A language and environment for statistical computing}}
+      \field{volume}{2}
+      \field{year}{2020}
+      \field{pages}{https://www.R\bibrangedash project.org}
+      \range{pages}{-1}
+      \verb{urlraw}
+      \verb http://www.r-project.org https://www.r-project.org/
+      \endverb
+      \verb{url}
+      \verb http://www.r-project.org%20https://www.r-project.org/
+      \endverb
+      \keyw{Rsoftware}
+    \endentry
+    \entry{robirainreview}{article}{}
+      \name{author}{5}{}{%
+        {{hash=bef26efcfbdbf4c6413c3cd8f9c47f1f}{%
+           family={Robira},
+           familyi={R\bibinitperiod},
+           given={Benjamin},
+           giveni={B\bibinitperiod}}}%
+        {{hash=1ee267eb7bba2d398fd8c7cebafa4ed7}{%
+           family={Benhamou},
+           familyi={B\bibinitperiod},
+           given={Simon},
+           giveni={S\bibinitperiod}}}%
+        {{hash=98df8e9835cd3863837418ef7a5151ba}{%
+           family={Masi},
+           familyi={M\bibinitperiod},
+           given={Shelly},
+           giveni={S\bibinitperiod}}}%
+        {{hash=481d5099f8632c9d4cf4c1731bab2c6a}{%
+           family={Llaurens},
+           familyi={L\bibinitperiod},
+           given={Violaine},
+           giveni={V\bibinitperiod}}}%
+        {{hash=2780480df57d6c9665f5715860cfe54d}{%
+           family={Riotte-Lambert},
+           familyi={R\bibinithyphendelim L\bibinitperiod},
+           given={Louise},
+           giveni={L\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {The Royal Society}%
+      }
+      \strng{namehash}{2d91e2bacd54f0dfe6e6daca9385c7bb}
+      \strng{fullhash}{bca7d204531e20eb05d2616180483a20}
+      \strng{bibnamehash}{bca7d204531e20eb05d2616180483a20}
+      \strng{authorbibnamehash}{bca7d204531e20eb05d2616180483a20}
+      \strng{authornamehash}{2d91e2bacd54f0dfe6e6daca9385c7bb}
+      \strng{authorfullhash}{bca7d204531e20eb05d2616180483a20}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Royal Society Open Science}
+      \field{title}{{Foraging efficiency in temporally predictable environments: Is a long-term temporal memory really advantageous?}}
+      \field{year}{2021}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

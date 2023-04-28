@@ -1,0 +1,177 @@
+
+<!-- ------------------------------------------------------------------- -->
+<!-- ---------------------      LAYOUT       --------------------------- -->
+<!-- ------------------------------------------------------------------- -->
+
+<!-- TO REMOVE NUMBERING IN TOC -->
+\makeatletter
+\let\latexl@section\l@section
+\def\l@section#1#2{\begingroup\let\numberline\@gobble\latexl@section{#1}{#2}\endgroup}
+\makeatother
+
+\makeatletter
+\let\latexl@subsection\l@subsection
+\def\l@subsection#1#2{\begingroup\let\numberline\@gobble\latexl@subsection{#1}{#2}\endgroup}
+\makeatother
+
+\makeatletter
+\let\latexl@subsubsection\l@subsubsection
+\def\l@subsubsection#1#2{\begingroup\let\numberline\@gobble\latexl@subsubsection{#1}{#2}\endgroup}
+\makeatother
+
+
+<!-- TO PUT THE LETTRINE -->
+
+\newcommand{\initial}[1]{%
+	\lettrine[lraise=0, loversize=0.5,nindent=0em]{
+		\color{black}
+     		{\textsc{#1}}}{}}
+     		
+<!--- Define Headers and Footers --->
+\fancypagestyle{fancy}{%
+  \renewcommand{\headrulewidth}{0pt}%
+  \fancyhf{}%
+  \fancyfoot[C]{\color{gray} \textit{\footnotesize Page \thepage\, of\, \pageref*{LastPage}}}
+  \setlength\footskip{0pt}
+}
+
+<!-- TO CREATE grey BOX -->
+
+\newtcolorbox{graybox}{
+  colback=lightgray!25,
+  colframe=lightgray!25,
+  coltext=black,
+  boxsep=3pt,
+  arc=0pt}
+
+<!-- TO HAVE CIRCLE NUMBER -->
+
+\newcommand*\circledBlack[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt, fill=black, text=white] (char) {#1};}}
+
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt, fill=white, text=black] (char) {#1};}}
+
+
+<!-- TO HAVE SECTION/SUBSECTION layout -->
+
+\setcounter{secnumdepth}{2}
+
+<!-- SECTION -->
+\newcommand\titlebarsection{
+\tikz[baseline,trim left=3.1cm,trim right=3cm] {
+    \node [
+        fill=black,
+        text=white,
+        anchor= base east,
+        rectangle,
+        minimum height=3.5ex] at (4cm,0) {
+        \textbf{\Roman{\thesection}}
+    };
+}
+}
+\titleformat{\section}{\large}{\titlebarsection}{1.5cm}{}
+
+\renewcommand*{\thesection}{section}
+
+<!-- SUBSECTION -->
+\newcommand\titlebarsubsection{
+\tikz[baseline,trim left=3.1cm,trim right=3cm] {
+    \node [
+        text=black,
+        anchor= base east,
+        minimum height=3.5ex] (p) at (5cm,0) {
+        \textbf{\Roman{\thesection}.\arabic{\thesubsection}}
+    };
+   \path[fill=black] (p.east) circle (.5ex);
+   \draw[color=black, thick,rounded corners=1ex] (p.east) |- (\textwidth+2cm,-0.75ex);
+}
+}
+\titleformat{\subsection}{\large}{\titlebarsubsection}{2.5cm}{}
+
+\renewcommand*{\thesubsection}{subsection}
+
+<!-- SUBSUBSECTION -->
+<!-- \newcommand\titlebarsubsubsection{ -->
+<!-- \tikz[baseline,trim left=3.1cm,trim right=3cm] { -->
+<!--     \node [ -->
+<!--         text=black, -->
+<!--         anchor= base east, -->
+<!--         minimum height=3.5ex] (p) at (5cm,0) { -->
+<!--         \textbf{\Roman{\thesection}.\arabic{\thesubsection}.\arabic{\thesubsubsection}} -->
+<!--     }; -->
+<!--    \path[fill=black] (p.east) circle (.5ex); -->
+<!--    \draw[color=black, thick,rounded corners=1ex] (p.east) |- (\textwidth+2cm,-0.75ex); -->
+<!-- } -->
+<!-- } -->
+<!-- \titleformat{\subsubsection}{\large}{\titlebarsubsubsection}{2.5cm}{} -->
+
+<!-- \renewcommand*{\thesubsubsection}{subsubsection} -->
+
+
+<!-- Figure legend title -->
+\captionsetup[figure]{labelfont={bf},name={Figure},labelsep=endash}
+
+<!-- Reference to word -->
+\makeatletter
+\newcommand{\setword}[2]{%
+  \phantomsection
+  #1\def\@currentlabel{\unexpanded{#1}}\label{#2}%
+}
+\makeatother
+
+
+<!-- <!-- Add the header -->
+<!-- \renewcommand{\headrulewidth}{0pt} -->
+<!-- \renewcommand{\footrulewidth}{0pt} -->
+
+<!-- \newcommand*\headerDate[1]{ -->
+<!-- \fancyhead{ -->
+<!-- \begin{flushleft} -->
+<!-- \rule[-0.15in]{0.25\linewidth}{0.8ex} -->
+<!-- \vspace{-0.8ex} -->
+<!-- \hrule -->
+<!-- \vspace{0.1in} -->
+<!-- {#1} %%\hfill \href{mailto:benjamin.robira@normalesup.org}{benjamin.robira@normalesup.org} -->
+<!-- \end{flushleft} -->
+<!-- } -->
+<!-- } -->
+
+<!-- \newcommand*\headerNew[1]{ -->
+<!-- \fancyhead{ -->
+<!-- \begin{flushleft} -->
+<!-- \rule[-0.15in]{0.25\linewidth}{0.8ex} -->
+<!-- \vspace{-0.8ex} -->
+<!-- \hrule -->
+<!-- \vspace{0.1in} -->
+<!-- {#1} -->
+<!-- \end{flushleft} -->
+<!-- } -->
+<!-- } -->
+
+
+<!-- <!-- center of footer -->
+<!-- \fancyfoot[C]{\circledBlack{\thepage}} -->
+<!-- <!-- page number on the left of even pages and right of odd pages -->
+<!-- \fancyfoot[R]{\small \copyright Benjamin Robira/FEM} -->
+
+
+<!-- \titlecontents{section}[0em] -->
+<!-- {\vskip 0.5ex}% -->
+<!-- {\scshape}% numbered sections formatting -->
+<!-- {\itshape}% unnumbered sections formatting -->
+<!-- {}% -->
+<!-- \titlecontents{subsection}[0em] -->
+<!-- {\vskip 0.5ex}% -->
+<!-- {\scshape}% numbered sections formatting -->
+<!-- {\itshape}% unnumbered sections formatting -->
+<!-- {}% -->
+<!-- \titlecontents{subsubsection}[0em] -->
+<!-- {\vskip 0.5ex}% -->
+<!-- {\scshape}% numbered sections formatting -->
+<!-- {\itshape}% unnumbered sections formatting -->
+<!-- {}% -->
+
+<!-- ------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------- -->

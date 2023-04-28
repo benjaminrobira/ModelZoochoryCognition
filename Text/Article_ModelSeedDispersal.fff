@@ -1,0 +1,22 @@
+\begin{figure}[H]
+
+{\centering \includegraphics[width=0.95\linewidth]{../FIG/summaryPredictions}
+
+}
+
+\caption{Test}\label{fig:predictions}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+\centering
+\includegraphics{Article_ModelSeedDispersal_files/figure-latex/figDistribution-1.pdf}
+\caption{\label{fig:figDistribution}Simulated spatial distributions to investigate metrics value \textbar{} Distribution: Homo. = homogeneous, Hetero. = Heterogeneous, Route = Route network-like. Tree population size: Low = 100 trees, High = 1000 trees, within a square map of side length 1000 su.}
+\end{figure}
+\efloatseparator
+ 
+\begin{figure}
+\centering
+\includegraphics{Article_ModelSeedDispersal_files/figure-latex/figMetrics-1.pdf}
+\caption{\label{fig:figMetrics}Patchiness and alignment allows for identifying spatial distributions at low (100 trees) or high (1000 trees) tree population size \textbar{} Results are based from simulated data following a homogeneous (Homo.), heterogeneous (Hetero.) or route network-like (Route) distribution. The mean value is depicted by the black dot and the text. The shape of the distribution is depicted by the half-violin plot, right to raw jittered data.}
+\end{figure}

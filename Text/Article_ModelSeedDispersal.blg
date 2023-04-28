@@ -1,0 +1,22 @@
+[0] Config.pm:307> INFO - This is Biber 2.17
+[0] Config.pm:310> INFO - Logfile is 'Article_ModelSeedDispersal.blg'
+[70] biber:340> INFO - === ven apr 28, 2023, 11:33:01
+[82] Biber.pm:418> INFO - Reading 'Article_ModelSeedDispersal.bcf'
+[163] Biber.pm:972> INFO - Found 8 citekeys in bib section 0
+[184] Biber.pm:4383> INFO - Processing section 0
+[197] Biber.pm:4574> INFO - Looking for bibtex file 'bibliographyarticlepackage.bib' for section 0
+[299] bibtex.pm:1713> INFO - LaTeX decoding ...
+[1565] bibtex.pm:1518> INFO - Found BibTeX data source 'bibliographyarticlepackage.bib'
+[1691] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[1691] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[1691] Biber.pm:4203> INFO - Sorting list 'nyt/global//global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[1691] Biber.pm:4209> INFO - No sort tailoring available for locale 'en-US'
+[1703] bbl.pm:654> INFO - Writing 'Article_ModelSeedDispersal.bbl' with encoding 'UTF-8'
+[1707] bbl.pm:757> INFO - Output to Article_ModelSeedDispersal.bbl
+[1707] Biber.pm:130> WARN - Duplicate entry key: 'bhattacharyya1943measure' in file 'bibliographyarticlepackage.bib', skipping ...
+[1707] Biber.pm:130> WARN - Duplicate entry key: 'dunlap2009components' in file 'bibliographyarticlepackage.bib', skipping ...
+[1707] Biber.pm:130> WARN - Duplicate entry key: 'schreier2009interspecific' in file 'bibliographyarticlepackage.bib', skipping ...
+[1707] Biber.pm:130> WARN - Duplicate entry key: 'springer2012macroevolutionary' in file 'bibliographyarticlepackage.bib', skipping ...
+[1707] Biber.pm:130> WARN - Duplicate entry key: 'guilford2014route' in file 'bibliographyarticlepackage.bib', skipping ...
+[1707] Biber.pm:130> WARN - BibTeX subsystem: /tmp/biber_tmp_dSTH/19177a871dd52d0267ba0d5985a32218_110478.utf8, line 6, warning: 172 characters of junk seen at toplevel
+[1707] Biber.pm:132> INFO - WARNINGS: 6

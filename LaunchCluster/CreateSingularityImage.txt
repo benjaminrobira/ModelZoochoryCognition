@@ -1,0 +1,47 @@
+## ----------------------------------------- ##
+## Creating and running the singulrity image ##
+## ----------------------------------------- ##
+
+#Go to the file where the R.sif and R.def to create singularity box are
+
+## -----
+## Removing old image and recreate image
+## -----
+
+# https://docs.sylabs.io/guides/3.0/user-guide/build_a_container.html
+
+sudo rm -f R.sif && \
+sudo singularity build R.sif R.def
+
+## -----
+## Preparing library path and launching the R script
+## -----
+
+# https://docs.rc.fas.harvard.edu/kb/r-packages-with-singularity/
+
+# Method 1: if change in library path in the R script
+
+# start a shell inside the Singularity container
+singularity shell R.sif
+
+# create folder of your library
+# (note: this path should be different than if you have installed R packages directly on the 
+mkdir -p $HOME/Rlibrary_singularity
+export R_LIBS_USER=$HOME/Rlibrary_singularity/$R_LIBS_USER
+
+# Launch the R script
+R
+source("Rscript.R")
+
+# Method 2: if no change in library path in the R script (advantage: has the Rscript.out file)
+
+#wrap up command outside singularity environment
+singularity exec R.sif R CMD BATCH Rscript.R Rscript.out
+#R.script is the main Rscript. Should source all subscripts if several are to be run. Rscript.out will be the output of the R console.
+
+#Checking if it worked
+singularity exec R.sif R CMD BATCH CHECK_IF_ERRORS.R Rerror.out
+
+
+
+singularity exec R.sif R CMD BATCH Scripts/R/7_Sentivity.R Rscript.out
