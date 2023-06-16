@@ -15,7 +15,6 @@ library(readr)
 library(parallel)
 library(doParallel)
 
-
 # Loading parameters ------------------------------------------------------
 load("Scripts/R/Parameterisation.RData")
 spatialKnowledge <- c(0, 0.25, 0.5, 0.75, 1)
@@ -40,7 +39,26 @@ print(s)
 cores=detectCores()
 cl <- makeCluster(cores[1]-4) #not to overload your computer
 registerDoParallel(cl)
-registerDoSEQ() #if you opt not to run parallelising -> C++ can't be exported with parallelisation apparently. I tried 
+registerDoSEQ() #if you opt not to run parallelising -> C++ can't be exported with parallelisation apparently. 
+#Check:
+#https://stackoverflow.com/questions/25062383/cant-run-rcpp-function-in-foreach-null-value-passed-as-symbol-address
+# 
+# Inspired by answers from @henine & @jmb, I tried the "reverse" option, which is that I actually source my R file with the Rccp functions inside my foreach loop and make sure to include "Rccp" in the .packages option of foreach. Might not be the most efficient, but does the job & is simple.
+# 
+# Something like:
+#   
+#   cl = makeCluster(n_cores, outfile="")
+# registerDoParallel(cl)
+# 
+# foreach(n = 1:N,.packages = "Rcpp",.noexport = "<name of Rccp function>")%dopar%{
+#   source("Scripts/Rccp_functions.R")
+#   ### do stuff with functions scripted in Rccp_functions.R
+# }
+# 
+# stopImplicitCluster()
+# 
+# And similarly to @jmb, I would have commented, but don't have enough reputation :D
+
 environmentPath <- getwd()
 
 foreach(r=1:numberRepetitions, .packages=c('Rcpp'), .inorder = TRUE) %dopar% { #for(r in 1:30){
@@ -77,8 +95,8 @@ foreach(r=1:numberRepetitions, .packages=c('Rcpp'), .inorder = TRUE) %dopar% { #
     temporalKnowledgeRate = temporalKnowledge[s],
     speed = speed,
     DispersalProbability = DispersalProbability, 
-    useProvidedMap = FALSE,
-    moveOnlyToFruitingTrees = TRUE,
+    useProvidedMap = TRUE,
+    moveOnlyToFruitingTrees = FALSE,
     moveOnlyToTarget = FALSE,
     intensityCompetitionForSpace = intensityCompetitionForSpace
   )
@@ -101,7 +119,7 @@ environmentPath <- getwd()
 foreach(r=1:numberRepetitions, .packages=c('Rcpp'), .inorder = TRUE) %dopar% { 
   ##Compare agent efficiency
   path <- paste0(
-    "Output/Main",
+    "Output/Main/Main",
     "_p15.811388",
     "_s",
     format(spatialKnowledge[s], nsmall=2),
@@ -142,7 +160,7 @@ foreach(r=1:numberRepetitions, .packages=c('Rcpp'), .inorder = TRUE) %dopar% {
     speed = speed,
     DispersalProbability = 0, 
     useProvidedMap = TRUE,
-    moveOnlyToFruitingTrees = TRUE,
+    moveOnlyToFruitingTrees = FALSE,
     moveOnlyToTarget = FALSE,
     intensityCompetitionForSpace = intensityCompetitionForSpace
   )
@@ -177,7 +195,7 @@ foreach(r=1:numberRepetitions, .packages=c('Rcpp'), .inorder = TRUE) %dopar% {
     speed = speed, 
     DispersalProbability = 0, 
     useProvidedMap = TRUE,
-    moveOnlyToFruitingTrees = TRUE,
+    moveOnlyToFruitingTrees = FALSE,
     moveOnlyToTarget = FALSE,
     intensityCompetitionForSpace = intensityCompetitionForSpace
   )
@@ -212,7 +230,7 @@ foreach(r=1:numberRepetitions, .packages=c('Rcpp'), .inorder = TRUE) %dopar% {
     speed = speed, 
     DispersalProbability = 0, 
     useProvidedMap = TRUE,
-    moveOnlyToFruitingTrees = TRUE,
+    moveOnlyToFruitingTrees = FALSE,
     moveOnlyToTarget = FALSE,
     intensityCompetitionForSpace = intensityCompetitionForSpace
   )

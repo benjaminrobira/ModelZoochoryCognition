@@ -10,7 +10,8 @@ rm(list = ls())
 
 #Load parameters
 load("Scripts/R/Parameterisation.RData")
-
+#If needed to replot and not running the lapply
+#load("Renvironment/outputSensitivityMovingRuleAndSpaceTree.RData")
 ## Packages ----------------------------------------------------------------
 
 library(readr)
@@ -288,7 +289,7 @@ patchiness_f <-
     #Readd those with 0
     presentQuadrat <- paste(countNumber[, 1], countNumber[, 2], sep = "_")
     allPossibleQuadrat.df <-
-      as.data.frame(crossing(
+      as.data.frame(tidyr::crossing(
         seq(
           from = minx,
           to = maxx - cellsize,
@@ -461,7 +462,6 @@ coords <- rbind(coords, cbind(seq(from = 0, to = 1000, length.out = 32), seq(fro
 coords <- unique(coords)
 nrow(coords)
 plot(coords[,1], coords[,2], asp = 1)
-
 alignmentPoints_f(coords)
 
 ### Result plot -------------------------------------------------------------
@@ -472,11 +472,14 @@ plotResults <- function(
     xVar,
     yVar,
     df,
+    boxplotOnly = TRUE,
     categoricalX = FALSE,
     levelsOldNameX = NA,
     levelsNewNameX = NA,
     groupVar = NA,
-    colourGroup_v = NA
+    colourGroup_v = NA,
+    nameGroup = NA,
+    levelOrderGroup = NA
 ){
   df <- df %>% mutate(
     x = .data[[xVar]],
@@ -486,86 +489,171 @@ plotResults <- function(
     for(i in 1:length(levelsOldNameX)){
       df <- df %>% mutate(
         x = ifelse(x == levelsOldNameX[i], levelsNewNameX[i], x)
-      )
+      )  
     }
+    df <- df %>% 
+      mutate(
+        x = factor(x, levels = levelsNewNameX)
+      )
   }
   
   if(!is.na(groupVar)){
     df <- df %>% mutate(
-      group = .data[[groupVar]]
+      group = .data[[groupVar]],
+      group = factor(group, levels = levelOrderGroup)
     )
-    plot <- ggplot(df, aes(x = x, y = y)) +
-      geom_violin(aes(x = x, y = y, group = group, fill = group), adjust = 1) +
-      geom_boxplot(aes(x = x, group =  group), width = 0.01, fill = "black") +
-      stat_summary(
-        #fun.data = give.n,
-        geom = "text",
-        fun.y = "mean",
-        size = 4,
-        hjust = -0.5,
-        aes(label = round(after_stat(y), 3), group = group)
-      ) +
-      stat_summary(
-        geom = "point",
-        fun.y = "mean",
-        size = 2,
-        shape = 21,
-        fill = "white",
-        colour = "black"
-      ) +
-      labs(x = xAxisName, y = yAxisName) +
-      scale_fill_manual(values = colourGroup_v) + 
-      theme_bw() +
-      theme(axis.title = element_text(face = "bold", size = 16),
-            axis.text.x = element_text(size = 12),
-            axis.text.y = element_text(size = 12),
-            legend.text = element_text(size = 10),
-            legend.title = element_text(size = 12, face = "bold"),
-            panel.grid.minor = element_line(colour = "grey93"),
-            panel.grid.major = element_line(colour = "grey93"),
-            strip.background = element_rect(colour = "white",
-                                            fill = "white"),
-            strip.text = element_text(face = "bold", size = 14)) +
-      scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+    dodge <- position_dodge(width = 0.5)
+  }
+  
+  if(boxplotOnly){
+    if(!is.na(groupVar)){
+      plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_boxplot(aes(x = x, y = y, group = interaction(x, group), fill = group), width = 0.25, notch = TRUE, position = dodge) +
+        stat_summary(
+          #fun.data = give.n,
+          geom = "text",
+          fun.y = "mean",
+          size = 4,
+          hjust = -0.65,
+          position = dodge,
+          aes(label = round(after_stat(y), 3), group = group)
+        ) +
+        stat_summary(
+          geom = "point",
+          fun.y = "mean",
+          size = 2,
+          shape = 21,
+          fill = "white",
+          aes(group = group),
+          position = dodge,
+          colour = "black"
+        ) +
+        labs(x = xAxisName, y = yAxisName) +
+        scale_fill_manual(name = nameGroup, values = colourGroup_v) + 
+        theme_bw() +
+        theme(axis.title = element_text(face = "bold", size = 16),
+              axis.text.x = element_text(size = 12),
+              axis.text.y = element_text(size = 12),
+              legend.text = element_text(size = 10),
+              legend.title = element_text(size = 12, face = "bold"),
+              panel.grid.minor = element_line(colour = "grey93"),
+              panel.grid.major = element_line(colour = "grey93"),
+              strip.background = element_rect(colour = "white",
+                                              fill = "white"),
+              strip.text = element_text(face = "bold", size = 14)) +
+        scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+    }else{
+      plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_boxplot(aes(x = x, y = y, group = x), width = 0.25, notch = TRUE, fill = "grey90") +
+        stat_summary(
+          #fun.data = give.n,
+          geom = "text",
+          fun.y = "mean",
+          size = 4,
+          hjust = -0.65,
+          aes(label = round(after_stat(y), 3))
+        ) +
+        stat_summary(
+          geom = "point",
+          fun.y = "mean",
+          size = 2,
+          shape = 21,
+          fill = "white",
+          colour = "black"
+        ) +
+        labs(x = xAxisName, y = yAxisName) +
+        theme_bw() +
+        theme(axis.title = element_text(face = "bold", size = 16),
+              axis.text.x = element_text(size = 12),
+              axis.text.y = element_text(size = 12),
+              legend.text = element_text(size = 10),
+              legend.title = element_text(size = 12, face = "bold"),
+              panel.grid.minor = element_line(colour = "grey93"),
+              panel.grid.major = element_line(colour = "grey93"),
+              strip.background = element_rect(colour = "white",
+                                              fill = "white"),
+              strip.text = element_text(face = "bold", size = 14)) +
+        scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+    }
   }else{
-    plot <- ggplot(df, aes(x = x, y = y)) +
-      geom_violin(aes(x = x, y = y, group = x), fill = "grey90", adjust = 1) +
-      geom_boxplot(aes(x = x, y = y, group = x), width = 0.01, fill = "black") +
-      stat_summary(
-        #fun.data = give.n,
-        geom = "text",
-        fun.y = "mean",
-        size = 4,
-        hjust = -0.5,
-        aes(label = round(after_stat(y), 3))
-      ) +
-      stat_summary(
-        geom = "point",
-        fun.y = "mean",
-        size = 2,
-        shape = 21,
-        fill = "white",
-        colour = "black"
-      ) +
-      labs(x = xAxisName, y = yAxisName) +
-      theme_bw() +
-      theme(axis.title = element_text(face = "bold", size = 16),
-            axis.text.x = element_text(size = 12),
-            axis.text.y = element_text(size = 12),
-            legend.text = element_text(size = 10),
-            legend.title = element_text(size = 12, face = "bold"),
-            panel.grid.minor = element_line(colour = "grey93"),
-            panel.grid.major = element_line(colour = "grey93"),
-            strip.background = element_rect(colour = "white",
-                                            fill = "white"),
-            strip.text = element_text(face = "bold", size = 14)) +
-      scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+    if(!is.na(groupVar)){
+      plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_violin(aes(x = x, y = y, fill = group), position = dodge) +
+        geom_boxplot(aes(x = x, y = y, group =  interaction(x, group)), position = dodge, width = 0.05, fill = "black") +
+        stat_summary(
+          #fun.data = give.n,
+          geom = "text",
+          fun.y = "mean",
+          size = 4,
+          hjust = -0.65,
+          position = dodge,
+          aes(label = round(after_stat(y), 3), group = group)
+        ) +
+        stat_summary(
+          geom = "point",
+          fun.y = "mean",
+          size = 2,
+          shape = 21,
+          fill = "white",
+          aes(group = group),
+          position = dodge,
+          colour = "black"
+        ) +
+        labs(x = xAxisName, y = yAxisName) +
+        scale_fill_manual(name = nameGroup, values = colourGroup_v) + 
+        theme_bw() +
+        theme(axis.title = element_text(face = "bold", size = 16),
+              axis.text.x = element_text(size = 12),
+              axis.text.y = element_text(size = 12),
+              legend.text = element_text(size = 10),
+              legend.title = element_text(size = 12, face = "bold"),
+              panel.grid.minor = element_line(colour = "grey93"),
+              panel.grid.major = element_line(colour = "grey93"),
+              strip.background = element_rect(colour = "white",
+                                              fill = "white"),
+              strip.text = element_text(face = "bold", size = 14)) +
+        scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+    }else{
+      plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_violin(aes(x = x, y = y, group = x), fill = "grey90", adjust = 1) +
+        geom_boxplot(aes(x = x, y = y, group = x), width = 0.01, fill = "black") +
+        stat_summary(
+          #fun.data = give.n,
+          geom = "text",
+          fun.y = "mean",
+          size = 4,
+          hjust = -0.65,
+          aes(label = round(after_stat(y), 3))
+        ) +
+        stat_summary(
+          geom = "point",
+          fun.y = "mean",
+          size = 2,
+          shape = 21,
+          fill = "white",
+          colour = "black"
+        ) +
+        labs(x = xAxisName, y = yAxisName) +
+        theme_bw() +
+        theme(axis.title = element_text(face = "bold", size = 16),
+              axis.text.x = element_text(size = 12),
+              axis.text.y = element_text(size = 12),
+              legend.text = element_text(size = 10),
+              legend.title = element_text(size = 12, face = "bold"),
+              panel.grid.minor = element_line(colour = "grey93"),
+              panel.grid.major = element_line(colour = "grey93"),
+              strip.background = element_rect(colour = "white",
+                                              fill = "white"),
+              strip.text = element_text(face = "bold", size = 14)) +
+        scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+    }
   }
   
   if(!categoricalX){
     plot <- plot +
       scale_x_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
   }
+  
   return(plot)
 }
 
@@ -597,15 +685,21 @@ plotMap <- function(
 ## Moving rule -------------------------------------------------------------
 
 listFiles_v <- list.files("Output/SensitivityMovingRule")
+whichlistFiles_v <- grep("CheckTest", listFiles_v)
+listFiles_v <- listFiles_v[whichlistFiles_v]
 whichMapFinal_v <- grep("Map_36500", listFiles_v)
 filesMapFinal_v <- listFiles_v[whichMapFinal_v]
 whichRoutine_v <- grep("Routine", listFiles_v)
 filesRoutine_v <- listFiles_v[whichRoutine_v]
 
+length(filesMapFinal_v)
+
 indices_l <- mclapply(
   1:length(filesMapFinal_v),
   mc.cores = 5,
   function(whatFile){
+    #print(whatFile)
+    system(as.character(whatFile))
     fileOfInterest <- filesMapFinal_v[whatFile]
     if(grepl("MovingNot", fileOfInterest)){
       whatRule <- "MovingAllTrees"
@@ -671,9 +765,27 @@ indices_l <- mclapply(
       )
     )
     
+    #Get the necessary extend to have 95%
+    outputTry = "KEEP GOING"
+    extentUse = -0.05
+    while(outputTry == "KEEP GOING"){
+      print(extentUse)
+      extentUse = extentUse + 0.05
+      outputTry <- tryCatch(
+        {
+          UD <- kernelUD(xy = SpatialPoints(outputMapFinal[, 1:2]), h = 50,
+                         boundary = boundary, extent = extentUse)
+          shrinkage <- 1 - getverticeshr(UD, percent = 95, unin = "m", unout = "m2")@data$area/((mapSize + extentUse * mapSize)**2)
+          "STOP"
+        }, error = function(e){
+          return("KEEP GOING")
+        }
+      )
+    }
+      
     UD <- kernelUD(xy = SpatialPoints(outputMapFinal[, 1:2]), h = 50,
-                   boundary = boundary, extent = 0)
-    shrinkage <- 1 - getverticeshr(UD, percent = 95, unin = "m", unout = "m2")@data$area/(mapSize*mapSize)
+                   boundary = boundary, extent = extentUse)
+    shrinkage <- 1 - getverticeshr(UD, percent = 95, unin = "m", unout = "m2")@data$area/((mapSize + extentUse * mapSize)**2)
     
     ### Routine ---------------------------------------------------------------
     
@@ -699,6 +811,7 @@ indices_l <- mclapply(
 indicesMovingRule_df <- do.call("rbind", indices_l) %>% as.data.frame()
 colnames(indicesMovingRule_df) <- c("movingRule", "patchiness", "alignment", "spatialAutocorr", "routine", "shrinkage")
 indicesMovingRule_df$patchiness <- as.numeric(indicesMovingRule_df$patchiness)
+indicesMovingRule_df$shrinkage <- as.numeric(indicesMovingRule_df$shrinkage)
 indicesMovingRule_df$alignment <- as.numeric(indicesMovingRule_df$alignment)
 indicesMovingRule_df$spatialAutocorr <- as.numeric(indicesMovingRule_df$spatialAutocorr)
 indicesMovingRule_df$routine <- as.numeric(indicesMovingRule_df$routine)
@@ -713,10 +826,10 @@ plotPatchiness <- plotResults(
   xAxisName = "Moving rule",
   xVar = "movingRule",
   yVar = "patchiness",
-  df = indicesMovingRule_df,
+  df = indicesMovingRule_df %>% mutate(patchiness = patchiness*(1-shrinkage)),#Normalise patchiness by shrinkage
   categoricalX = TRUE,
-  levelsOldNameX = unique(indicesMovingRule_df$movingRule),
-  levelsNewNameX = c("Moving to fruit tree", "Moving to all trees")
+  levelsOldNameX = unique(indicesMovingRule_df$movingRule)[c(2,1,3)],
+  levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)]
 )
 
 plotAlignment <- plotResults(
@@ -726,8 +839,8 @@ plotAlignment <- plotResults(
   yVar = "alignment",
   df = indicesMovingRule_df,
   categoricalX = TRUE,
-  levelsOldNameX = unique(indicesMovingRule_df$movingRule),
-  levelsNewNameX = c("Moving to fruit tree", "Moving to all trees")
+  levelsOldNameX = unique(indicesMovingRule_df$movingRule)[c(2,1,3)],
+  levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)]
 )
 
 plotRoutine <- plotResults(
@@ -737,8 +850,8 @@ plotRoutine <- plotResults(
   yVar = "routine",
   df = indicesMovingRule_df,
   categoricalX = TRUE,
-  levelsOldNameX = unique(indicesMovingRule_df$movingRule),
-  levelsNewNameX = c("Moving to fruit tree", "Moving to all trees")
+  levelsOldNameX = unique(indicesMovingRule_df$movingRule)[c(2,1,3)],
+  levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)]
 )
 
 plotSpatAutocorr <- plotResults(
@@ -748,8 +861,19 @@ plotSpatAutocorr <- plotResults(
   yVar = "spatialAutocorr",
   df = indicesMovingRule_df,
   categoricalX = TRUE,
-  levelsOldNameX = unique(indicesMovingRule_df$movingRule),
-  levelsNewNameX = c("Moving to fruit tree", "Moving to all trees")
+  levelsOldNameX = unique(indicesMovingRule_df$movingRule)[c(2,1,3)],
+  levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)]
+)
+
+plotShrinkageMovingRule <- plotResults(
+  yAxisName = "Shrinkage",
+  xAxisName = "Moving rule",
+  xVar = "movingRule",
+  yVar = "shrinkage",
+  df = indicesMovingRule_df,
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesMovingRule_df$movingRule)[c(2,1,3)],
+  levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)]
 )
 
 library(ggpubr)
@@ -768,18 +892,23 @@ mergedPlotMovingRule
 # Spacing tree ------------------------------------------------------------
 
 listFiles_v <- list.files("Output/SensitivitySpaceTree")
+whichlistFiles_v <- grep("CheckTest", listFiles_v)
+listFiles_v <- listFiles_v[whichlistFiles_v]
 whichMapFinal_v <- grep("Map_36500", listFiles_v)
 filesMapFinal_v <- listFiles_v[whichMapFinal_v]
 whichRoutine_v <- grep("Routine", listFiles_v)
 filesRoutine_v <- listFiles_v[whichRoutine_v]
 
+length(filesMapFinal_v)
+
 spacingValue_v <- rep(c(0.05, 0.45, 0.85), times = numberRepetitions)
-simuID_v <- paste0("r", 1:(3*numberRepetitions))
+simuID_v <- paste0("r", 1:(3*numberRepetitions), "_")
 
 indices_l <- mclapply(
   1:length(filesMapFinal_v),
   mc.cores = 5,
   function(whatFile){
+    system(as.character(whatFile))
     fileOfInterest <- filesMapFinal_v[whatFile]
 
     valueSpacing <- spacingValue_v[
@@ -843,8 +972,26 @@ indices_l <- mclapply(
       )
     )
     
+    #Get the necessary extend to have 95%
+    outputTry = "KEEP GOING"
+    extentUse = -0.05
+    while(outputTry == "KEEP GOING"){
+      print(extentUse)
+      extentUse = extentUse + 0.05
+      outputTry <- tryCatch(
+        {
+          UD <- kernelUD(xy = SpatialPoints(outputMapFinal[, 1:2]), h = 50,
+                         boundary = boundary, extent = extentUse)
+          shrinkage <- 1 - getverticeshr(UD, percent = 95, unin = "m", unout = "m2")@data$area/(mapSize*mapSize)
+          "STOP"
+        }, error = function(e){
+          return("KEEP GOING")
+        }
+      )
+    }
+    
     UD <- kernelUD(xy = SpatialPoints(outputMapFinal[, 1:2]), h = 50,
-                   boundary = boundary, extent = 0)
+                   boundary = boundary, extent = extentUse)
     shrinkage <- 1 - getverticeshr(UD, percent = 95, unin = "m", unout = "m2")@data$area/(mapSize*mapSize)
     
     ### Routine ---------------------------------------------------------------
@@ -871,14 +1018,17 @@ indicesSpacing_df <- do.call("rbind", indices_l) %>% as.data.frame()
 colnames(indicesSpacing_df) <- c("valueSpacing", "patchiness", "alignment", "spatialAutocorr", "routine", "shrinkage")
 
 ## Quick plot --------------------------------------------------------------------
+indicesSpacing_df$shrinkage <- as.numeric(indicesSpacing_df$shrinkage)
 
 plotPatchiness <- plotResults(
   yAxisName = "Patchiness",
   xAxisName = "Spacing tree intensity",
   xVar = "valueSpacing",
   yVar = "patchiness",
-  df = indicesSpacing_df,
-  categoricalX = FALSE
+  df = indicesSpacing_df %>% mutate(patchiness = patchiness*(1-shrinkage)),#Normalise patchiness by shrinkage
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesSpacing_df$valueSpacing),
+  levelsNewNameX = c("0.05", "0.45", "0.85")
 )
 
 plotAlignment <- plotResults(
@@ -887,7 +1037,9 @@ plotAlignment <- plotResults(
   xVar = "valueSpacing",
   yVar = "alignment",
   df = indicesSpacing_df,
-  categoricalX = FALSE
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesSpacing_df$valueSpacing),
+  levelsNewNameX = c("0.05", "0.45", "0.85")
 )
 
 plotRoutine <- plotResults(
@@ -896,7 +1048,9 @@ plotRoutine <- plotResults(
   xVar = "valueSpacing",
   yVar = "routine",
   df = indicesSpacing_df,
-  categoricalX = FALSE
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesSpacing_df$valueSpacing),
+  levelsNewNameX = c("0.05", "0.45", "0.85")
 )
 
 plotSpatAutocorr <- plotResults(
@@ -905,7 +1059,20 @@ plotSpatAutocorr <- plotResults(
   xVar = "valueSpacing",
   yVar = "spatialAutocorr",
   df = indicesSpacing_df,
-  categoricalX = FALSE
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesSpacing_df$valueSpacing),
+  levelsNewNameX = c("0.05", "0.45", "0.85")
+)
+
+plotShrinkageSpaceTree <- plotResults(
+  yAxisName = "Shrinkage",
+  xAxisName = "Spacing tree intensity",
+  xVar = "valueSpacing",
+  yVar = "shrinkage",
+  df = indicesSpacing_df,
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesSpacing_df$valueSpacing),
+  levelsNewNameX = c("0.05", "0.45", "0.85")
 )
 
 library(ggpubr)
@@ -923,8 +1090,11 @@ mergedPlotSpaceTree
 
 # Save output -------------------------------------------------------------
 
-save.rds(mergedPlotMovingRule, "Renvironment/Plots/movingRulePlots.rds")
-save.rds(mergedPlotSpaceTree, "Renvironment/Plots/spacingTreePlots.rds")
+save.image("Renvironment/outputSensitivityMovingRuleAndSpaceTree.RData")
+saveRDS(mergedPlotMovingRule, "Renvironment/Plots/movingRulePlots.rds")
+saveRDS(mergedPlotSpaceTree, "Renvironment/Plots/spacingTreePlots.rds")
+saveRDS(plotShrinkageMovingRule, "Renvironment/Plots/movingRuleShrinkage.rds")
+saveRDS(plotShrinkageSpaceTree, "Renvironment/Plots/spacingTreeShrinkage.rds")
 
 # Garbage -----------------------------------------------------------------
 

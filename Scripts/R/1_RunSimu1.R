@@ -76,8 +76,8 @@ foreach(r=1:numberRepetitions, .packages=c('Rcpp'), .inorder = TRUE) %dopar% { #
     temporalKnowledgeRate = temporalKnowledge[s],
     speed = speed,
     DispersalProbability = DispersalProbability, 
-    useProvidedMap = FALSE,
-    moveOnlyToFruitingTrees = TRUE,
+    useProvidedMap = TRUE,
+    moveOnlyToFruitingTrees = FALSE,
     moveOnlyToTarget = FALSE,
     intensityCompetitionForSpace = intensityCompetitionForSpace
   )
@@ -140,7 +140,7 @@ foreach(r=1:numberRepetitions, .packages=c('Rcpp'), .inorder = TRUE) %dopar% {
     speed = speed,
     DispersalProbability = 0, 
     useProvidedMap = TRUE,
-    moveOnlyToFruitingTrees = TRUE,
+    moveOnlyToFruitingTrees = FALSE,
     moveOnlyToTarget = FALSE,
     intensityCompetitionForSpace = intensityCompetitionForSpace
   )
@@ -175,7 +175,7 @@ foreach(r=1:numberRepetitions, .packages=c('Rcpp'), .inorder = TRUE) %dopar% {
     speed = speed, 
     DispersalProbability = 0, 
     useProvidedMap = TRUE,
-    moveOnlyToFruitingTrees = TRUE,
+    moveOnlyToFruitingTrees = FALSE,
     moveOnlyToTarget = FALSE,
     intensityCompetitionForSpace = intensityCompetitionForSpace
   )
@@ -210,7 +210,7 @@ foreach(r=1:numberRepetitions, .packages=c('Rcpp'), .inorder = TRUE) %dopar% {
     speed = speed, 
     DispersalProbability = 0, 
     useProvidedMap = TRUE,
-    moveOnlyToFruitingTrees = TRUE,
+    moveOnlyToFruitingTrees = FALSE,
     moveOnlyToTarget = FALSE,
     intensityCompetitionForSpace = intensityCompetitionForSpace
   )

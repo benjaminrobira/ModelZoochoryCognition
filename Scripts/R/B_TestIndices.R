@@ -478,6 +478,157 @@ plot(coords[,1], coords[,2], asp = 1)
 
 alignmentPoints_f(coords)
 
+# Test spatial autocorrelation --------------------------------------------
+
+library(tidyr)
+library(dplyr)
+
+#Gradient distribution
+outputMapFinal <- tidyr::crossing(0:100, 0:100)
+colnames(outputMapFinal) <- c("x", "y")
+outputMapFinal <- outputMapFinal %>% 
+  mutate(
+    fruitDateStart = (x + y)/(200) * 365
+  )
+hist(outputMapFinal$fruitDateStart)
+
+#Check visually
+plot(outputMapFinal$x, outputMapFinal$y, pch = 19, col = grey(level = outputMapFinal$fruitDateStart/365))
+
+#Create distance matrix
+treeDistance_m <- as.matrix(dist(outputMapFinal[, 1:2]))
+#Use the inverse of distance as weight
+treeDistanceInverse_m <- 1 / (treeDistance_m)
+#Remove pb with self distance
+diag(treeDistanceInverse_m) <- 0
+
+#Moran/Geary Index considering circular Date: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5870747/
+startFruitingInRadian_v <-
+  as.data.frame(outputMapFinal)[, 3] * 2 * pi / 365
+
+#Transform to -pi pi interval
+startFruitingInRadian_v <-
+  ifelse(
+    startFruitingInRadian_v > pi,
+    startFruitingInRadian_v - 2 * pi,
+    startFruitingInRadian_v
+  )
+
+#Calcul spatial autocorr
+spatialAutocorrNotCircu = autocorrSp(
+startFruitingInRadian_v,
+treeDistanceInverse_m,
+circular = FALSE,
+index = "Geary"
+)
+spatialAutocorrNotCircu
+
+spatialAutocorr = autocorrSp(
+  startFruitingInRadian_v,
+  treeDistanceInverse_m,
+  circular = TRUE,
+  index = "Geary"
+)
+spatialAutocorr
+
+#No corr unif
+outputMapFinal <- tidyr::crossing(0:100, 0:100)
+colnames(outputMapFinal) <- c("x", "y")
+outputMapFinal <- outputMapFinal %>% 
+  mutate(
+    fruitDateStart = runif(101*101, 0, 365)
+  )
+hist(outputMapFinal$fruitDateStart)
+
+#Check visually
+plot(outputMapFinal$x, outputMapFinal$y, pch = 19, col = grey(level = outputMapFinal$fruitDateStart/365))
+
+#Create distance matrix
+treeDistance_m <- as.matrix(dist(outputMapFinal[, 1:2]))
+#Use the inverse of distance as weight
+treeDistanceInverse_m <- 1 / (treeDistance_m)
+#Remove pb with self distance
+diag(treeDistanceInverse_m) <- 0
+
+#Moran/Geary Index considering circular Date: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5870747/
+startFruitingInRadian_v <-
+  as.data.frame(outputMapFinal)[, 3] * 2 * pi / 365
+
+#Transform to -pi pi interval
+startFruitingInRadian_v <-
+  ifelse(
+    startFruitingInRadian_v > pi,
+    startFruitingInRadian_v - 2 * pi,
+    startFruitingInRadian_v
+  )
+
+#Calcul spatial autocorr
+spatialAutocorrNotCircu = autocorrSp(
+  startFruitingInRadian_v,
+  treeDistanceInverse_m,
+  circular = FALSE,
+  index = "Geary"
+)
+spatialAutocorrNotCircu
+
+spatialAutocorr = autocorrSp(
+  startFruitingInRadian_v,
+  treeDistanceInverse_m,
+  circular = TRUE,
+  index = "Geary"
+)
+spatialAutocorr
+
+#No corre gaussian
+outputMapFinal <- tidyr::crossing(0:100, 0:100)
+colnames(outputMapFinal) <- c("x", "y")
+outputMapFinal <- outputMapFinal %>% 
+  mutate(
+    fruitDateStart = rnorm(101*101, 182.5, 50),
+    fruitDateStart = ifelse(fruitDateStart < 0, 0, fruitDateStart),
+    fruitDateStart = ifelse(fruitDateStart > 365, 365, fruitDateStart)
+  )
+hist(outputMapFinal$fruitDateStart)
+
+#Check visually
+plot(outputMapFinal$x, outputMapFinal$y, pch = 19, col = grey(level = outputMapFinal$fruitDateStart/365))
+
+#Create distance matrix
+treeDistance_m <- as.matrix(dist(outputMapFinal[, 1:2]))
+#Use the inverse of distance as weight
+treeDistanceInverse_m <- 1 / (treeDistance_m)
+#Remove pb with self distance
+diag(treeDistanceInverse_m) <- 0
+
+#Moran/Geary Index considering circular Date: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5870747/
+startFruitingInRadian_v <-
+  as.data.frame(outputMapFinal)[, 3] * 2 * pi / 365
+
+#Transform to -pi pi interval
+startFruitingInRadian_v <-
+  ifelse(
+    startFruitingInRadian_v > pi,
+    startFruitingInRadian_v - 2 * pi,
+    startFruitingInRadian_v
+  )
+
+#Calcul spatial autocorr
+spatialAutocorrNotCircu = autocorrSp(
+  startFruitingInRadian_v,
+  treeDistanceInverse_m,
+  circular = FALSE,
+  index = "Geary"
+)
+spatialAutocorrNotCircu
+
+spatialAutocorr = autocorrSp(
+  startFruitingInRadian_v,
+  treeDistanceInverse_m,
+  circular = TRUE,
+  index = "Geary"
+)
+spatialAutocorr
+
 # Test distance to use ----------------------------------------------------
 
 # resultDistanceReticulation <- matrix(NA, nrow=numberOfRepetitionsForMetrics*3*4, ncol=3)

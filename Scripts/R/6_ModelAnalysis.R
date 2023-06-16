@@ -11,6 +11,7 @@ rm(list = ls())
 #Load parameters
 load("Scripts/R/Parameterisation.RData")
 
+percentForDifference = 5
 ## Packages ----------------------------------------------------------------
 
 library(readr)
@@ -292,7 +293,7 @@ patchiness_f <-
     #Readd those with 0
     presentQuadrat <- paste(countNumber[, 1], countNumber[, 2], sep = "_")
     allPossibleQuadrat.df <-
-      as.data.frame(crossing(
+      as.data.frame(tidyr::crossing(
         seq(
           from = minx,
           to = maxx - cellsize,
@@ -501,15 +502,9 @@ convergenceSimulation <-
     
     testDifferenceMeanEfficiency <-
       t.test(compare1.m[, 2], compare2.m[, 2])
-    testDifferenceMeanNN <- t.test(compare1.m[, 3], compare2.m[, 3])
-    testDifferenceSdNN <-  t.test(compare1.m[, 4], compare2.m[, 4])
-    testDifferenceMeanCrowding <-
-      t.test(compare1.m[, 5], compare2.m[, 5])
-    testDifferencePatchiness <-
-      t.test(compare1.m[, 6], compare2.m[, 6])
     
-    outputVector <- c(NA, NA, NA)
-    outputVector[1] <-
+    outputVector <- NA
+    outputVector <-
       ifelse(
         testDifferenceMeanEfficiency$p.value[1] < alpha &
           abs(
@@ -517,54 +512,6 @@ convergenceSimulation <-
           ) > percentToAssumeDifference / 100 * min(
             testDifferenceMeanEfficiency$estimate[1],
             testDifferenceMeanEfficiency$estimate[2]
-          ),
-        "NO",
-        "YES"
-      )
-    outputVector[2] <-
-      ifelse(
-        testDifferenceMeanNN$p.value[1] < alpha &
-          abs(
-            testDifferenceMeanNN$estimate[1] - testDifferenceMeanNN$estimate[2]
-          ) > percentToAssumeDifference / 100 * min(
-            testDifferenceMeanNN$estimate[1],
-            testDifferenceMeanNN$estimate[2]
-          ),
-        "NO",
-        "YES"
-      )
-    outputVector[3] <-
-      ifelse(
-        testDifferenceSdNN$p.value[1] < alpha &
-          abs(
-            testDifferenceSdNN$estimate[1] - testDifferenceSdNN$estimate[2]
-          ) > percentToAssumeDifference / 100 * min(
-            testDifferenceSdNN$estimate[1],
-            testDifferenceSdNN$estimate[2]
-          ),
-        "NO",
-        "YES"
-      )
-    outputVector[4] <-
-      ifelse(
-        testDifferenceMeanCrowding$p.value[1] < alpha &
-          abs(
-            testDifferenceMeanCrowding$estimate[1] - testDifferenceMeanCrowding$estimate[2]
-          ) > percentToAssumeDifference / 100 * min(
-            testDifferenceMeanCrowding$estimate[1],
-            testDifferenceMeanCrowding$estimate[2]
-          ),
-        "NO",
-        "YES"
-      )
-    outputVector[5] <-
-      ifelse(
-        testDifferencePatchiness$p.value[1] < alpha &
-          abs(
-            testDifferencePatchiness$estimate[1] - testDifferencePatchiness$estimate[2]
-          ) > percentToAssumeDifference / 100 * min(
-            testDifferencePatchiness$estimate[1],
-            testDifferencePatchiness$estimate[2]
           ),
         "NO",
         "YES"
@@ -581,11 +528,14 @@ plotResults <- function(
     xVar,
     yVar,
     df,
+    boxplotOnly = TRUE,
     categoricalX = FALSE,
     levelsOldNameX = NA,
     levelsNewNameX = NA,
     groupVar = NA,
-    colourGroup_v = NA
+    colourGroup_v = NA,
+    nameGroup = NA,
+    levelOrderGroup = NA
 ){
   df <- df %>% mutate(
     x = .data[[xVar]],
@@ -595,86 +545,171 @@ plotResults <- function(
     for(i in 1:length(levelsOldNameX)){
       df <- df %>% mutate(
         x = ifelse(x == levelsOldNameX[i], levelsNewNameX[i], x)
-      )
+      )  
     }
+    df <- df %>% 
+      mutate(
+        x = factor(x, levels = levelsNewNameX)
+      )
   }
   
   if(!is.na(groupVar)){
     df <- df %>% mutate(
-      group = .data[[groupVar]]
+      group = .data[[groupVar]],
+      group = factor(group, levels = levelOrderGroup)
     )
-    plot <- ggplot(df, aes(x = x, y = y)) +
-      geom_violin(aes(x = x, y = y, group = group, fill = group), adjust = 1) +
-      geom_boxplot(aes(x = x, group =  group), width = 0.01, fill = "black") +
-      stat_summary(
-        #fun.data = give.n,
-        geom = "text",
-        fun.y = "mean",
-        size = 4,
-        hjust = -0.5,
-        aes(label = round(after_stat(y), 3), group = group)
-      ) +
-      stat_summary(
-        geom = "point",
-        fun.y = "mean",
-        size = 2,
-        shape = 21,
-        fill = "white",
-        colour = "black"
-      ) +
-      labs(x = xAxisName, y = yAxisName) +
-      scale_fill_manual(values = colourGroup_v) + 
-      theme_bw() +
-      theme(axis.title = element_text(face = "bold", size = 16),
-            axis.text.x = element_text(size = 12),
-            axis.text.y = element_text(size = 12),
-            legend.text = element_text(size = 10),
-            legend.title = element_text(size = 12, face = "bold"),
-            panel.grid.minor = element_line(colour = "grey93"),
-            panel.grid.major = element_line(colour = "grey93"),
-            strip.background = element_rect(colour = "white",
-                                            fill = "white"),
-            strip.text = element_text(face = "bold", size = 14)) +
-      scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
-  }else{
-    plot <- ggplot(df, aes(x = x, y = y)) +
-      geom_violin(aes(x = x, y = y, group = x), fill = "grey90", adjust = 1) +
-      geom_boxplot(aes(x = x, y = y, group = x), width = 0.01, fill = "black") +
-      stat_summary(
-        #fun.data = give.n,
-        geom = "text",
-        fun.y = "mean",
-        size = 4,
-        hjust = -0.5,
-        aes(label = round(after_stat(y), 3))
-      ) +
-      stat_summary(
-        geom = "point",
-        fun.y = "mean",
-        size = 2,
-        shape = 21,
-        fill = "white",
-        colour = "black"
-      ) +
-      labs(x = xAxisName, y = yAxisName) +
-      theme_bw() +
-      theme(axis.title = element_text(face = "bold", size = 16),
-            axis.text.x = element_text(size = 12),
-            axis.text.y = element_text(size = 12),
-            legend.text = element_text(size = 10),
-            legend.title = element_text(size = 12, face = "bold"),
-            panel.grid.minor = element_line(colour = "grey93"),
-            panel.grid.major = element_line(colour = "grey93"),
-            strip.background = element_rect(colour = "white",
-                                            fill = "white"),
-            strip.text = element_text(face = "bold", size = 14)) +
-      scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+    dodge <- position_dodge(width = 0.5)
   }
- 
+  
+  if(boxplotOnly){
+    if(!is.na(groupVar)){
+      plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_boxplot(aes(x = x, y = y, group = interaction(x, group), fill = group), width = 0.25, notch = TRUE, position = dodge) +
+        stat_summary(
+          #fun.data = give.n,
+          geom = "text",
+          fun.y = "mean",
+          size = 4,
+          hjust = -0.55,
+          position = dodge,
+          aes(label = round(after_stat(y), 3), group = group)
+        ) +
+        stat_summary(
+          geom = "point",
+          fun.y = "mean",
+          size = 2,
+          shape = 21,
+          fill = "white",
+          aes(group = group),
+          position = dodge,
+          colour = "black"
+        ) +
+        labs(x = xAxisName, y = yAxisName) +
+        scale_fill_manual(name = nameGroup, values = colourGroup_v) + 
+        theme_bw() +
+        theme(axis.title = element_text(face = "bold", size = 16),
+              axis.text.x = element_text(size = 12),
+              axis.text.y = element_text(size = 12),
+              legend.text = element_text(size = 10),
+              legend.title = element_text(size = 12, face = "bold"),
+              panel.grid.minor = element_line(colour = "grey93"),
+              panel.grid.major = element_line(colour = "grey93"),
+              strip.background = element_rect(colour = "white",
+                                              fill = "white"),
+              strip.text = element_text(face = "bold", size = 14)) +
+        scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+    }else{
+      plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_boxplot(aes(x = x, y = y, group = x), width = 0.25, notch = TRUE, fill = "grey90") +
+        stat_summary(
+          #fun.data = give.n,
+          geom = "text",
+          fun.y = "mean",
+          size = 4,
+          hjust = -0.55,
+          aes(label = round(after_stat(y), 3))
+        ) +
+        stat_summary(
+          geom = "point",
+          fun.y = "mean",
+          size = 2,
+          shape = 21,
+          fill = "white",
+          colour = "black"
+        ) +
+        labs(x = xAxisName, y = yAxisName) +
+        theme_bw() +
+        theme(axis.title = element_text(face = "bold", size = 16),
+              axis.text.x = element_text(size = 12),
+              axis.text.y = element_text(size = 12),
+              legend.text = element_text(size = 10),
+              legend.title = element_text(size = 12, face = "bold"),
+              panel.grid.minor = element_line(colour = "grey93"),
+              panel.grid.major = element_line(colour = "grey93"),
+              strip.background = element_rect(colour = "white",
+                                              fill = "white"),
+              strip.text = element_text(face = "bold", size = 14)) +
+        scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+    }
+  }else{
+    if(!is.na(groupVar)){
+      plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_violin(aes(x = x, y = y, fill = group), position = dodge) +
+        geom_boxplot(aes(x = x, y = y, group =  interaction(x, group)), position = dodge, width = 0.05, fill = "black") +
+        stat_summary(
+          #fun.data = give.n,
+          geom = "text",
+          fun.y = "mean",
+          size = 4,
+          hjust = -0.55,
+          position = dodge,
+          aes(label = round(after_stat(y), 3), group = group)
+        ) +
+        stat_summary(
+          geom = "point",
+          fun.y = "mean",
+          size = 2,
+          shape = 21,
+          fill = "white",
+          aes(group = group),
+          position = dodge,
+          colour = "black"
+        ) +
+        labs(x = xAxisName, y = yAxisName) +
+        scale_fill_manual(name = nameGroup, values = colourGroup_v) + 
+        theme_bw() +
+        theme(axis.title = element_text(face = "bold", size = 16),
+              axis.text.x = element_text(size = 12),
+              axis.text.y = element_text(size = 12),
+              legend.text = element_text(size = 10),
+              legend.title = element_text(size = 12, face = "bold"),
+              panel.grid.minor = element_line(colour = "grey93"),
+              panel.grid.major = element_line(colour = "grey93"),
+              strip.background = element_rect(colour = "white",
+                                              fill = "white"),
+              strip.text = element_text(face = "bold", size = 14)) +
+        scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+    }else{
+      plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_violin(aes(x = x, y = y, group = x), fill = "grey90", adjust = 1) +
+        geom_boxplot(aes(x = x, y = y, group = x), width = 0.01, fill = "black") +
+        stat_summary(
+          #fun.data = give.n,
+          geom = "text",
+          fun.y = "mean",
+          size = 4,
+          hjust = -0.55,
+          aes(label = round(after_stat(y), 3))
+        ) +
+        stat_summary(
+          geom = "point",
+          fun.y = "mean",
+          size = 2,
+          shape = 21,
+          fill = "white",
+          colour = "black"
+        ) +
+        labs(x = xAxisName, y = yAxisName) +
+        theme_bw() +
+        theme(axis.title = element_text(face = "bold", size = 16),
+              axis.text.x = element_text(size = 12),
+              axis.text.y = element_text(size = 12),
+              legend.text = element_text(size = 10),
+              legend.title = element_text(size = 12, face = "bold"),
+              panel.grid.minor = element_line(colour = "grey93"),
+              panel.grid.major = element_line(colour = "grey93"),
+              strip.background = element_rect(colour = "white",
+                                              fill = "white"),
+              strip.text = element_text(face = "bold", size = 14)) +
+        scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+    }
+  }
+  
   if(!categoricalX){
     plot <- plot +
       scale_x_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
   }
+  
   return(plot)
 }
 
@@ -717,6 +752,9 @@ filesMapFinal_v <- c(filesMapFinalStart_v, filesMapFinalEnd_v)
 whichRoutine_v <- grep("Routine", listFiles_v)
 filesRoutine_v <- listFiles_v[whichRoutine_v]
 
+length(filesMapFinal_v)
+length(filesRoutine_v)
+
 # whichContinuous_v <- grep("Main_Continuous", listFiles_v)
 # filesContinuous_v <- listFiles_v[whichContinuous_v]
 
@@ -725,7 +763,7 @@ library(doParallel)
 library(parallel)
 
 indices_l <- mclapply(
-  1:400,#length(filesMapFinal_v),
+  1:length(filesMapFinal_v),
   mc.cores = 5,
   function(whatFile){
     system(as.character(whatFile))
@@ -807,8 +845,26 @@ indices_l <- mclapply(
       )
     )
     
+    #Get the necessary extend to have 95%
+    outputTry = "KEEP GOING"
+    extentUse = -0.05
+    while(outputTry == "KEEP GOING"){
+      print(extentUse)
+      extentUse = extentUse + 0.05
+      outputTry <- tryCatch(
+        {
+          UD <- kernelUD(xy = SpatialPoints(outputMapFinal[, 1:2]), h = 50,
+                         boundary = boundary, extent = extentUse)
+          shrinkage <- 1 - getverticeshr(UD, percent = 95, unin = "m", unout = "m2")@data$area/((mapSize + extentUse * mapSize)**2)
+          "STOP"
+        }, error = function(e){
+          return("KEEP GOING")
+        }
+      )
+    }
+    
     UD <- kernelUD(xy = SpatialPoints(outputMapFinal[, 1:2]), h = 50,
-                   boundary = boundary, extent = 0)
+                   boundary = boundary, extent = extentUse)
     shrinkage <- 1 - getverticeshr(UD, percent = 95, unin = "m", unout = "m2")@data$area/(mapSize*mapSize)
     
     ### Routine ---------------------------------------------------------------
@@ -848,16 +904,29 @@ indicesMain_df$alignment <- as.numeric(indicesMain_df$alignment)
 indicesMain_df$spatialAutocorr <- as.numeric(indicesMain_df$spatialAutocorr)
 indicesMain_df$routine <- as.numeric(indicesMain_df$routine)
 
+save.image("Renvironment/outputTestCognition.RData")
+
 # Data extraction: efficiency ---------------------------------------------
 
-whichOMNISCIENT_v <- grep("TestEfficiencyOMNISCIENT_Continuous", listFiles_v)
+listFiles_v <- list.files("Output/Main")
+whichOMNISCIENT_v <- grep("TestEfficiencyOMNISCIENT", listFiles_v)
 filesOMNISCIENT_v <- listFiles_v[whichOMNISCIENT_v]
+whichOMNISCIENT_v <- grep("EfficiencyContinuous", filesOMNISCIENT_v)
+filesOMNISCIENT_v <- filesOMNISCIENT_v[whichOMNISCIENT_v]
 
-whichINTERMEDIATE_v <- grep("TestEfficiencyINTERMEDIATE_Continuous", listFiles_v)
+whichINTERMEDIATE_v <- grep("TestEfficiencyINTERMEDIATE", listFiles_v)
 filesINTERMEDIATE_v <- listFiles_v[whichINTERMEDIATE_v]
+whichINTERMEDIATE_v <- grep("EfficiencyContinuous", filesINTERMEDIATE_v)
+filesINTERMEDIATE_v <- filesINTERMEDIATE_v[whichINTERMEDIATE_v]
 
-whichNULL_v <- grep("TestEfficiencyNULL_Continuous", listFiles_v)
+whichNULL_v <- grep("TestEfficiencyNULL", listFiles_v)
 filesNULL_v <- listFiles_v[whichNULL_v]
+whichNULL_v <- grep("EfficiencyContinuous", filesNULL_v)
+filesNULL_v <- filesNULL_v[whichNULL_v]
+
+length(filesOMNISCIENT_v)
+length(filesINTERMEDIATE_v)
+length(filesNULL_v)
 
 indices_l <- mclapply(
   1:length(filesOMNISCIENT_v),
@@ -912,7 +981,7 @@ indices_l <- mclapply(
         type = c("Null", "Intermediate", "Omniscient"),
         simulationNb = rep(whatFile, 3),
         convergence = c(convergenceNULL, convergenceINTERMEDIATE, convergenceOMNISCIENT),
-        efficiency = c(efficiencyNULL, efficiencyINTERMEDIATE, efficiencyOMNISCIENT)
+        efficiency = as.numeric(c(efficiencyNULL, efficiencyINTERMEDIATE, efficiencyOMNISCIENT))
       )
     
     return(output)
@@ -921,6 +990,8 @@ indices_l <- mclapply(
 
 indicesEfficiency_df <- do.call("rbind", indices_l) %>% as.data.frame()
 
+length(indicesEfficiency_df$convergence[indicesEfficiency_df$convergence == "YES"])/nrow(indicesEfficiency_df)
+#ok
 # Plots -------------------------------------------------------------------
 
 ## Final conditions -------------------------------------------------------
@@ -931,7 +1002,9 @@ plotShrinkage <- plotResults(
   xVar = "knowledgeRate",
   yVar = "shrinkage",
   df = indicesMain_df %>% filter(time == 36500),
-  categoricalX = FALSE
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesMain_df$knowledgeRate),
+  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1))
 )
 
 plotPatchiness <- plotResults(
@@ -939,8 +1012,10 @@ plotPatchiness <- plotResults(
   xAxisName = "Spatio-temporal knowledge rate",
   xVar = "knowledgeRate",
   yVar = "patchiness",
-  df = indicesMain_df %>% filter(time == 36500),
-  categoricalX = FALSE
+  df = indicesMain_df %>% filter(time == 36500) %>% mutate(patchiness = patchiness*(1-shrinkage)),#Normalise patchiness by shrinkage
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesMain_df$knowledgeRate),
+  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1))
 )
 
 plotAlignment <- plotResults(
@@ -949,7 +1024,9 @@ plotAlignment <- plotResults(
   xVar = "knowledgeRate",
   yVar = "alignment",
   df = indicesMain_df %>% filter(time == 36500),
-  categoricalX = FALSE
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesMain_df$knowledgeRate),
+  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1))
 )
 
 plotRoutine <- plotResults(
@@ -958,7 +1035,9 @@ plotRoutine <- plotResults(
   xVar = "knowledgeRate",
   yVar = "routine",
   df = indicesMain_df %>% filter(time == 36500),
-  categoricalX = FALSE
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesMain_df$knowledgeRate),
+  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1))
 )
 
 plotSpatAutocorr <- plotResults(
@@ -967,7 +1046,9 @@ plotSpatAutocorr <- plotResults(
   xVar = "knowledgeRate",
   yVar = "spatialAutocorr",
   df = indicesMain_df %>% filter(time == 36500),
-  categoricalX = FALSE
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesMain_df$knowledgeRate),
+  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1))
 )
 
 library(ggpubr)
@@ -983,57 +1064,73 @@ mergedPlotMain <- annotate_figure(mergedPlot,
                                         top = text_grob("Spatio-temporal knowledge rate", face = "bold", size = 16))
 mergedPlotMain
 
+## Map along time ---------------------------------------------------------
 
-## Along time -------------------------------------------------------------
-
-
+# plotResults(
+#   yAxisName = "Patchiness",
+#   xAxisName = "Time",
+#   xVar = "time",
+#   yVar = "patchiness",
+#   df = indicesMain_df,
+#   categoricalX = TRUE,
+#   levelsOldNameX = unique(sort(indicesMain_df$time)),
+#   levelsNewNameX = as.character(unique(sort(indicesMain_df$time))),
+#   groupVar = "knowledgeRate",
+#   colourGroup_v = c("white", "grey95", "grey80", "grey65", "grey50"),
+#   nameGroup = "Knowledge rate",
+#   levelOrderGroup = as.character(unique(indicesMain_df$knowledgeRate))
+# )
+# 
+# plotResults(
+#   yAxisName = "Alignment",
+#   xAxisName = "Time",
+#   xVar = "time",
+#   yVar = "alignment",
+#   df = indicesMain_df,
+#   categoricalX = TRUE,
+#   levelsOldNameX = unique(sort(indicesMain_df$time)),
+#   levelsNewNameX = as.character(unique(sort(indicesMain_df$time))),
+#   groupVar = "knowledgeRate",
+#   colourGroup_v = c("white", "grey95", "grey80", "grey65", "grey50"),
+#   nameGroup = "Knowledge rate",
+#   levelOrderGroup = as.character(unique(indicesMain_df$knowledgeRate))
+# )
 
 ## Efficiency -------------------------------------------------------------
 
-indicesEfficiency_df <- data.frame(
-  initCondition = rep(c("Null", "Intermediate", "Omniscient"), each = 100),
-  type = rep(c("Null", "Intermediate", "Omniscient"), 100),
-  efficiency = runif(300, 0, 1)
-)
 plotEfficiency <- plotResults(
-  yAxisName = "Efficiency",
+  yAxisName = "Efficiency (x1000)",
   xAxisName = "Initial resource condition",
   xVar = "initCondition",
   yVar = "efficiency",
-  df = indicesEfficiency_df,
+  df = indicesEfficiency_df %>% filter(initCondition %in% c(1,3,5)) %>% mutate(efficiency = efficiency*1000),
   categoricalX = TRUE,
-  levelsOldNameX = c("0", "0.5", "1"),
+  levelsOldNameX = c("1", "3", "5"),
   levelsNewNameX = c("Null", "Intermediate", "Omniscient"),
   groupVar = "type",
-  colourGroup_v = c("white", "grey97", "grey50")
-)
-
-indicesEfficiency_dfrdc <- indicesEfficiency_df %>% 
-  filter(initCondition %in% c(0, 0.5, 1)) %>% 
-  mutate(
-    initCondition = ifelse(initCondition == 0, "Null", as.character(initCondition)),
-    initCondition = ifelse(initCondition == "0.5", "Intermediate", as.character(initCondition)),
-    initCondition = ifelse(initCondition == "1", "Omniscient", as.character(initCondition))
-  )
-
-plotEfficiency <- plotResults(
-  yAxisName = "Efficiency",
-  xAxisName = "Initial resource condition",
-  xVar = "initCondition",
-  yVar = "efficiency",
-  df = indicesEfficiency_dfrdc %>% filter(time == 36500),
-  categoricalX = TRUE,
-  levelsOldNameX = c("0", "0.5", "1"),
-  levelsNewNameX = c("Null", "Intermediate", "Omniscient"),
-  groupVar = "type",
-  colourGroup_v = c("white", "grey97", "grey50")
+  colourGroup_v = c("white", "grey80", "grey50"),
+  nameGroup = "Agent type",
+  levelOrderGroup = c("Null", "Intermediate", "Omniscient")
 )
 
 
 # Save --------------------------------------------------------------------
 
-save.rds(mergedPlotMain, "Renvironment/Plots/mainPlots.rds")
-save.rds(plotEfficiency, "Renvironment/Plots/efficiencyPlots.rds")
+save.image("Renvironment/mainResults.RData")
+ggsave(plot = plotPatchiness + theme(axis.title = element_text(face = "bold", size = 25),
+                                             axis.text.x = element_text(size = 20),
+                                             axis.text.y = element_text(size = 20),
+                                             legend.text = element_text(size = 10),
+                                             legend.title = element_text(size = 12, face = "bold"),
+                                             panel.grid.minor = element_line(colour = "grey93"),
+                                             panel.grid.major = element_line(colour = "grey93"),
+                                             strip.background = element_rect(colour = "white",
+                                                                             fill = "white"),
+                                             strip.text = element_text(face = "bold", size = 14))
+       , filename = "FIG/plotPatchiness.pdf", width = 7, height = 7, dpi = 400)
+saveRDS(mergedPlotMain, "Renvironment/Plots/mainPlots.rds")
+saveRDS(plotShrinkage, "Renvironment/Plots/mainShrinkage.rds")
+saveRDS(plotEfficiency, "Renvironment/Plots/efficiencyPlots.rds")
 
 # Garbage -----------------------------------------------------------------
 

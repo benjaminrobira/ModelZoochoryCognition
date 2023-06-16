@@ -28,11 +28,12 @@ Rcpp::sourceCpp("Scripts/Rcpp/FunctionsRcpp.cpp")
 competitionIntensity_v <- c(0.05, 0.45, 0.85)#seq(0.05 0.85, 0.05)
 for(r in 1:numberRepetitionsSensitivity){
 
-  set.seed(r)
-  dateStart <- runif(numberTrees, 0, cycleLength)
-  locTree <- as.matrix(cbind(runif(numberTrees, 0, 1000), runif(numberTrees, 0, 1000)))
-
   for(c in 1:length(competitionIntensity_v)){
+    
+    set.seed(r)
+    dateStart <- runif(numberTrees, 0, cycleLength)
+    locTree <- as.matrix(cbind(runif(numberTrees, 0, 1000), runif(numberTrees, 0, 1000)))
+    
     runSimulation(
       cycleLimitNumber = cycleLimitNumber,
       repetitionNumber = (r-1)*3 + c,
@@ -63,6 +64,8 @@ for(r in 1:numberRepetitionsSensitivity){
       speed = speed,
       DispersalProbability = DispersalProbability,
       useProvidedMap = TRUE,
+      moveOnlyToFruitingTrees = FALSE,
+      moveOnlyToTarget = FALSE,
       intensityCompetitionForSpace = competitionIntensity_v[c]
     )
   }

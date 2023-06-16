@@ -23,6 +23,14 @@ struct add_multiple {
   }
 };
 
+// set seed
+// [[Rcpp::export]]
+void set_seed(double seed) {
+  Rcpp::Environment base_env("package:base");
+  Rcpp::Function set_seed_r = base_env["set.seed"];
+  set_seed_r(std::floor(std::fabs(seed)));
+}
+
 // [[Rcpp::export]]
 Rcpp::NumericVector rcpp_seq(double from_, double to_, double by_ = 1.0) {
   
@@ -992,6 +1000,7 @@ bool learning = false
   //// INITIALISATION
   ////----------------------------------------------------
 
+  set_seed(42);
   // for(int loopingForMapSave = 0; loopingForMapSave < numberTrees; loopingForMapSave++){
   //   Rcout << loopingForMapSave << " " << treeLocInit_m(loopingForMapSave, 0) << " " <<  treeLocInit_m(loopingForMapSave, 1) << std::endl;
   // }
@@ -1056,7 +1065,7 @@ bool learning = false
     //Let initial settings;
   }else{
       //Distribute trees
-      distributionTree(
+      treeLocInit_m = distributionTree(
         numberTrees,
         lowerBorder,
         upperBorder,
@@ -1131,7 +1140,7 @@ bool learning = false
   ////----------------------------------------------------
   
   while(timer < (cycleLimitNumber * cycleLength + 5 * cycleLength)){//last five cycles will be to analyse routine
-    // Rcout << timer << std::endl;
+    //Rcout << timer << std::endl;
     
     //Checking fruiting dates
     // if(timer >= 7206){
@@ -1271,9 +1280,11 @@ bool learning = false
         // }
 
         if(moveOnlyToTarget){
+          //Rcout << "Moving target" << std::endl;
           IDpreviousTree = IDcurrentTree;
           IDcurrentTree = targetIDInit;
         }else{
+          //Rcout << "Moving not target" << std::endl;
           //Assess all the trees on the way
           IntegerVector expectedVisitedTrees_v = visitedTrees(
             agentCurrentLocation,
@@ -1335,6 +1346,12 @@ bool learning = false
           //    Rcout << "Size of vector visited" << whatVisitedTrees_v.size() << std::endl;
           //}
 
+          // if(timer >=2 && timer <= 2.1){
+          //   Rcout << "Agent loc " << agentCurrentLocation[0] << " " << agentCurrentLocation[1] << std::endl;
+          //   Rcout << "306 " << treeLocReal_m(306,0) << " " << treeLocReal_m(306,1) << " " << foodQuantityAtTree_v [306] << std::endl;
+          //   Rcout << "450 " << treeLocReal_m(450,0) << " " << treeLocReal_m(450,1) << " " << foodQuantityAtTree_v [450] << std::endl;
+          // }
+               
           if(whatVisitedTrees_v.size() > 0){
             // Consider target as the closest tree with food that should have been seen en route to the target
             IDpreviousTree = IDcurrentTree;
@@ -1406,8 +1423,8 @@ bool learning = false
         }
       }
 
-      // if(timer >= 7206){
-      //   Rcout << "ID Target " << IDcurrentTree << std::endl;
+      // if(timer >=2 && timer <= 10 && IDcurrentTree  != -1000){
+      //   Rcout << timer << " ID Target " << IDcurrentTree << std::endl;
       //   Rcout << "Food previous " << foodQuantityAtTree_v[IDpreviousTree] << std::endl;
       //   Rcout << "Food target " << foodQuantityAtTree_v[IDcurrentTree] << std::endl;
       //   Rcout << "Food knowledge target " << treeLoc_knowledge_m(IDcurrentTree,2) << std::endl;
@@ -1983,14 +2000,19 @@ bool learning = false
                               "No_return_time" << " " <<
                                 "Value_if_unknown_temporality" << " " <<
                                   "What_rule_to_move" << " " <<
-                                    "Dispersal_probability" << " " <<
-                                      "Time_delay_Dispersal" << " " <<
-                                        "Perception_range" << " " <<
-                                          "Temporal_knowledge_rate" << " " <<
-                                            "Spatial_knoledge_rate" << " " <<
-                                              "Number_events_with_no_food" << " " <<
-                                                "Tot_food_eaten" << " " <<
-                                                  "Tot_distance_travelled" << std::endl;
+                                    "intensityCompetitionForSpace" << " " <<
+                                      "moveOnlyToFruitingTrees" << " " <<
+                                        "moveOnlyToTarget" << " " <<
+                                          "linear" << " " <<
+                                            "learning" << " " <<
+                                              "Dispersal_probability" << " " <<
+                                                "Time_delay_Dispersal" << " " <<
+                                                  "Perception_range" << " " <<
+                                                    "Temporal_knowledge_rate" << " " <<
+                                                      "Spatial_knoledge_rate" << " " <<
+                                                        "Number_events_with_no_food" << " " <<
+                                                          "Tot_food_eaten" << " " <<
+                                                            "Tot_distance_travelled" << std::endl;
 
     //Values
     outputFluxEfficiency <<
@@ -2009,14 +2031,19 @@ bool learning = false
                               noReturnTime << " " <<
                                 whatValueUnknownTemporal << " " <<
                                   whatRule << " " <<
-                                    DispersalProbability << " " <<
-                                      timeDelayForDispersal << " " <<
-                                        perceptualRange << " " <<
-                                          temporalKnowledgeRate << " " <<
-                                            spatialKnowledgeRate << " " <<
-                                              eventsWithNoFood << " " <<
-                                                totFoodEaten << " " <<
-                                                  totDistanceTravelled << std::endl;
+                                    intensityCompetitionForSpace << " " <<
+                                      moveOnlyToFruitingTrees << " " <<
+                                        moveOnlyToTarget << " " <<
+                                          linear << " " <<
+                                            learning << " " <<
+                                              DispersalProbability << " " <<
+                                                timeDelayForDispersal << " " <<
+                                                  perceptualRange << " " <<
+                                                    temporalKnowledgeRate << " " <<
+                                                      spatialKnowledgeRate << " " <<
+                                                        eventsWithNoFood << " " <<
+                                                          totFoodEaten << " " <<
+                                                            totDistanceTravelled << std::endl;
 
   }
   else //If impossible to write in the file, say it

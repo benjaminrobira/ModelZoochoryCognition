@@ -1,0 +1,72 @@
+BootStrap: docker
+From: ubuntu:22.04
+
+%labels
+	Author Benjamin Robira
+	Version v0.0.1
+	
+	## ---------------------------------------- ##
+	## Specify some features of the environment ##
+	## ---------------------------------------- ##
+	
+%environment
+    export PATH=/opt/bin:$PATH
+    export LC_ALL=C.UTF-8
+	export LANG=C.UTF-8
+	export PATH=/opt/:$PATH
+	
+	## -------------------------------------------------------------------------------------- ##
+	## Install necessary softwares (certainly too many, from Remi's script, slightly reduced) ##
+	## -------------------------------------------------------------------------------------- ##
+	
+%post -c bash
+	cp /etc/apt/sources.list /etc/apt/sources.list~
+	sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
+	apt-get upd && apt-get upgrade -y
+	export DEBIAN_FRONTEND=noninteractive
+	apt install -y dirmngr gnupg apt-transport-https ca-certificates software-properties-common
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+	add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/'
+	add-apt-repository ppa:openjdk-r/ppa
+	apt-get install -y tzdata
+	apt update --fix-missing
+	apt-get install wget
+	wget http://archive.ubuntu.com/ubuntu/pool/main/i/icu/libicu66_66.1-2ubuntu2_amd64.deb
+	dpkg -i libicu66_66.1-2ubuntu2_amd64.deb
+	deb http://archive.ubuntu.com/ubuntu xenial main restricted universe
+	deb http://archive.ubuntu.com/ubuntu xenial-updates main restricted universe
+	deb http://archive.ubuntu.com/ubuntu xenial multiverse
+	deb http://archive.ubuntu.com/ubuntu xenial-updates multiverse
+	deb http://archive.ubuntu.com/ubuntu xenial-security main restricted universe
+	deb http://archive.ubuntu.com/ubuntu xenial-security multiverse
+	deb http://archive.canonical.com/ubuntu xenial partner
+	apt-get install -y php7.0
+	apt-cache search openjdk
+	apt-get -y build-dep libcurl4-gnutls-dev
+	apt-get install -y \
+		wget \
+		git \
+		g++ \
+		build-essential \
+		libc6-dev \
+		software-properties-common \
+		automake \
+		curl \
+		cmake \
+		gfortran \
+		autoconf \
+		libcurl4 \
+		libcurl4-openssl-dev \
+		libxml2-dev \
+		r-base-core \
+		r-base-dev \
+		r-cran-devtools
+
+	## ------------------ ##
+	## Install R packages ##
+	## ------------------ ##
+	
+	R CMD javareconf
+	mkdir -p /opt/library
+	R --slave -e 'install.packages(c("readr", "devtools", "ggplot2", "librarian", "readr", "dplyr", "lubridate",  "data.table", "tidyverse", "lutz", "tidyr", "trajr", "parallel", "doParallel", "ggrepel", "Rcpp"), dependencies = TRUE)'
+		

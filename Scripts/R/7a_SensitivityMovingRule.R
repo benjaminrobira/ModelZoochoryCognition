@@ -65,6 +65,10 @@ for(r in 1:numberRepetitionsSensitivity){
     intensityCompetitionForSpace = intensityCompetitionForSpace
   )
   
+  set.seed(r)# restart everything to be sure the seed use remains the same
+  dateStart <- runif(numberTrees, 0, cycleLength)
+  locTree <- as.matrix(cbind(runif(numberTrees, 0, 1000), runif(numberTrees, 0, 1000)))
+  
   runSimulation(
     cycleLimitNumber = cycleLimitNumber,
     repetitionNumber = r,
@@ -98,6 +102,10 @@ for(r in 1:numberRepetitionsSensitivity){
     moveOnlyToTarget = FALSE,
     intensityCompetitionForSpace = intensityCompetitionForSpace
   )
+  
+  set.seed(r)# restart everything to be sure the seed use remains the same
+  dateStart <- runif(numberTrees, 0, cycleLength)
+  locTree <- as.matrix(cbind(runif(numberTrees, 0, 1000), runif(numberTrees, 0, 1000)))
   
   runSimulation(
     cycleLimitNumber = cycleLimitNumber,

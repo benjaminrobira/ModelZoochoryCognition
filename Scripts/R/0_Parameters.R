@@ -9,7 +9,7 @@ rm(list=ls())
 
 #Parameters
 
-numberRepetitions = 100#Repetition of same conditions for agent (but note environment - spatio-temporal distribution is resampled)
+numberRepetitions = 200#Repetition of same conditions for agent (but note environment - spatio-temporal distribution is resampled)
 
 # Environment related -----------------------------------------------------
 
@@ -75,7 +75,7 @@ parametersValue[11,] <- c("Agent","Perceptual range","Distance at which the fora
 parametersValue[12,] <- c("Agent","Knowledge rate","Proportion of trees of the environment for which the forager knows the location and prodution timing", paste0("(", paste(spatialKnowledge, collapse = ", "), ")"),"")
 parametersValue[13,] <- c("Agent","No-return time","Time delay before a forager mentally decides to target a previously visited tree", noReturnTime, "tu")
 parametersValue[14,] <- c("Agent","Dispersal time","Time duration during which seeds from a previously ingested fruit can be dispersed", timeDelayForDispersal, "tu")
-parametersValue[15,] <- c("Agent","Probability of dispersal","Probability (per tu) that the seeds is actually dispersed", DispersalProbability,as.character(expression("tu"^"-1")))
+parametersValue[15,] <- c("Agent","Probability of dispersal","Probability (per tu) that the seeds is actually dispersed", DispersalProbability,"1/tu")
 parametersValue[16,] <- c("Agent", as.character(expression(lambda["step length"])), "Average step length for random movements used to parameterise the exponential distribution", exponentialRate,"su")
 # parametersValue[16,] <- c("","","","")
 # parametersValue[17,] <- c("","","","")
