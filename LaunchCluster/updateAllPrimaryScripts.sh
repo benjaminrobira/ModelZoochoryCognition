@@ -2,7 +2,7 @@
 
 # Connect to cluster
 ssh robirab@sge-qsub.intra.ismaa.it
-cd nfs1/robirab/ModelZoochoryCognition
+cd /nfs1/robirab/ModelZoochoryCognition
 
 #Submit work
 qsub /nfs1/robirab/ModelZoochoryCognition/LaunchCluster/bashExecute.sh
@@ -24,6 +24,9 @@ scp ~/Documents/Miscellaneous/ModelZoochoryCognition/LaunchCluster/bashExecute.s
 scp ~/Documents/Miscellaneous/ModelZoochoryCognition/R.sif robirab@sge-qsub.intra.ismaa.it:/nfs1/robirab/ModelZoochoryCognition/
 
 # FROM CLUSTER TO PC
+
+# Update all outputs
+scp -r robirab@sge-qsub.intra.ismaa.it:/nfs1/robirab/ModelZoochoryCognition/Output ~/Documents/Miscellaneous/ModelZoochoryCognition
 
 # Update output SPACE TREE
 scp -r robirab@sge-qsub.intra.ismaa.it:/nfs1/robirab/ModelZoochoryCognition/Output/SensitivitySpaceTree ~/Documents/Miscellaneous/ModelZoochoryCognition/Output

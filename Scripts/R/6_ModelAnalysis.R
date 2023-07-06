@@ -1053,10 +1053,10 @@ plotSpatAutocorr <- plotResults(
 
 library(ggpubr)
 mergedPlot <- ggarrange(
-  plotPatchiness + rremove("xlab"),
-  plotAlignment + rremove("xlab"),
-  plotSpatAutocorr + rremove("xlab"),
-  plotRoutine + rremove("xlab"),
+  plotPatchiness + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.8,1.3)),
+  plotAlignment + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.1,0.8)),
+  plotSpatAutocorr + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.45,0.65)),
+  plotRoutine + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.5,0.9)),
   nrow = 4, 
   ncol = 1
 )

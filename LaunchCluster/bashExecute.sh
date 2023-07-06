@@ -26,12 +26,12 @@
 
 ###Test script to see how path worked
 ###cd /nfs1/robirab/
-rm /nfs1/robirab/ModelZoochoryCognition/workedR7a.txt
+rm /nfs1/robirab/ModelZoochoryCognition/workedR7b.txt
 ###echo $HOME $USER > /nfs1/$USER/workedR.txt
 ###singularity3 --version > /nfs1/robirab/workedR.txt
 ###cd /nfs1/robirab/
 ###echo $(pwd) > /nfs1/robirab/test.txt
 
 ###Launch the R script
-singularity3 exec -B /nfs1:/nfs1 /nfs1/$USER/ModelZoochoryCognition/R.sif R CMD BATCH /nfs1/robirab/ModelZoochoryCognition/Scripts/R/EXECUTE_CLUSTER.R /nfs1/robirab/ModelZoochoryCognition/Rscript7a.Rout &> /nfs1/robirab/ModelZoochoryCognition/workedR7a.txt
+singularity3 exec -B /nfs1:/nfs1 /nfs1/$USER/ModelZoochoryCognition/R.sif R CMD BATCH /nfs1/robirab/ModelZoochoryCognition/Scripts/R/EXECUTE_CLUSTER.R /nfs1/robirab/ModelZoochoryCognition/Rscript7b.Rout &> /nfs1/robirab/ModelZoochoryCognition/workedR7b.txt
 

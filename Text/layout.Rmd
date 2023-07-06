@@ -44,6 +44,15 @@
   boxsep=3pt,
   arc=0pt}
 
+\newtcolorbox{contouronlybox}{
+  colback=white,
+  colframe=black,
+  coltext=black,
+  boxsep=2pt,
+  boxrule=0.4pt,
+  outer arc=0pt, 
+  arc=4pt}
+  
 <!-- TO HAVE CIRCLE NUMBER -->
 
 \newcommand*\circledBlack[1]{\tikz[baseline=(char.base)]{
@@ -70,7 +79,7 @@
     };
 }
 }
-\titleformat{\section}{\large}{\titlebarsection}{1.5cm}{}
+\titleformat{\section}{\large\bfseries}{\titlebarsection}{1.5cm}{}
 
 \renewcommand*{\thesection}{section}
 
@@ -87,7 +96,7 @@
    \draw[color=black, thick,rounded corners=1ex] (p.east) |- (\textwidth+2cm,-0.75ex);
 }
 }
-\titleformat{\subsection}{\large}{\titlebarsubsection}{2.5cm}{}
+\titleformat{\subsection}{\large\bfseries}{\titlebarsubsection}{2.5cm}{}
 
 \renewcommand*{\thesubsection}{subsection}
 

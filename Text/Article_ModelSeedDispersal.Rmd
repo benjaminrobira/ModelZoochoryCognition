@@ -7,7 +7,7 @@ title: "The role of animal cognition in shaping resource distribution"
 
 #I follow: https://stackoverflow.com/questions/52918716/authors-and-affiliations-in-the-yaml-of-rmarkdown for author display
 author: 
-  - name: Benjamin Robira
+  - name: Benjamin Robira \orcidlink{0000-0002-3168-6573}
     email: benjamin.robira@normalesup.org
     institute: FEM
     correspondence: true
@@ -34,10 +34,18 @@ biblatexoptions: [natbib=true, sorting=nyt, uniquename=false, uniquelist=false]
 
 urlcolor: gray
 filecolor: gray
+link-citations: yes
 linkcolor: gray
-fontsize: 12pt
+citecolor: gray
+fontsize: 11pt
 
 header-includes:
+  #Lato font
+  - \usepackage[default]{lato}
+  - \usepackage{lipsum}% for dummy text
+  - \renewcommand{\mddefault}{l}
+  #Orcid link
+  - \usepackage{orcidlink}
   #Emoticone
   - \usepackage{fontawesome5}
   #Customise page
@@ -162,7 +170,7 @@ theme_set(
 
 \captionsetup{list=no}
 
-\newpage
+\hfill
 
 ```{r}
 words <- RmdWords("Article_ModelSeedDispersal.Rmd")
@@ -171,13 +179,13 @@ words <- RmdWords("Article_ModelSeedDispersal.Rmd")
 <!-- When an animal engages in food searching, its cognition can be stimulated, as it may need to remember where and when to find food.  -->
 
 
-:::: {.graybox data-latex=""}
+:::: {.contouronlybox data-latex=""}
 
-**Abstract |** In the wildlife theater, an evolutionary play takes place in an unchanging setting, or so current hypotheses on the evolution of spatiotemporal cognition of plant-eater animals assume. If these animals are likely to have their spatiotemporal cognition shaped by the distribution of resources, their movement may shape the way plant resources are distributed by dispersing their seeds too. This could create eco-evolutionary feedback loops between animal spatiotemporal cognition and the distribution patterns of plant resources. Using an agent-based model simulating the foraging behaviour of a seed disperser endowed with spatiotemporal knowledge of resource distribution, we investigated whether resource spatiotemporal patterns could be influenced by the level of cognition involved in foraging. This level of cognition represented how well resource location and phenology were predicted by the agent. We showed that seed dispersers could shape the long-term resource distribution with the formation of materialised resource routes. This stemmed from the conjunction of two forces: competition for space between trees and a seed-dispersal forager moving from tree to tree based on spatiotemporal memory. However, the engineering of the resource landscape did not substantially affect the selection gradient that, in turn, could apply to cognition. Altogether, the results emphasise that cognition is a cause and a consequence of resource heterogeneity.
+**Abstract |** In the wild, an evolutionary play takes place in an unchanging setting, or so current hypotheses on the evolution of spatiotemporal cognition of animals implicitly assume. If plant-eating vagile animals are likely to have their spatiotemporal cognition shaped by the distribution of plant resources, their movement may shape the way resources are distributed as well, by dispersing seeds. This could create eco-evolutionary feedback loops between animal spatiotemporal cognition and the distribution patterns of plant resources. Using an agent-based model simulating the foraging behaviour of a seed disperser endowed with spatiotemporal knowledge of resource distribution, I investigated whether resource spatiotemporal patterns could be influenced by the level of cognition involved in foraging. This level of cognition represented how well resource location and phenology were predicted by the agent. I showed that seed dispersers could shape the long-term resource distribution with the formation of materialised resource routes. This stemmed from the conjunction of two forces: competition for space between trees and a seed-dispersing forager moving from tree to tree based on spatiotemporal memory. In turn, this engineering affected the benefits of spatiotemporal memory, hence the selection gradient that applies to cognition. Altogether, the results emphasise that foraging cognition is a cause and a consequence of resource heterogeneity.
 
 <!-- Cognition can shape the movement of animals such as for frugivores. As frugivores can be involved in the life cycle of plants, for example in seed dispersal (i.e. zoochory), their cognition could also shape resource distribution patterns. As resource distribution patterns are known to affect the benefits of cognition, this could create eco-evolutionary feedback loops between animal cognition and the spatiotemporal patterns of resources.  -->
 
-<!-- Using an agent-based model simulating the foraging behaviour of a seed disperser endowed with spatiotemporal knowledge of resource distribution, we investigated whether resource spatiotemporal patterns could be influenced by the level of cognition involved in foraging. This level of cognition represented how well resource location and phenology were predicted by the agent. We showed that seed dispersers could shape the long-term resource distribution with the formation of materialised resource routes. This stemmed from the conjunction of two forces: competition for space between trees and a seed-dispersal forager moving from tree to tree based on spatiotemporal memory. However, the engineering of the resource landscape did not affect the selection gradient that, in turn, could apply to cognition.  -->
+<!-- Using an agent-based model simulating the foraging behaviour of a seed disperser endowed with spatiotemporal knowledge of resource distribution, I investigated whether resource spatiotemporal patterns could be influenced by the level of cognition involved in foraging. This level of cognition represented how well resource location and phenology were predicted by the agent. I showed that seed dispersers could shape the long-term resource distribution with the formation of materialised resource routes. This stemmed from the conjunction of two forces: competition for space between trees and a seed-dispersal forager moving from tree to tree based on spatiotemporal memory. However, the engineering of the resource landscape did not affect the selection gradient that, in turn, could apply to cognition.  -->
 
 <!-- the more organised the resource distribution forming routes of phenologically correlated trees. -->
 
@@ -200,13 +208,13 @@ words <- RmdWords("Article_ModelSeedDispersal.Rmd")
 
 # Introduction
 
-\initial{\textcolor{black}{P}}erhaps because animal mobility contrasts with plant sessility, hypotheses on the evolution of plant foragers' spatiotemporal cognition generally assume that moving foragers evolve in an unchanging environment over the long term [@rosati2017foraging]. However, while foragers' cognition is likely to be shaped by the distribution of resources [@milton1981distribution; @grove2013evolution; @robiratemporalmemory; @bracis2015memory; @boyer2010modelling], the characteristics of the resources themselves could be the result of forager-induced selection [@valenta2020dispersal; @lomascolo2010signal]. In the tropical rainforests, for example, the cognition of frugivorous primates has probably been shaped by the challenge of the ephemerality and dispersal of their food [@zuberbuhler2010foraging; @trapanese2019review], supporting complex [@teichroeb2019navigation; @trapanese2019whatwhere; @janson2016capuchins; @janson1992measuring; @janmaat2013mistake; @robirarandomwalk] and flexible [@trapanese2022flexibility; @janmaat2006primates] movement heuristics. In turn, primates remember and forage for the most rewarding trees [@ban2016fattyfruit; @ban2014highreward; @florchinger2010fruit]. The latter are thus more likely to have their seeds dispersed, driving plant and landscape evolution [@chapman2013primates].  
+\initial{\textcolor{black}{H}}ypotheses about the evolution of vagile plant-eating foragers' spatiotemporal cognition (i.e. the ability to process, integrate and utilise information on resource distribution and phenology) generally assume that foragers evolve in an unchanging environment [@rosati2017foraging]. However, while foragers' cognition is likely to be shaped by the distribution of resources [@milton1981distribution; @grove2013evolution; @robiratemporalmemory; @bracis2015memory; @boyer2010modelling], the characteristics of the resources themselves could be the result of forager-induced selection [@lomascolo2010signal; @rojas2021combination]. In the tropical rainforests, for example, the cognition of frugivorous primates has probably been shaped by the challenge of the ephemerality and dispersal of their food [@milton1981distribution; @zuberbuhler2010foraging; @trapanese2019review], supporting complex [@teichroeb2019navigation; @trapanese2019whatwhere; @janson2016capuchins; @janson1998experimental; @janmaat2013mistake; @robirarandomwalk] and flexible [@trapanese2022flexibility; @janmaat2006primates] movement heuristics. In turn, primates remember and forage for the most rewarding trees [@ban2016fattyfruit; @ban2014highreward; @florchinger2010fruit]. The latter are thus more likely to have their seeds dispersed, driving plant and landscape evolution [@chapman2013primates; @lambert1998evolutionary].  
 
-|   The way seeds are dispersed contributes to the emerging pattern of resource distribution [@vittoz2007seed]. Most of the world's plants [@tiffney1995angiosperm] and especially rainforest trees [main and supplementary material: @gottsberger1983dispersal; @bagchi2011spatial] are dispersed by animals (zoochory). Compared to other modes of dispersal, such as wind (anemochory) or gravity (barychory), zoochory induces a more patchy distribution of adult plants [@seidler2006seed]. This is because animals may tend to revisit memorised sites regularly, and to some extent exclusively [@john2016memoryseed; @addis2017causes]. Furthermore, the imperfection and limited size of spatial memory [@fagan2013spatial] is expected to lead to different movement patterns, and therefore potentially different patterns of resource distribution [@cortes2013integrating]. By being affected by cognition and by affecting resource dispersal, animal movement could thus lead to eco-evolutionary feedback loops between animal cognition and resource dispersal [@john2016cognitionmeetdispersal]. In other words, cognition could be both a cause and a consequence of resource heterogeneity.
+|   The way seeds are dispersed contributes to the emerging pattern of resource distribution [@vittoz2007seed]. Most of the world's plants [@tiffney1995angiosperm] and especially rainforest trees [@gottsberger1983dispersal; @bagchi2011spatial] are dispersed by animals (zoochory). Compared to other modes of dispersal, such as wind (anemochory) or gravity (gravichory), zoochory induces a more patchy distribution of adult plants [@seidler2006seed]. This is because animals may tend to revisit memorised sites regularly, if not exclusively [@john2016memoryseed; @addis2017causes]. Furthermore, the imperfection and limited size of spatial memory [@fagan2013spatial] is expected to lead to different movement patterns [@avgar2013empirically], and therefore potentially to different patterns of resource distribution [@cortes2013integrating]. By being affected by cognition and by affecting resource dispersal, animal movement could thus lead to eco-evolutionary feedback loops between animal cognition and resource dispersal [@borah2022studying]. In other words, foraging cognition could be both a cause and a consequence of resource heterogeneity.
 
-|   To illustrate the possible retroactions between cognition and resource distribution, let's consider an extreme speculative scenario in which seed-dispersing frugivores are freely foraging (Figure \@ref(fig:predictions)). At start, assuming a parcimonious homogeneous distribution, long-term spatiotemporal memory is only marginally advantageous [@grove2013evolution]. As it is nonetheless, cognition should be selected for. Through zoochory, deliberate targeting of some resource patches over others may induce a change in resource distribution over time (e.g. increasing patchiness), eventually making cognition more and more advantageous. Gradually, by repeatedly targeting the same trees, the routes used by the foragers may begin to materialise through the seeds scattered along the way. However, in doing so, foragers who can only passively follow these routes and have survived may also begin to become very efficient: they should not even have to bear the cost of high cognitive ability, putting them at an advantage over foragers who bear the burden of cognition [@raichle2006brain]. While the pattern of resource distribution can be maintained because the routes are used equally by all foragers [but through two different mechanisms: long-term memory vs. taxis, @benhamou1995comparative; @benhamou1992distinguishing], cognition could even start to be counter-selected. 
+|   To illustrate the possible retroactions between cognition and resource distribution, let's consider an extreme speculative scenario in which seed-dispersing frugivores are freely foraging (Figure \@ref(fig:predictions)). At start, assuming a parcimonious homogeneous distribution, long-term spatiotemporal memory is only marginally advantageous [@grove2013evolution]. As it is nonetheless, cognition should be selected for. Through zoochory, deliberate targeting of some resource patches over others may induce a change in resource distribution over time (e.g. increasing patchiness), eventually making cognition more and more advantageous. Gradually, by repeatedly targeting the same trees, the routes used by the foragers may begin to materialise through the seeds scattered along the way. However, in doing so, foragers who can only passively follow these routes and have survived may also begin to become very efficient: they should not even have to bear the cost of high cognitive ability, putting them at an advantage over foragers who bear the burden of cognition [@raichle2006brain; @burns2011costs]. While the pattern of resource distribution can be maintained because the routes are used equally by all foragers [but through two different mechanisms: long-term memory *vs* taxis, @benhamou1995comparative; @benhamou1992distinguishing], cognition could even start to be counter-selected. 
 
-|   While some facets of this scenario may be rooted in empirical evidence [e.g. with forest elephants, @campos2011megagardeners; @blake2004fruit; @blake2009forest], most of this scenario remains speculative. The aim of this study is thus to put such a scenario to the test. Using an agent-centred model simulating the movement of seed-dispersing frugivores with different cognitive abilities, we sought to investigate (a) whether the spatial arrangement of resource varies with the cognitive level and movement behaviour of the simulated agents, and (b) whether this in turn affects the selection pressure on the agents' cognition.
+|   While some facets of this scenario may be rooted in empirical evidence [e.g. with forest elephants, @campos2011megagardeners; @blake2004fruit; @blake2009forest], most of it remains speculative. The aim of this study is thus to put such a scenario to the test. Using an agent-based model simulating the movement of seed-dispersing frugivores with different cognitive abilities, I sought to investigate (a) whether and how the spatial arrangement of resource varies with the cognitive level and movement behaviour of the simulated agents, and (b) whether and how this in turn affects the selection pressure on the agents' cognition.
 
 ```{r predictions, echo = FALSE, message = FALSE, include = TRUE, fig.align = 'center', fig.cap='Theoretical expectations on eco-evolutionary feedback loops between animal spatiotemporal cognition and resource distribution', out.width = '0.95\\linewidth'}
 knitr::include_graphics("../FIG/summaryPredictions.pdf")
@@ -223,7 +231,7 @@ knitr::include_graphics("../FIG/summaryPredictions.pdf")
 
 ## Agent-based model
 
-The main objective of the model was to simulate the foraging behaviour of a single agent in an environment dynamical both on the short term, through an interplay between resource growth and depletion, and on the long term, due to seed dispersal. For simplicity, we will refer to the agent as the forager, and to resource patches as fruit trees, but this model should find larger resonance. The model was implemented in the *Rcpp* language in *R* software [`r extractRversion()`, @Rsoftware]  based on the *Rcpp* package [@Rcpp1; @Rcpp2; @Rcpp3].
+The main objective of the model was to simulate the foraging behaviour of a single agent in an environment dynamical both on the short term, through an interplay between resource growth and depletion, and on the long term, due to seed dispersal. For simplicity, I will refer to the agent as the forager, and to resource patches as fruit trees, but this model should find larger resonance. The model was implemented in the *Rcpp* language in *R* software [`r extractRversion()`, @Rsoftware]  based on the *Rcpp* package [@Rcpp1; @Rcpp2; @Rcpp3].
 
 <!-- Statistical significance was assumed considering the nominal threshold of significance $\alpha=0.05$. -->
 
@@ -231,7 +239,7 @@ The main objective of the model was to simulate the foraging behaviour of a sing
 
 #### Spatial distribution
 
-We modelled the environment as a flat square map of side `r mapSize` arbitrary spatial units (su). Within this map, `r numberTrees` trees were initially homogeneously distributed (uniform distribution of their $x$ and $y$ coordinates, resulting in a Poisson distribution of tree density).
+I modelled the environment as a flat square map of side `r mapSize` arbitrary spatial units (su). Within this map, `r numberTrees` trees were initially homogeneously distributed (uniform distribution of their $x$ and $y$ coordinates, resulting in a Poisson distribution of tree density).
 
 #### Resource growth
 
@@ -239,7 +247,7 @@ Time was cyclical, with a period of `r cycleLength` arbitrary time units (tu). E
 
 #### Seed dispersal
 
-Trees could reproduce and disperse via fruit eaten by the agent. Once the agent ate on ripe fruit, seeds could be dispersed once up to `r timeDelayForDispersal` tu after ingestion, with a probability of `r DispersalProbability/timeDelayForDispersal` tu$^{-1}$, independent of the quantity of fruit ingested, for simplicity. Thus, all fruit eaten did not mandatorily led to dispersal. Dispersal was eventually successful only if some space was left available for the new tree. This means that no tree had to be at a distance lower than `r round(0.45 * sqrt(mapSize * mapSize / (numberTrees * pi)), digits = 2)` su. This number was obtained such as the exclusive "lifespace" by trees (a circular area of radius the aforementioned distance) was equal to 45% of the map area (but other percentages were tested, see [Route formation as a product of two forces][Route formation as a product of two forces: tree competition for space and agent movement step rule]). If it happened that there was available space for the seedling to grow, then the seedling location was sampled in the available space along the linear path linking the previous target. Otherwise, the seedling could not grow and died. 
+Trees could reproduce and disperse via fruit eaten by the agent. Once the agent ate on ripe fruit, seeds could be dispersed once up to `r timeDelayForDispersal` tu after ingestion, with a probability of `r DispersalProbability/timeDelayForDispersal` tu$^{-1}$, independent of the quantity of fruit ingested, for simplicity. Thus, all fruit eaten did not mandatorily led to dispersal. Dispersal was eventually successful only if some space was left available for the new tree: no tree had to be at a distance lower than `r round(0.45 * sqrt(mapSize * mapSize / (numberTrees * pi)), digits = 2)` su. This number was obtained such as the cumulative (when non overlapping) exclusive "lifespace" by trees (a circular area of radius the aforementioned distance) reached at best 45% of the map area (but other percentages were tested, see [Route formation as a product of two forces][Q3. Route formation as a product of two forces? Tree competition for space and forager movement step rule]). If it happened that there was available space for the seedling to grow, then the seedling location was sampled in the available space along the linear path linking the previous and current locations. Otherwise, the seedling could not grow and died. 
 
 <!-- If considering buffer for dispersal: -->
 <!-- and the current one buffer by the sensory range of the agent (`r round(perceptualRange)` su) -->
@@ -254,15 +262,16 @@ The forager was endowed with a gradient of knowledge abilities: from no memory o
 
 <!-- trees growing from successful seedlings were memorised, as well as trees that were visited while fruiting. In this case, they replaced known trees that were visited the longest time ago. To maintain the spatiotemporal knowledge rate constant, each time a new tree location and associate fruiting dates were memorised, those of the tree visited the longest time ago were forgotten. -->
 
-#### Moving rules
+#### Movement rules
 
-The forager was initially randomly located within the map. It is fully aware of trees present within sensory range fixed to `r round(perceptualRange, digit=2)` su. This actually corresponds to the average nearest-neighbour distance which equates $\frac{1}{2\sqrt{\rho}}$, with $\rho$ the density of trees (here `r numberTrees/mapSize/mapSize`) at start of the simulation where trees are homogeneously distributed. It is also aware of trees part of its spatiotemporal long-term memory. To decide where to head next, the forager could either rely on its private knowledge (sensory or memory) or not. If all trees within its private knowledge did not yield any fruit (i.e., all having less than 0.001 fu), the forager was moving randomly. Random movements were performed by randomly choosing a direction (uniform distribution of the heading angle), while the step length was sampled within an exponential distribution of mean $\lambda_{step\,length}$ = `r exponentialRate`. An exponential distribution of step lengths is indeed classically observed in nature [REF]. Otherwise, the agent targeted the `r whatRule` tree which maximised the ratio between the predicted food quantity at the tree (which accounts for depletion history), and the distance to the tree. Nonetheless, the forager avoided to target trees recently visited within the previous `r noReturnTime` tu to avoid targeting recently depleted trees [@robiratemporalmemory]. 
+The forager was initially randomly located within the map. It is fully aware of trees present within sensory range fixed to `r round(perceptualRange, digit=2)` su. This actually corresponds to the average nearest-neighbour distance which equates $\frac{1}{2\sqrt{\rho}}$, with $\rho$ the density of trees (here `r numberTrees/mapSize/mapSize`) at start of the simulation where trees are homogeneously distributed. It is also aware of trees part of its spatiotemporal long-term memory. To decide where to head next, the forager could either rely on its private knowledge (sensory or memory) or not. If all trees within its private knowledge did not yield any fruit (i.e., all having less than 0.001 fu), the forager was moving randomly. Random movements were performed by randomly choosing a direction (uniform distribution of the heading angle), while the step length was sampled within an exponential distribution of mean $\lambda_{step\,length}$ = `r exponentialRate`. An exponential distribution of step lengths is indeed classically observed in nature [@benhamou2014scales]. Otherwise, the agent targeted the `r whatRule` tree which maximised the ratio between the predicted food quantity at the tree (which accounts for depletion history), and the distance to the tree. Nonetheless, the forager avoided to target trees recently visited within the previous `r noReturnTime` tu to avoid targeting recently depleted trees [@robiratemporalmemory]. 
 
-|   Once the target had been chosen (or random point, if none), the forager moved straight to the first tree that should have been theoretically perceived *en route* to the initial destination point if any (provided they were not recently visited), or the destination otherwise. When this destination is reached, it then re-estimated the best tree to target and so on. Such a movement roughly mimics a beacon/landmark-based navigation, where individuals individuals move from beacon to beacon to reach a target [REF] and frames coherently with the tendency of individuals to monitor resource state while moving [REF]. After each moving bout time was updated based on the distance travelled, knowing that the forager moved at a speed of `r speed` su/tu. Then, the resource quantity available at each tree was updated. 
+|   Once the target had been chosen (or random point, if none), the forager moved straight to the first tree that should have been theoretically perceived *en route* to the initial destination point if any (provided they were not recently visited), or the destination otherwise. When this destination is reached, it then re-estimated the best tree to target and so on. After each moving bout time was updated based on the distance travelled, knowing that the forager moved at a speed of `r speed` su/tu. Then, the resource quantity available at each tree was updated. 
 
 |   In case all trees were empty (no food available in the environment, considered if the sum of food available was less than 1 fu), the forager entered a torpor period for `r torporTime` tu, and so on until food was available again. This was done to avoid biasing measure of foraging efficiency in case the forager could deplete entirely the environment while being unable to disperse to another area, as expected in nature if this happens. 
 
 ```{r modelParametersTable, include=TRUE}
+source("../Scripts/R/0_Parameters.R")
 library(kableExtra)
 options(knitr.kable.NA = "-")
 parametersValue[parametersValue[, 5] == "", 5] <- NA
@@ -290,7 +299,7 @@ knitr::kable(parametersValue, escape = TRUE, booktabs = TRUE, longtable = TRUE,
 
 ### Characterisation of tree distribution patterns 
 
-To assess whether different levels of cognition resulted in different organisation of the spatial distribution of trees at the end of the simulation we focused on three metrics describing the tree spatiotemporal patterns: the *patchiness*, the *alignment* and the *spatial autocorrelation of fruiting timing*.
+To assess whether different levels of cognition resulted in different organisations of the spatial distribution of trees at the end of the simulation I focused on three metrics describing the tree spatiotemporal patterns: the *patchiness*, the *alignment* and the *spatial autocorrelation of fruiting timing*.
 
 <!-- the *pseudo fractal dimension*, the *reticulation* -->
 
@@ -310,7 +319,7 @@ $P=N_{quadrat}\frac{\sum_{i}{n_{i}(n_{i}-1)}}{(\sum_{i}{n_{i}})^2}$
 
 where $n_{i}$ represents the number of trees in quadrat *i* and $N_{quadrat}$ the number of quadrats. The map was divided in 400 square quadrats of side 50 su. The quadrat size, provided sufficient length for biological relevance, little affects the measurement [@lloyd1967mean]. Lower values indicate homogeneous distribution while larger values indicate heterogeneous and route distributions [(see Appendix Material)][Using patchiness and alignment to characterise spatial point patterns].
 
-|   As the forager is set up to forage in a square map with reflective boundaries, seed dispersal may lead to the shrinkage of resource range towards the centre of the map (where recursions are inevitably the higher), an artefact not of interest there. This would contribute to inflate measures of patchiness. We therefore calculated a measure of shrinkage *s* as one minus the area covered by the 95% of the kernel distribution based on all tree locations divided by the map size. To account for variations in shrinkage in the different simulated scenarii [(see Appendix Material)][Variations in resource range shrinkage intensity], we corrected patchiness such as $P_c = P(1-s)$.
+|   As the forager is set up to forage in a square map with reflective boundaries, seed dispersal may lead to the shrinkage of resource range towards the centre of the map (where recursions are inevitably the higher), an artefact not of interest there. This would contribute to inflate measures of patchiness. I therefore calculated a measure of shrinkage *s* as one minus the area covered by the 95% of the kernel distribution based on all tree locations divided by the map size. To account for variations in shrinkage in the different simulated scenarios [(see Appendix Material)][Variations in resource range shrinkage intensity], I corrected patchiness such as $P_c = P(1-s)$.
 
 
 <!-- -> TO CHECK IN LLOYD PUBLICATION. I AM NOW UNSURE GIVEN THAT IT DOES WHEN I VARY THE SIZE ON SIMULATED DISTRIB. -->
@@ -319,23 +328,23 @@ where $n_{i}$ represents the number of trees in quadrat *i* and $N_{quadrat}$ th
 
 <!-- #### Pseudo-fractal dimension -->
 
-<!-- Pseudo fractal dimension (i.e. the tendency of trees to organise in patterns insensitive to observation scale) was calculated based on a Geographically Weighted Fractal Analysis [Applying two fractal methods to characterise the local and global deviations from scale invariance of built patterns throughout mainland France] specifically developed for point patterns. In brief, for points, the fractal dimension corresponds to the slope of the regression of the logarithm of the number of points around a point of interest, as a function of the radius length to consider neighbouring points. To do so, we used the "gwfa" function of the *gwfa* package [@gwfa]. We fixed the circular neighbourhood (a measure of whether the scale is local, low radius compared to the map size, or global, large radius compared to the map size) to 200 su. The pseudo-fractal dimension corresponds to the average pseudo fractal dimension of randomly sampled points (limited to 500 within cells of side 200 su), for which we varied the counting scale (i.e. circular radius around each point of interest) from 20 su to 60 su (ten regularly spaced values in total). We use the "pseudo" prefix because we did not verify whether the calculated fractal dimension is statistically significant (i.e. if the regression slope, aimed to determine the fractal dimension, indeed offers a different fit from a constant). -->
+<!-- Pseudo fractal dimension (i.e. the tendency of trees to organise in patterns insensitive to observation scale) was calculated based on a Geographically Weighted Fractal Analysis [Applying two fractal methods to characterise the local and global deviations from scale invariance of built patterns throughout mainland France] specifically developed for point patterns. In brief, for points, the fractal dimension corresponds to the slope of the regression of the logarithm of the number of points around a point of interest, as a function of the radius length to consider neighbouring points. To do so, I used the "gwfa" function of the *gwfa* package [@gwfa]. I fixed the circular neighbourhood (a measure of whether the scale is local, low radius compared to the map size, or global, large radius compared to the map size) to 200 su. The pseudo-fractal dimension corresponds to the average pseudo fractal dimension of randomly sampled points (limited to 500 within cells of side 200 su), for which I varied the counting scale (i.e. circular radius around each point of interest) from 20 su to 60 su (ten regularly spaced values in total). I use the "pseudo" prefix because I did not verify whether the calculated fractal dimension is statistically significant (i.e. if the regression slope, aimed to determine the fractal dimension, indeed offers a different fit from a constant). -->
 
 <!-- #### Reticulation -->
 
 <!-- Reticulation (i.e. the tendency of trees to form reticulated networks) of the tree distribution was measured following Addis (2017) [https://repositories.lib.utexas.edu/bitstream/handle/2152/68127/ADDIS-DISSERTATION-2017.pdf?sequence=1]. This method is based on the Relative Neighbourhood Graph [RNG, Toussaint, G. T. 1980. The relative neighbourhood graph of a finite planar set. Pattern Recognition 12:261–268], which should reflect the intuitive perception of reticulation a human observer might have. In this graph, two points are connected by an edge if there is no third point that is closer to the two points than the two are between each other. Such a property thus drives the visualisation of "void areas" within the distribution, since it favours immediate close-distance edge. It thus likely reflects the "routes" that are paved by trees that a forager might tend to follow. -->
-<!-- We constructed the RNG as an undirected and weighted graph, where the edge weight corresponded to the Manhattan distance between the two connected points ("rng" function of the *cccd* package [@cccd]). We followed Addis (2017) and defined the reticulation as   -->
+<!-- I constructed the RNG as an undirected and weighted graph, where the edge weight corresponded to the Manhattan distance between the two connected points ("rng" function of the *cccd* package [@cccd]). I followed Addis (2017) and defined the reticulation as   -->
 <!-- \hfill -->
 
 <!-- $R = \frac{D - M}{max(M_{i,j})}$   -->
 
 <!-- \hfill -->
 
-<!-- where *D* is the diameter of the RNG. This diameter corresponds to the length of the longest of the shortest paths that connect two points within the RNG. Shortest paths between each pair of points of the RNG were obtained with the "shortest.path" function of the *igraph* package [@igraph]. *M* corresponds to the Manhattan distance between the pair of points whose shortest path equates to that of the diameter (or its average, if multiple pairs could lead to the maximum diameter length), while $M_{i,j}$ corresponds to the Euclidean distance between two points *i* and *j*. Despite we are not in a grid-based system (Addis, 2017), we used the Manhattan distance because we empirically observed that this enabled us distinguishing correctly between different spatial patterns (see Appendix [What distance to calculate reticulation?]) -->
+<!-- where *D* is the diameter of the RNG. This diameter corresponds to the length of the longest of the shortest paths that connect two points within the RNG. Shortest paths between each pair of points of the RNG were obtained with the "shortest.path" function of the *igraph* package [@igraph]. *M* corresponds to the Manhattan distance between the pair of points whose shortest path equates to that of the diameter (or its average, if multiple pairs could lead to the maximum diameter length), while $M_{i,j}$ corresponds to the Euclidean distance between two points *i* and *j*. Despite I are not in a grid-based system (Addis, 2017), I used the Manhattan distance because I empirically observed that this enabled us distinguishing correctly between different spatial patterns (see Appendix [What distance to calculate reticulation?]) -->
 
 #### Tree alignment
 
-Routes are (curvi-)linear features. To assess the tendency of trees to form linear motifs, we quantified their alignment. For a given tree, alignment *a* was defined as one minus the minimum of the sine of the angles of the triangle formed by the tree of interest and the two closest trees. This varies from perfect alignment (value of 1), to no alignment (i.e., the minimum angle would be at worse 60° hence an alignment of ca. 0.134). Therefore, we used a corrected alignment $a_c$ varying from 0 (no alignment) to 1 (perfect alignment) such as
+Routes are (curvi-)linear features. To assess the tendency of trees to form linear motifs, I quantified their alignment. For a given tree, alignment *a* was defined as one minus the minimum of the sine of the angles of the triangle formed by the tree of interest and the two closest trees. This varies from perfect alignment (value of 1), to no alignment (i.e., the minimum angle would be at worse 60° hence an alignment of ca. 0.134). Therefore, I used a corrected alignment $a_c$ varying from 0 (no alignment) to 1 (perfect alignment) such as
 
 \begin{center}
 
@@ -347,14 +356,14 @@ $a_{c} = \frac{a - (1 - sin(\pi/3))}{1 - (1 - sin(\pi/3))}$
 
 \end{center}
 
-We defined the general alignement for a given environmental map as the opposite of the skewness of alignment values of all trees in the map. Positive values indicate the existence of linear motifs while negative values indicate no obvious linear motifs. Random distributions (homogeneous or heterogeneous) should show moderate positive values, while a route pattern should have a high positive value [(see Appendix Material)][Using patchiness and alignment to characterise spatial point patterns].
+I defined the general alignement for a given environmental map as the opposite of the skewness of alignment values of all trees in the map. Positive values indicate the existence of linear motifs while negative values indicate no obvious linear motifs. Random distributions (homogeneous or heterogeneous) should show moderate positive values, while a route pattern should have a high positive value [(see Appendix Material)][Using patchiness and alignment to characterise spatial point patterns].
 
 <!-- IF USING NEIGHBOURHOOD ALIGNMENT -->
 <!-- other neighbouring trees. A neighbourhood was defined as a circular area of radius three times the tree lifespace (to possible have at least twice lifespace distances between the two farthest trees). If more than two trees were present, all combinations of two trees were associated to the tree of interest, and the minimum alignment among all possible combinations was eventually considered. If no tree, or only one, was found in this neighbourhood, the algorithm selected the two closest trees. -->
 
 #### Spatial autocorrelation of fruiting timing
 
-Spatial autocorrelation of fruiting timing (i.e. the tendency of fruiting date of trees to more closely match that of neighbours than of distant trees) was calculated as the Geary Index, \textit{C} [@geary1954contiguity] applied to the start of fruiting dates. Since the date of start of fruiting corresponds to a circular variable, we followed [@schmal2017moran] to adapt existing functions of the *ape* package [@ape] to circular variables. Geary's \textit{C} was therefore defined as
+Spatial autocorrelation of fruiting timing (i.e. the tendency of fruiting date of trees to more closely match that of neighbours than of distant trees) was calculated as the Geary Index, \textit{C} [@geary1954contiguity] applied to the start of fruiting dates. Since the date of start of fruiting corresponds to a circular variable, I followed [@schmal2017moran] to adapt existing functions of the *ape* package [@ape] to circular variables. Geary's \textit{C} was therefore defined as
 
 \begin{center}
 
@@ -366,27 +375,31 @@ $C = \frac{(N-1)}{2} \frac{\sum_{i}\sum_{j} w_{ij}d(t_i,t_j)^2}{\sum_{i,j}w_{ij}
 
 \end{center}
 
-where $N$ is the number of trees, $t$ is the fruiting date (in radian), $d(t_1,t_2) = atan2(sin(t_1 - t_2), cos(t_1 - t_2))$, $\bar{t} = atan2(1/N\sum_isin(t_i), 1/N\sum_icos(t_i))$. We used the inverse of the Euclidean distance between tree locations as weights. Values of $C$ close to 1 indicate absence of spatial autocorrelation. Values close to 0 indicate negative spatial autocorrelation. Values larger than 1 indicate positive spatial autocorrelation.
+where $N$ is the number of trees, $t$ is the fruiting date (in radian), $d(t_1,t_2) = atan2(sin(t_1 - t_2), cos(t_1 - t_2))$, $\bar{t} = atan2(1/N\sum_isin(t_i), 1/N\sum_icos(t_i))$. I used the inverse of the Euclidean distance between tree locations as weights. Values of $C$ close to 1 indicate absence of spatial autocorrelation. Values close to 0 indicate negative spatial autocorrelation. Values larger than 1 indicate positive spatial autocorrelation.
 
 ### Routine emergence
 
-For each simulation, we verified whether a routine behaviour emerged and paralleled the variations in tree distribution. We characterised routine holding on the notion of conditional entropy following [@riotte2016randomness] using the series of the id of trees targeted during five supplementary seasons in which dispersal could not occur. We computed the routine possibly up to only a first order conditional entropy, as computing routine indices is computationally demanding and a first order is expecting to be the most informative to describe a perfect traplining behaviour [@riotte2016randomness]. The routine index varies from 0 (no routine) to 1 (perfect traplining).
+For each simulation, I verified whether a routine behaviour emerged and paralleled the variations in tree distribution. I characterised routine holding on the notion of conditional entropy following [@riotte2016randomness] using the series of the id of trees targeted during five supplementary seasons in which dispersal could not occur. I computed the routine possibly up to only a first order conditional entropy, as computing routine indices is computationally demanding and a first order is expecting to be the most informative to describe a perfect traplining behaviour [@riotte2016randomness]. The routine index varies from 0 (no routine) to 1 (perfect traplining).
 
-### Does resource spatiotemporal distribution vary with cognition level? 
+### Research questions and associated scenarios
 
-To investigate whether different levels of cognition eventually led to different distribution patterns, we considered five forager types differing by the proportion of trees for which the location and phenology was known (from 0 to 100%, at a step of `r 100/length(spatialKnowledge)`, henceforth *spatiotemporal knowledge rate*). Each forager was first let foraging individually for `r cycleLimitNumber` seasonal periods. We repeated the simulations for a given condition (i.e. knowledge rate) `r numberRepetitions` times.
- 
-### Does resource distribution engineering favour some cognition levels?
+#### Q1. Does resource spatiotemporal distribution vary with cognition level? 
 
-To investigate whether the engineered distribution of trees could in turn affect the foraging benefices purported by cognition, we considered the final tree distributions of simulations computed to answer [question 1][Does resource spatiotemporal distribution vary with cognition level?]). For each of these tree distributions, in three different simulation runs, we let forage a forager endowed with no, intermediate (i.e. half of trees known), or full (all trees known) spatiotemporal knowledge. In these simulations, no seed-dispersal could occur. We measured the foraging efficiency after the forager foraged for `r cycleLimitNumber/5` full seasons and compared them across environments and agent abilities. Foraging efficiency was computed as the cumulated quantity of eaten food, over the cumulated distance travelled. We verified that at the end of the simulation that foraging efficiency stabilised, which meant that we reached a foraging equilibrium. We considered that foraging efficiency stabilised when the foraging efficiency sampled after each moving bout during the fourth and fifth quintile of simulation times did not statistically differed of more than `r percentToAssumeDifference`% (reference is the minimum efficiency in the fourth or the fifth quintile of simulation times). Distributions of foraging efficiency measures were compared with Student tests ("t.test" function). We repeated the simulations for a given conditions (i.e. knowledge rate) `r numberRepetitions` times.
+To investigate whether different levels of cognition eventually led to different distribution patterns, I considered five forager types differing by the proportion of trees for which the location and phenology was known (from 0 to 100%, at a step of `r 100/length(spatialKnowledge)`, henceforth *spatiotemporal knowledge rate*). Each forager was first let foraging individually for `r cycleLimitNumber` seasonal periods. I repeated the simulations for a given condition (i.e. knowledge rate) `r numberRepetitions` times.
 
-### Route formation as a product of two forces: tree competition for space and agent movement step rule
+#### Q2. Does resource distribution engineering favour some cognition levels?
 
-During the model construction, we noticed that routes eventually appeared with the implementation of two mechanisms: space competition between trees and sequential targeting of all trees seen *en route* to the target. To better quantify the effect of those two forces, we considered two other sets of `r numberRepetitions` simulations each.
+To investigate whether the engineered distribution of trees could in turn affect the foraging benefices purported by cognition, I considered the final tree distributions of simulations computed to answer [question 1][Q1. Does resource spatiotemporal distribution vary with cognition level?]). For each of these tree distributions, in three different simulation runs, I let forage a forager endowed with no, intermediate (i.e. half of trees known), or full (all trees known; omniscience) spatiotemporal knowledge. In these simulations, no seed-dispersal could occur. I measured the foraging efficiency after the forager foraged for `r cycleLimitNumber/5` full seasons and compared them across environments and forager abilities. Foraging efficiency was computed as the cumulated quantity of eaten food, over the cumulated distance travelled. I verified that at the end of the simulation that foraging efficiency stabilised, which meant that I reached a foraging equilibrium. I considered that foraging efficiency stabilised when the foraging efficiency sampled after each moving bout during the fourth and fifth quintile of simulation times did not statistically differed of more than `r percentToAssumeDifference`% (reference is the minimum efficiency in the fourth or the fifth quintile of simulation times). Distributions of foraging efficiency measures were compared with Student tests ("t.test" function). I repeated the simulations for a given conditions (i.e. knowledge rate) `r numberRepetitions` times.
 
-|   To assess the effect of competition for space between trees, we compared the final tree spatiotemporal patterns when a perfectly knowledgeable agent (all tree locations and phenology known) was let foraging in the same setting as in question 1), with the only difference that the exclusive lifespace between trees could vary be of 5 (small lifespace), 45 (intermediate lifespace) or 85% (large lifespace) of the map surface, so that the radius of this exclusive circular lifespace was always inferior to the perception range (`r round(0.85 * sqrt(mapSize * mapSize / (numberTrees * pi)), digits = 2)` su vs `r round(perceptualRange, digit=2)` su).
 
-|   To assess the effect of the movement tactic of the forager on tree distribution patterns, we compared the final tree spatiotemporal patterns when an omniscient agent was let foraging in the same setting as in question 1) and while the stringency in skipping trees encountered *en route* varied. It could either stop at all trees perceived on the way to the initial target (mimicking a "monitoring" behaviour, as in all other simulations; small skipping stringency), stop only at trees currently fruiting (i.e., with at least 0.001 fu, mimicking an opportunistic feeding only; intermediate skipping stringency) or move directly to the target (large skipping stringency).
+#### Q3. Route formation as a product of two forces? Tree competition for space and forager movement step rule
+
+During the model construction, I noticed that routes eventually appeared with the implementation of two mechanisms: space competition between trees and sequential targeting of all trees seen *en route* to the target. To better quantify the effect of those two forces, I considered two other sets of `r numberRepetitions` simulations each.
+
+|   To assess the effect of competition for space between trees, I compared the final tree spatiotemporal patterns when a perfectly knowledgeable forager (all tree locations and phenology known) was let foraging in the same setting as in question 1), with the only difference that the exclusive lifespace between trees could vary be of 5 (small lifespace), 45 (intermediate lifespace) or 85% (large lifespace) of the map surface, so that the radius of this exclusive circular lifespace was always inferior to the perception range (`r round(0.85 * sqrt(mapSize * mapSize / (numberTrees * pi)), digits = 2)` su vs `r round(perceptualRange, digit=2)` su).
+
+|   To assess the effect of the movement rule of the forager on tree distribution patterns, I compared the final tree spatiotemporal patterns when an omniscient forager was let foraging in the same setting as in question 1) and while the stringency in skipping trees encountered *en route* varied. It could either stop at all trees perceived on the way to the initial target (mimicking a "monitoring" behaviour, as in all other simulations; small skipping stringency), stop only at trees currently fruiting (i.e., with at least 0.001 fu, mimicking an opportunistic feeding only; intermediate skipping stringency) or move directly to the target (large skipping stringency).
+
 
 # Results
 
@@ -401,7 +414,7 @@ During the model construction, we noticed that routes eventually appeared with t
 
 <!-- X column: -->
 <!-- def of knowledge rate -> Brain size increase, wise number of trees inside -->
-<!-- def moving rule: path following trees according to rule -->
+<!-- def movement rule: path following trees according to rule -->
 <!-- def Space tree: image trees more or less aggregated -->
 
 ```{r meanValues}
@@ -440,12 +453,12 @@ comparisonsEfficiency <- meanValuesEfficiency %>%
 
 ```
 
-```{r figEngineering, fig.width=18.5, fig.height=18.5, include=TRUE, warning = FALSE, fig.cap="Seed disperser agents can shape resource distribution | The plots show the results of 200 simulations when a seed-dispersing agent with varying level of cognition, moving choice rules or space competition intensities between trees (left to right) was let foraging for a long time. The resulting distribution pattern was assessed by its patchiness (the tendency of trees to be aggregated into patches; larger values indicate highly aggregated trees), its alignement (the tendency of trees to form linear geometries; larger values indicate the presence of linear geometries) and spatial autocorelation in fruiting date (the tendency of trees to have fruiting dates closer in time to their spatial neighbours; values close to 0 indicate negative spatial autocorrelation, values close to 1 indicate no spatial autocorrelation, values above 1 indicate positive spatial autocorrelation). The emerging movement behaviour of the forager was described in terms of routine behaviour (the tendency of the forager to target visit trees in a predictible way; values close to 0 indicate no predictibly movement, values close to 1 indicate highly predictible movements)."}
+```{r figEngineering, fig.width=19.25, fig.height=19.25, include=TRUE, warning = FALSE, fig.cap="Seed-dispersing foragers can shape resource distribution | The plots show the results of 200 simulations when a seed-dispersing forager with varying level of cognition, moving choice rules or space competition intensities between trees (left to right) was let foraging for a long time. The resulting distribution pattern was assessed by its patchiness (the tendency of trees to be aggregated into patches; larger values indicate highly aggregated trees), its alignement (the tendency of trees to form linear geometries; larger values indicate the presence of linear geometries) and spatial autocorelation in fruiting date (the tendency of trees to have fruiting dates closer/farther in time to their spatial neighbours; values close to 0 indicate negative spatial autocorrelation, values close to 1 indicate no spatial autocorrelation, values above 1 indicate positive spatial autocorrelation). The emerging movement behaviour of the forager was described in terms of routine behaviour (the tendency of the forager to target visit trees in a predictible way; values close to 0 indicate no predictibly movement, values close to 1 indicate highly predictible movements)."}
 
 mergedPlotMovingRule <- readRDS("../Renvironment/Plots/movingRulePlots.rds")
 mergedPlotSpaceTree <- readRDS("../Renvironment/Plots/spacingTreePlots.rds")
 mergedPlotMain <- readRDS("../Renvironment/Plots/mainPlots.rds")
-#mergedLegend <- readRDS("../FIG/plotLegend.rds")
+mergedLegend <- readRDS("../FIG/plotLegend.rds")
 
 library(ggplot2)
 library(ggpubr)
@@ -453,24 +466,25 @@ plotEngineering <- ggarrange(
   mergedPlotMain,
   mergedPlotMovingRule,
   mergedPlotSpaceTree,
-  #mergedLegend,
-  ncol = 3#4,
-  #widths = c(0.27,0.27,0.27,0.19)
+  mergedLegend,
+  ncol = 4,
+  widths = c(0.3,0.25,0.25,0.2)
 )
 plotEngineering
 ```
 
 ## Resource distribution is affected by the forager's cognition
 
-The amount of trees for which the agents known the location and phenology (henceforth spatiotemporal knowledge rate) affected the resource distribution emerging after it had been let foraging for a long time (Figure \@ref(fig:figEngineering)). Both the patchiness (the tendency of trees to be aggregated into patches) and the alignment (the tendency of trees to form linear geometries) varied non-linearily and oppositely with spatiotemporal knowledge rate. While patchiness abruptly increased and was maximised for low cognition (spatiotemporal rate of 0.25; `r patchinessToNull[2]` times superior to that when a naive agent foraged), alignment was minimised for it (`r round(1/alignmentToNull[2], digits = 3)` times lower than when a naive agent foraged). In both cases, other spatiotemporal knowledges led to larger patchiness (`r min(patchinessToNull[3:5])` to `r max(patchinessToNull[3:5])` times) and alignment (`r min(alignmentToNull[3:5])` to `r max(alignmentToNull[3:5])` times) than when a naive agent foraged (Figure \@ref(fig:figEngineering)).  
+Foragers' spatiotemporal knowledge rate affected the resource distribution emerging after it had been let foraging for a long time (Figure \@ref(fig:figEngineering)). Both the patchiness (the tendency of trees to be aggregated into patches) and the alignment (the tendency of trees to form linear geometries) varied non-linearily and oppositely with spatiotemporal knowledge rate. While patchiness abruptly increased and was maximised for low cognition (spatiotemporal rate of 0.25; `r patchinessToNull[2]` times superior to that when a naive forager foraged), alignment was minimised for it (remaining equal to when a naive forager foraged). In both cases, other spatiotemporal knowledge led to larger patchiness (`r min(patchinessToNull[3:5])` to `r max(patchinessToNull[3:5])` times) and alignment (`r min(alignmentToNull[3:5])` to `r max(alignmentToNull[3:5])` times) than when a naive forager foraged (Figure \@ref(fig:figEngineering)).  
 
-|   Spatial autocorrelation in fruiting date (the tendency of trees to have fruiting dates closer in time to their spatial neighbours) remained barely unchanged by the spatiotemporal knowledge rate of the agent (Figure \@ref(fig:figEngineering)).  
+|   Spatial autocorrelation in fruiting date (the tendency of trees to have fruiting dates closer/farther in time to their spatial neighbours) remained mostly unaffected by the spatiotemporal knowledge rate of the forager (Figure \@ref(fig:figEngineering)).  
 
-|   Overall, such a space engineering was paralleled with the emergence of routine behaviours, which increased with spatiotemporal knowledge rate to saturate around 0.7 (Figure \@ref(fig:figEngineering)).
+|   Overall, such a space engineering was paralleled with the emergence of routine behaviours, which increased with spatiotemporal knowledge rate to saturate around 0.8 (Figure \@ref(fig:figEngineering)).
+
 
 ## Engineered patterns could affect the selection gradient on spatiotemporal cognition
 
-```{r figEfficiency, fig.width=8, fig.height=4, include=TRUE, warning = FALSE, fig.cap=" Relative foraging benefits of cognition are insensitive to changes in the emerging resource distribution | The 'initial condition' of resource distribution was taken from the simulations in which a null, intermediate or omniscient forager was first let foraging. Then, those three forager types were let foraging (separately) without dispersal and foraging efficiency was measured (cumulated food eaten over cumulated travelled distance)."}
+```{r figEfficiency, fig.width=8, fig.height=4, include=TRUE, warning = FALSE, fig.cap=" Relative foraging benefits of cognition are sensitive to changes in the emerging resource distribution | The 'initial condition' of resource distribution was taken from the simulations in which a null, intermediate or omniscient forager was first let foraging. Then, those three forager types were let foraging (separately) without dispersal and foraging efficiency was measured (cumulated food eaten over cumulated travelled distance)."}
 
 meanValuesEfficiency <- indicesEfficiency_df %>% 
   filter(initCondition %in% c(1,3,5)) %>% 
@@ -521,22 +535,25 @@ plotEfficiency +
 
 ```
 
-On average, an "omniscient" agent (knowing all trees' locations and phenology patterns) was around `r round(mean(comparisonsEfficiency$OmniToIntermediate[c(1,3,5)]), digits = 3)` times more efficient than an "intermediate" agent (knowing only 50% of them) or `r round(mean(comparisonsEfficiency$OmniToNull[c(1,3,5)]), digits = 3)` times than a "null" agent (knowning none of them) (Figure \@ref(fig:figEfficiency)). Yet, these relative benefits of memory varied a little with the resource distribution emerging from previous engineering (Figure \@ref(fig:figEfficiency)). Compared to when the agents foraged in an environment previously shaped by a null forager (left boxplots in Figure \@ref(fig:figEfficiency)), the relative foraging efficiency of intermediate agents compared to null agents increased of `r relativeIncreaseIntermediateNull_NullIntermediate`% and `r relativeIncreaseIntermediateNull_NullOmniscient`% when the agents foraged in an environment previously shaped by an intermediate or omniscient agent, respectively. Similarly, the relative foraging efficiency of intermediate agents compared to omniscient agents increased of `r relativeIncreaseIntermediateOmniscient_NullIntermediate`% and `r relativeIncreaseIntermediateOmniscient_NullOmniscient`% when the forager foraged in an environment previously shaped by an intermediate or omniscient agent, respectively.
+On average, an "omniscient" forager (knowing all trees' locations and phenology patterns) was around `r round(mean(comparisonsEfficiency$OmniToIntermediate[c(1,3,5)]), digits = 3)` times more efficient than an "intermediate" forager (knowing only 50% of them) or `r round(mean(comparisonsEfficiency$OmniToNull[c(1,3,5)]), digits = 3)` times than a "null" forager (knowning none of them) (Figure \@ref(fig:figEfficiency)). Yet, these relative benefits of memory varied a little with the resource distribution emerging from previous engineering (Figure \@ref(fig:figEfficiency)). Compared to when the foragers foraged in an environment previously shaped by a null forager (left boxplots in Figure \@ref(fig:figEfficiency)), the relative foraging efficiency of intermediate foragers compared to null foragers increased of `r relativeIncreaseIntermediateNull_NullIntermediate`% and `r relativeIncreaseIntermediateNull_NullOmniscient`% when the foragers foraged in an environment previously shaped by an intermediate or omniscient forager, respectively (middle and right boxplots in Figure \@ref(fig:figEfficiency)). Similarly, the relative foraging efficiency of intermediate foragers compared to omniscient foragers increased of `r relativeIncreaseIntermediateOmniscient_NullIntermediate`% and `r relativeIncreaseIntermediateOmniscient_NullOmniscient`% when the forager foraged in an environment previously shaped by an intermediate or omniscient forager, respectively, compared to when the foragers foraged in an environment
+previously shaped by a null forager.
 
-## Route formation emerges because of opportunistic stops and is reinforced by low tree space competition 
+## Route formation is reinforced because of opportunistic stops and by low tree space competition 
 
-How an agent moved to the target affected the emerging resource pattern (Figure \@ref(fig:figEngineering)). In particular, moving to all trees encountered *en route* to the target induced a `r round(meanValuesMovingRule$patchiness[meanValuesMovingRule$movingRule == "MovingAllTrees"]/meanValuesMovingRule$patchiness[meanValuesMovingRule$movingRule == "MovingFruitTrees"], digits = 3)` times higher patchiness than only stopping to fruit trees, but a `r round(1/(meanValuesMovingRule$patchiness[meanValuesMovingRule$movingRule == "MovingAllTrees"]/meanValuesMovingRule$patchiness[meanValuesMovingRule$movingRule == "MovingTarget"]), digits = 3)` times lower than moving only to the target. This latter is because resource tended to be concentred to the center of the map (Figures \@ref(fig:figShrinkage) and \@ref(fig:figMapShrinkage)), but not because more routes were formed. Indeed, resource alignment was `r round(1/(meanValuesMovingRule$alignment[meanValuesMovingRule$movingRule == "MovingTarget"]/meanValuesMovingRule$alignment[meanValuesMovingRule$movingRule == "MovingAllTrees"]), digits = 3)` and `r round(1/(meanValuesMovingRule$alignment[meanValuesMovingRule$movingRule == "MovingTarget"]/meanValuesMovingRule$alignment[meanValuesMovingRule$movingRule == "MovingFruitTrees"]), digits = 3)` times lower when the agent moved directly to the target rather than stopped to all or only fruiting trees (Figure \@ref(fig:figEngineering)).  
+How a forager moved to the target affected the emerging resource pattern (Figure \@ref(fig:figEngineering)). In particular, moving to all trees encountered *en route* to the target induced a `r round(1/(meanValuesMovingRule$patchiness[meanValuesMovingRule$movingRule == "MovingAllTrees"]/meanValuesMovingRule$patchiness[meanValuesMovingRule$movingRule == "MovingFruitTrees"]), digits = 3)` times lower patchiness than only stopping to fruit trees and `r round(1/(meanValuesMovingRule$patchiness[meanValuesMovingRule$movingRule == "MovingAllTrees"]/meanValuesMovingRule$patchiness[meanValuesMovingRule$movingRule == "MovingTarget"]), digits = 3)` times lower than moving only to the target. 
+<!-- This latter is because resource tended to be concentred to the center of the map (Figures \@ref(fig:figShrinkage) and \@ref(fig:figMapShrinkage)), but not because more routes were formed. Indeed, -->
+Resource alignment was `r round((meanValuesMovingRule$alignment[meanValuesMovingRule$movingRule == "MovingAllTrees"]/meanValuesMovingRule$alignment[meanValuesMovingRule$movingRule == "MovingTarget"]), digits = 3)` and `r round((meanValuesMovingRule$alignment[meanValuesMovingRule$movingRule == "MovingAllTrees"]/meanValuesMovingRule$alignment[meanValuesMovingRule$movingRule == "MovingFruitTrees"]), digits = 3)` times higher when the forager stopped to all trees rather than only stopped fruiting trees or moved directly to the target (Figure \@ref(fig:figEngineering)). Both patchiness and alignment were considerably reduced by competition for space between trees, with patchiness `r round((meanValuesSpacing$alignment[meanValuesSpacing$valueSpacing == 0.05]/meanValuesSpacing$alignment[meanValuesSpacing$valueSpacing == 0.45]), digits = 3)`  and `r round((meanValuesSpacing$alignment[meanValuesSpacing$valueSpacing == 0.05]/meanValuesSpacing$alignment[meanValuesSpacing$valueSpacing == 0.85]), digits = 3)` times larger when competition for space between trees was low compared to when it was intermediate or high, and alignment being `r round((meanValuesSpacing$alignment[meanValuesSpacing$valueSpacing == 0.05]/meanValuesSpacing$alignment[meanValuesSpacing$valueSpacing == 0.45]), digits = 3)`  and `r round((meanValuesSpacing$alignment[meanValuesSpacing$valueSpacing == 0.05]/meanValuesSpacing$alignment[meanValuesSpacing$valueSpacing == 0.85]), digits = 3)` times larger, respectively (Figure \@ref(fig:figEngineering)).
 
-|   Spatial autocorrelation in fruiting date remained unaffected by the agent moving rule (Figure \@ref(fig:figEngineering)).  
+|   Spatial autocorrelation in fruiting date remained mostly unaffected by the forager movement rule or competition for space between trees (Figure \@ref(fig:figEngineering)).  
 
-|   Variations in moving rules were paralleled by variations in routine behaviour, with agents moving to all tree being `r round((meanValuesMovingRule$routine[meanValuesMovingRule$movingRule == "MovingAllTrees"]/meanValuesMovingRule$routine[meanValuesMovingRule$movingRule == "MovingFruitTrees"]), digits = 3)` and `r round((meanValuesMovingRule$routine[meanValuesMovingRule$movingRule == "MovingAllTrees"]/meanValuesMovingRule$routine[meanValuesMovingRule$movingRule == "MovingTarget"]), digits = 3)` times more routine than agents stopping only to fruit trees or their target, respectively. Competition for space between trees did not affect the tendency of the agent to engage into routine behaviour (Figure \@ref(fig:figEngineering)).
+|   Variations in movement rules were paralleled by variations in routine behaviour, with foragers moving to all trees being `r round((meanValuesMovingRule$routine[meanValuesMovingRule$movingRule == "MovingAllTrees"]/meanValuesMovingRule$routine[meanValuesMovingRule$movingRule == "MovingFruitTrees"]), digits = 3)` and `r round((meanValuesMovingRule$routine[meanValuesMovingRule$movingRule == "MovingAllTrees"]/meanValuesMovingRule$routine[meanValuesMovingRule$movingRule == "MovingTarget"]), digits = 3)` times more routine than foragers stopping only to fruit trees or their target, respectively. Competition for space between trees similarly affected the tendency of the forager to engage into routine behaviour, with a larger routine when competition for space between trees was low (Figure \@ref(fig:figEngineering)).
 
 
 <!-- ```{r figMap, fig.width=7, fig.height=7, include=TRUE, warning = FALSE, fig.cap=""} -->
 
 <!-- # -> add one figure for distribution:  -->
-<!-- # - init, after naive agent ran, intermediate or prescient -->
-<!-- # - init and three moving rules -->
+<!-- # - init, after naive forager ran, intermediate or prescient -->
+<!-- # - init and three movement rules -->
 <!-- # - init and three spacing -->
 
 <!-- ``` -->
@@ -548,118 +565,52 @@ How an agent moved to the target affected the emerging resource pattern (Figure 
 
 # Discussion
 
-[TO BE COMPLETED]
+\initial{\textcolor{black}{T}}he environment is shaped by the species that inhabit it. The destructive behaviour of some animals when moving, such as forest elephants [@pringle2008elephants; @vanleeuwe1998forest], can lead to blatant changes, but more elusive - yet no less ecologically relevant - engineering can also occur over longer time scales. Using an agent-based model, I have illustrated the role of vagile animals in shaping the distribution of plants through zoochory. Based on a minimal set of realistic assumptions, I showed how this slow process could affect resource distribution provided that the seed-dispersing animal was endowed with cognitive abilities, which in turn shaped selection on these abilities. Therefore, this study illustrates how foraging cognition is both a cause and a consequence of resource heterogeneity.
 
-\initial{\textcolor{black}{T}}he environment is shaped by the species that inhabit it. The destructive behaviour of some animals, such as forest elephants [@pringle2008elephants; @vanleeuwe1998forest], can lead to blatant changes, but more elusive - yet no less ecologically relevant - engineering can also occur over longer time scales. Using an agent-based model, we have illustrated the role of animals in shaping the distribution of plants through zoochory. We showed that this slow process could affect how resource is distributed in space provided that the seed disperser animal was endowed with cognitive abilities.
+|    As the breadth of knowledge increased, routine behaviour, the ability to repeatedly follow a fixed sequence of movements, developed [routine index > 0.8, @riotte2015memory]. The model evidenced that the emergence of such behaviour was associated with changes in the distribution of resources, which tended to become more patchy, eventually forming linear features paralleling the routes used. The agglomeration of seeds for cognitive foragers has been proposed theoretically [@john2016memoryseed] and empirically [@fragoso2003tapiraggregationseed], ultimately impacting the genetic structure and flow of plant populations [@gelmicandusso2017zoochorygenetic]. Here, the model highlighted how engineering can go further by contributing to a more organised distribution of resources, with the emergence of linear features likely to be associated with the foraging routes used due to cognition, as suggested by forest elephant routes matching with fruit gradients in the forest [@blake2009forest]. Indeed, the non-linearity of the changes in patchiness and alignment with the cognition of the forager likely corresponds to the formation of the routes themselves, with the "materialisation" first of the route intersections (hence higher patchiness, lower alignment for low cognition), where most of the recursions occur [@presotto2018intersection], before a spreading along the segment path connecting them is possible when cognition increases. This engineering remained yet limited because the resource patterns did not fully match the simulated route-based patterns [(see Appendix)][Using patchiness and alignment to characterise spatial point patterns]. Furthermore, despite vertical inheritance of the parent tree phenology, seed dispersal was not sufficient to drive local autocorrelation in fruiting dates. Tree synchrony is an important tool that can be used by foragers to plan their movements efficiently [@janmaat2012use]. Given the climatic drivers of large-scale synchrony, the latter can be tracked by animals [@janmaat2006primates]. While large-scale populational trend in phenology might root into genetic constraints [@chuine2000geneticphenology; @lyngdoh2012influence], a fine-scale synchrony is also observed in nature [@lamontagne2007local] and might as likely affect animal foraging success. The absence of emergence of spatial autocorrelation in fruiting date in this model may suggest a mainly non-genetic origin of these fine-scale variations for endozoochory (as implicitly assumed here) given the delay between ingestion and defecation, in the absence of other dispersal modes [e.g. gravichory, leading to highly clustered patterns, @seidler2006seed]. However, these conclusions may be challenged by more accurate modelling of movement behaviour, which may lead to different results (see below). Despite these limits, the observed spatial engineering could still be sufficient for the emergence of eco-evolutionary feedback loops between animal resources and animal movement (and cognition) [@riotte2020environmental] due to the evidenced repercussions on foragers' foraging efficiency.  
 
-[%PARAGRAPH COGNITION]
--> routine emergence and route formation
--> non-linear engineering: importance for evolution. Yet, small consequence on memory benefits. For those, it seems that taxis is not sufficient (as null model did not perform better). But the perception range is relatively reduced compared to tree density. Further investigation should see whether taxis is then more efficient in engineered environments.
+|   While the same individual might experience little change in resource distribution over its lifetime, the progressive engineering of resource distribution could overturn selection over generations. This model showed that changes in environmental conditions were likely to affect the benefits of memory, but not enough to completely overturn selection. Indeed, in engineered environments, omniscient foragers were relatively less efficient compared to less cognitively skilled individuals than in non-engineered environments. However, naive agents did not perform better in engineered environments. The performance of these naive agents is clearly dependent on their sensory abilities [@grove2013evolution]. Although always superior to the randomly expected nearest neighbour distance, the sensory range modelled here may have been insufficient for simple movement strategies such as taxis to perform well. As much as memory could be favoured, the environment could also shape sensory abilities [@LaScalaGurenwald2019sensory]. Still, the changes in the relative efficiency of cognitive agents open the door to the possible emergence of evolutionary feedback loops if the costs of memory are no longer compensated, which should lead to a dynamic equilibrium [@beisner2003alternative] due to the simultaneous changes in memory benefits (hence selection) with space engineering.
 
--> no effect on temporal pattern: in reality microclimate reigns over shaping this
-Opening:
-seed dispersal across scales (scaling with animal size)
+|   Space engineering was reinforced by the conjunction of two forces: the forager movement rules and competition for space between trees. Maximum resource engineering was achieved when the individual moved to all the trees it encountered along the way. At the other extreme, when the animal moved directly to the best target, engineering was reduced, following routine trends. Although more efficient, moving straight to the target is rarely observed in nature. Instead, animals tend to move along routes, sometimes bypassing or otherwise opportunistically inspecting trees without resources, fitting with a beacon-based navigation, where individuals move from beacon to beacon to reach a goal [@warren2019non; @fagan2013spatial]. Such a movement strategy give them the possibility to monitor the environment [@guinea2019arboreal], allowing them to update personal information. As such, despite short-term costs due to detours, moving to all tress might provide long-term advantages. Simulated movement patterns remained yet extremely simplistic and animal movement is much more nuanced than this modelling work provides. This could be important for seed acquisition and deposition [@morales2022models]. This model considered directed movement supported by memory, which could alternate with random steps when memory was limited but independent of local cue feedback, as it would rather be expected for efficient foraging [@benhamou2015ultimate]. In reality, animal movement may indeed alternate between 'large-scale' directed relocation events and 'area-restricted' wandering searches of the tree in a non-random manner [@bartumeus2016foraging]. When and where area-restricted searches occur may further contribute to the emergent distribution of seed deposition [@westcott2005incorporating; @russo2006behaviourdispersal], provided that both seed deposition and foraging can occur simultaneously. Animals may yet be selective about where and when they defecate. The presence of latrines may contribute to shaping the distribution of resources too [@irwin2004lemurlatrine; @fragoso1997tapir; @pouvelle2009howlerlatrine; @fuzessy2022defecation; @sakamoto2015raccoon]. Overall, as movement and/or dispersal scales with behaviour/personality [@zwolak2018intraspecificdispersal; @brehm2022personalitydispersal; @zwolak2020personalitydispersal], but also species and individual size [@jordano2007frugivores], a multi-individual and multi-species system could lead to a more complex multi-scale scaffolding than illustrated here. This could explain why the evolution of the cognitive machinery underpinning foraging might depend on the frugivore community composition [@robira2023primate].
 
--> necessité de prendre en compte la competition (cf publi Louise + phylogenie)
+|   In this scaffolding, the plant itself may also play a role. Not only are seed characteristics important in the dispersal process [@albert2015traitdispersal; @fuzessy2018effects], but the success of seedling germination is highly dependent on the conditions in which the seed is deposited, due to direct or indirect actions of conspecifics. This model took into account negative interactions between trees [e.g. competition for resource, @craine2013mechanismcompetitiontree, inducing an exclusive space use] and illustrated how this could act as a barrier to spatial engineering. Indeed, as competition for space between trees increased, both patchiness and alignment logically decreased. While the model effect was interpreted as a competition for space, this may also encompass other processes such as greater exposure of seeds to predation risk in the vicinity of adult plant conspecifics [@janzen1970herbivores]. Conversely, facilitation could also occur, with the adult plants acting as a shelter for new seedlings [@callaway1995positive]. This facilitation should thus increase clustering. While directly unmodelled here, in the quasi absence of competition for space, tree range was coherently drastically reduced (i.e. shrunk; Figure \@ref(fig:figShrinkage)), with a tendency to agglomerate towards the centre of the map, where individual recurrences are likely to be most important. Therefore, the engineered patterns (e.g. from increased patchiness to route formation) may also depend on plant interactions, adding to the complexity of the system depicted.
 
-[%PARAGRAPH MOVING RULE]
-
--> different movement rules => different patterns. 
+<!-- Competition between trees: -->
+<!-- Theory and Models of Inter-Plant Competition as a Spatial Process -->
 
 
-Limit (extension to do):
--> fine scale variation due to movement behaviour modes: REF a trouver
+\bigskip
 
-seed dispersal and animal behaviour
-Incorporating patterns of disperser behaviour into models of seed dispersal and its effects on estimated dispersal curves
-https://link.springer.com/article/10.1007/s00442-005-0178-1
-INCORPORATING ANIMAL BEHAVIOR INTO SEED DISPERSAL MODELS: IMPLICATIONS FOR SEED SHADOWS
-https://esajournals.onlinelibrary.wiley.com/doi/full/10.1890/0012-9658%282006%2987%5B3160%3AIABISD%5D2.0.CO%3B2
+|   The sessile lifestyle of plants may have created the illusion of residual fixity in the environmental conditions that shape the lives of animals. While the environment is likely to remain the same over an animal's lifetime, conferring the benefits of long-term information retention in animals, the environment can also change over longer periods of time. Selection could thus operate in two ways at two different evolutionary speeds: animals could play a key role in plant traits by actively selecting and dispersing their food over long time, while their traits could have been shaped by foraging on that primary food over shorter time. Considering the feedback loops between these different entities could be an important facet to make sense of still poorly understood patterns of co-evolution, such as the primates/angiosperms dyad [@gomez2012understanding; @sussman1991Primate; @fuzessy2022Phylogenetic; @fuzessy2023friends]. 
 
--> other aspects of dispersion matter + variability between individual
-How intraspecific variation in seed-dispersing animals matters for plants
-https://onlinelibrary.wiley.com/doi/full/10.1111/brv.12377
 
--> inter-individual variability (personality and seed dispersal)
+<!-- Model  -->
+<!-- https://besjournals.onlinelibrary.wiley.com/doi/pdf/10.1111/j.1365-2745.2007.01341.x -->
+<!-- https://besjournals.onlinelibrary.wiley.com/doi/pdf/10.1111/1365-2745.13287 -->
 
-seed dispersal/personality
-Small mammal personalities generate context dependence in the seed dispersal mutualism
-https://www.pnas.org/doi/full/10.1073/pnas.2113870119
-Animal personalities and seed dispersal: A conceptual review
-https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/1365-2435.13583
-
--> potentially different rules for "where to defecate", selection of latrine sites
-
-[%PARAGRAPH TREE SPACING]
-It would be abusive to only see the story through the forager's lens. Trees are not passive in this process: they compete for resource themselves. Hence effect of this competition on the resulting pattern.
-Limit: 3D scaffolding too.
-
-Opening:
-
-Therefore, the evolutionary history of resources
-and associated foragers, as in the angiosperms/primates dyad, may be joint (Fuzessy
-et al., 2022; Gómez & Verdú, 2012; Lim et al., 2021; Sussman, 1991).
-Co-evolution primate angiosperms
-Fuzessy et al., 2022
-Gómez & Verdú, 2012
-Lim et al., 2021
-Sussman, 1991
-
-<!-- Lomáscolo, S. B., & Schaefer, H. M. (2010). Signal convergence in fruits: A result of selection -->
-<!-- by frugivores? Journal of Evolutionary Biology, 23 (3), 614–624. https://doi.org/10. -->
-<!-- 1111/j.1420-9101.2010.01931.x -->
+<!-- Same movement pattern and still difference in resulting pattern: -->
+<!-- Valenta, Kim, et al. "Spatial patterns of primary seed dispersal and adult tree distributions: Genipa americana dispersed by Cebus capucinus." Journal of Tropical Ecology 31.6 (2015): 491-498. -->
+<!-- @valenta2020dispersal;  -->
 
 <!-- Flörchinger, M., Braun, J., Böhning-Gaese, K., & Schaefer, H. M. (2010). Fruit size, crop -->
 <!-- mass, and plant height explain differential fruit choice of primates -->
 
-<!-- Fuzessy, L., Silveira, F. A., Culot, L., Jordano, P., & Verdú, M. (2022). Phylogenetic congruence between Neotropical primates and plants is driven by frugivory. Ecology Letters, 25 (2), 320–329. https://doi.org/10.1111/ele.13918 -->
-
-<!-- Gómez, J. M., & Verdú, M. (2012). Mutualism with plants drives primate diversification. -->
-<!-- Systematic Biology, 61 (4), 567–577. https://doi.org/10.1093/sysbio/syr127 -->
-
-<!-- Sussman, R. W. (1991). Primate origins and the evolution of angiosperms. American Journal -->
-<!-- of Primatology, 23 (4), 209–223. https://doi.org/10.1002/ajp.1350230402 -->
-
-<!-- Lim, J. Y., Wasserman, M. D., Veen, J., Després-Einspenner, M. L., & Kissling, W. D. -->
-<!-- (2021). Ecological and evolutionary significance of primates’ most consumed plant -->
-<!-- families. Proceedings of the Royal Society B: Biological Sciences, 288 (1953). https: -->
-<!-- //doi.org/10.1098/rspb.2021.0737 -->
-
-
-
-<!-- Active selection for some plant individuals etc... has likely fostered co-evolution (REF). -->
-
-<!-- Rojas, Tobias Nicolas, et al. "A combination of rules govern fruit trait preference by frugivorous bat and bird species: nutrients, defence and size." Animal Behaviour 176 (2021): 111-123. -->
-
-<!-- Duan, Qiong, Eben Goodale, and Rui-chang Quan. "Bird fruit preferences match the frequency of fruit colours in tropical Asia." Scientific Reports 4.1 (2014): 5627. -->
-<!-- . -->
-
-<!-- Case of seed dispersal: -->
-<!-- How do primates affect seed germination? A meta‐analysis of gut passage effects on neotropical plants -->
-<!-- LF Fuzessy, TG Cornelissen, C Janson, FAO Silveira -->
-<!-- Oikos 125 (8), 1069-1080 -->
-
-<!-- Effects of seed size and frugivory degree on dispersal by Neotropical frugivores -->
-<!-- LF Fuzessy, C Janson, FAO Silveira -->
-<!-- Acta Oecologica 93, 41-47 -->
-
-
 
 # Acknowledgements
 
-Simulations were ran on the HPC cluster of the Edmund Mach Foundation. We thank Louise Riotte-Lambert for discussion on the model rationale.
+Simulations were run on the HPC cluster of the Edmund Mach Foundation. I thank Louise Riotte-Lambert for discussion on the model rationale.
 
 # Funding
 
-B.R. was supported by the Gordon and Betty Moore Foundation.
+I was supported by the Gordon and Betty Moore Foundation.
 
 # Declaration of conflict of interest
 
-We declare having no conflict of interest.
+I declare having no conflict of interest.
 
 # Data and code availability
 
-The code used to generate the data and perform the analyses is available at https://github.com/benjaminrobira/ModelZoochoryCognition. We provide it with the singularity image, which would allow the user to access the computing environment used to run the simulations in the first place.
+The code used to generate the data and perform the analyses is available at https://github.com/benjaminrobira/ModelZoochoryCognition. For the definitive archiving, I will provide the singularity image, which would allow the user to access the computing environment used to run the simulations in the first place.
 
 \beginsupplement
 
@@ -670,7 +621,7 @@ The code used to generate the data and perform the analyses is available at http
 
 <!-- ## What distance to calculate reticulation? -->
 
-<!-- We tested four different distance to use for establishing the Relative Neighbouring Graph, namely, the Euclidean distance (distance of norm 2, used for basics geometry), the Manhattan distance (distance of norm 1, usually adapted to grid system), the Chebychev distance (distance of infinite norm), or the Canberra distance (Weighted manhattan distance). We considered point patterns corresponding to a homogeneous distribution (Poisson distribution), a heterogeneous distribution (Poisson distribution of clusters of trees), and of route networks (see Figure \@ref(fig:figDistribution), at high density). The distribution resembling a route network was obtained by modelling ten correlated random walk of 100 steps ("simm.crw" function of the *adehabitatLT* package [@adehabitatLT], with a scaling parameter, to determine step length, of 20 su, and a concentration parameter, relative to the correlation in heading, of 0.9). All distributions included 1000 trees within a square map of side length 1000 su. We repeated measurements on `r numberOfRepetitionsForMetrics` maps for each distribution type. It emphasizes that the Manhattan distance seems the most pertinent distance to clearly distinguish between distribution reticulation, with more reticulated distributions corresponding to route network-like distributions. -->
+<!-- I tested four different distance to use for establishing the Relative Neighbouring Graph, namely, the Euclidean distance (distance of norm 2, used for basics geometry), the Manhattan distance (distance of norm 1, usually adapted to grid system), the Chebychev distance (distance of infinite norm), or the Canberra distance (Weighted manhattan distance). I considered point patterns corresponding to a homogeneous distribution (Poisson distribution), a heterogeneous distribution (Poisson distribution of clusters of trees), and of route networks (see Figure \@ref(fig:figDistribution), at high density). The distribution resembling a route network was obtained by modelling ten correlated random walk of 100 steps ("simm.crw" function of the *adehabitatLT* package [@adehabitatLT], with a scaling parameter, to determine step length, of 20 su, and a concentration parameter, relative to the correlation in heading, of 0.9). All distributions included 1000 trees within a square map of side length 1000 su. I repeated measurements on `r numberOfRepetitionsForMetrics` maps for each distribution type. It emphasizes that the Manhattan distance seems the most pertinent distance to clearly distinguish between distribution reticulation, with more reticulated distributions corresponding to route network-like distributions. -->
 
 <!-- ```{r figDistance, fig.width=7, fig.height=8, include=TRUE, warning = FALSE, fig.cap="Reticulation index as a function of the distance used for calculation | Distribution: Homo. = homogeneous, Hetero. = Heterogeneous, Route = Route network-like."} -->
 <!-- theme_set(theme_bw(15)) -->
@@ -679,13 +630,13 @@ The code used to generate the data and perform the analyses is available at http
 
 <!-- ## Quadrat size estimation -->
 
-<!-- As specified by @lloyd1967mean, quadrat size should little matter for calculation provided sufficient biological relevance in a homogeneous distribution (*to verify, written based on my memories of it*). Estimating such "biological relevance" in a completely artefactual world is thus rendered difficult. We thus considered different quadrat sizes (paste(patchSizeToTest, collapse=", ") su), and calculated patchiness for r numberPatchinessRepetition homogeneous or heterogeneous distribution (see below for definition) when a square map of side 1000 su contained 1000 trees. -->
+<!-- As specified by @lloyd1967mean, quadrat size should little matter for calculation provided sufficient biological relevance in a homogeneous distribution (*to verify, written based on my memories of it*). Estimating such "biological relevance" in a completely artefactual world is thus rendered difficult. I thus considered different quadrat sizes (paste(patchSizeToTest, collapse=", ") su), and calculated patchiness for r numberPatchinessRepetition homogeneous or heterogeneous distribution (see below for definition) when a square map of side 1000 su contained 1000 trees. -->
 
 ## Using patchiness and alignment to characterise spatial point patterns
 
-We provide below evidence that the two metrics, namely *patchiness* and *alignment*, allows for distinguishing between homogeneous, heterogeneous and route point patterns. In both the low (100 trees) and high (1000 trees) density, we considered 1/10 of the number of trees as the number of clusters for the heterogeneous distribution (i.e. 10 clusters at low density, 100 at high density). Around these clusters of strictly equivalent size, trees were distributed according to a Gaussian distribution (both for the *x* and *y* axis) of variance 50 su. The distribution resembling a route network was obtained by modelling one (low density) to ten (high density) correlated random walks of 100 steps ("simm.crw" function of the *adehabitatLT* package, @adehabitatLT, with a scaling parameter, to determine step length, of 20 su, and a concentration parameter, relative to the correlation in heading, of 0.9). We calculated the two metrics on `r numberOfRepetitionsForMetrics` distributions. 
+I provide below evidence that the two metrics, namely *patchiness* and *alignment*, allows for distinguishing between homogeneous, heterogeneous and route point patterns. In both the low (100 trees) and high (1000 trees) density, I considered 1/10 of the number of trees as the number of clusters for the heterogeneous distribution (i.e. 10 clusters at low density, 100 at high density). Around these clusters of strictly equivalent size, trees were distributed according to a Gaussian distribution (both for the *x* and *y* axis) of variance 50 su. The distribution resembling a route network was obtained by modelling one (low density) to ten (high density) correlated random walks of 100 steps ("simm.crw" function of the *adehabitatLT* package, @adehabitatLT, with a scaling parameter, to determine step length, of 20 su, and a concentration parameter, relative to the correlation in heading, of 0.9). I calculated the two metrics on `r numberOfRepetitionsForMetrics` distributions. 
 
-<!-- Note that, because we are in "perfect" conditions, we considered a neighbourhood for the alignment of 0 su, implying that the calculation was based on the triangle formed with the two closest trees for each tree. -->
+<!-- Note that, because I are in "perfect" conditions, I considered a neighbourhood for the alignment of 0 su, implying that the calculation was based on the triangle formed with the two closest trees for each tree. -->
 
 |   Homogeneous distributions are identified by a low patchiness and a low alignment. Heterogeneous distributions are identified by an intermediate patchiness and a low alignment. Finally route point distributions are evidenced by a high patchiness and a high alignment (Figure \ref{fig:figMetrics}). This pattern is robust to density variations, although absolute differences in the indices shrink with density increase (Figure \ref{fig:figMetrics}).
 
@@ -791,15 +742,11 @@ global.ggplot
 
 ## Variations in resource range shrinkage intensity
 
-Shrinkage was driven by the agent limiting visits to tree encountered *en route*, with a maximum reached when the agent discarded all of these trees and moved directly to the target (Figure \@ref(fig:figShrinkage)a), but was mostly insensitive to the competition for space between trees (Figure \@ref(fig:figShrinkage)b) and the agent's cognition (Figure \@ref(fig:figShrinkage)c). Note however that the effect of those two latter was estimated when the forager moved to all trees. 
+Shrinkage was affected by the forager's cognition, peaking at low cognition (Figure \@ref(fig:figShrinkage)a). Shrinkage was also driven by the forager limiting visits to tree encountered *en route*, with a maximum reached when the forager discarded all of these trees and moved directly to the target (Figure \@ref(fig:figShrinkage)b). Finally, shrinkage was removed when the competition for space between trees was high (Figure \@ref(fig:figShrinkage)c).
 
+<!-- Rapid investigation confirmed that the competition for space was an efficient tool to counterbalance shrinkage when the forager moved only to target trees (e.g. Figure \@ref(fig:figMapShrinkage)). -->
 
-<!-- Rapid investigation confirmed that the competition for space was an efficient tool to counterbalance shrinkage when the agent moved only to target trees (e.g. Figure \@ref(fig:figMapShrinkage)). -->
-
-
-[WARNING: IN FIRGURE SHRINKAGE: MOVING ALL TREES; COMPETITION INTENSITY OF 0.45 and OMNISCIENCE should give same results. It does not, why?]
-
-```{r figShrinkage, fig.width=20, fig.height=5, include=TRUE, warning = FALSE, fig.cap="Shrinkage of resource range is driven by the forager moving rule | Shrinkage (varies from 0 to 1) as a function of the agent moving rule, the level of competition for space between tree or the spatiotemporal knowledge rate of the agent."}
+```{r figShrinkage, fig.width=20, fig.height=5, include=TRUE, warning = FALSE, fig.cap="Shrinkage of resource range is driven by cognition, the forager's movement rules and competition for space between trees."}
 shrinkageMovingRule_plot <- readRDS("../Renvironment/Plots/movingRuleShrinkage.rds")
 shrinkageSpaceTree_plot <- readRDS("../Renvironment/Plots/spacingTreeShrinkage.rds")
 shrinkageMain_plot <- readRDS("../Renvironment/Plots/mainShrinkage.rds")
@@ -814,15 +761,15 @@ rasterhomogeneous <- rasterGrob(image, interpolate = TRUE)
 
 #Shrinked
 image <- readPNG("../FIG/shrinked.png")
-rastershrinked <- rasterGrob(image, interpolate = TRUE)
+rasterShrunk <- rasterGrob(image, interpolate = TRUE)
 
 #Patchiness legend
-shrinkedLegend <- ggplot() +
+ShrunkLegend <- ggplot() +
   geom_segment(mapping = aes(x = 0, xend = 0, y = 0.1, yend = 1),
                arrow = arrow(length = unit(0.03, "npc"), ends="last"),
                color = "black",
                size = 0.7) +
-  annotation_custom(rastershrinked, xmin = 0, xmax = 0.2, ymin = 0.8, ymax = 1) + 
+  annotation_custom(rasterShrunk, xmin = 0, xmax = 0.2, ymin = 0.8, ymax = 1) + 
   annotation_custom(rasterhomogeneous, xmin = 0, xmax = 0.2, ymin = 0.1, ymax = 0.3) + 
   xlim(c(0, 0.4)) + 
   ylim(c(0, 1)) + 
@@ -830,18 +777,18 @@ shrinkedLegend <- ggplot() +
 
 library(ggpubr)
 mergedShrinkagePlot <- ggarrange(
-  shrinkageMain_plot,
-  shrinkageMovingRule_plot + rremove("ylab"),
-  shrinkageSpaceTree_plot + rremove("ylab"),
-  shrinkedLegend,
+  shrinkageMain_plot + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0,0.25)),
+  shrinkageMovingRule_plot + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0,0.25)),
+  shrinkageSpaceTree_plot + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0,0.25)),
+  ShrunkLegend,
   nrow = 1,
-  widths = c(0.27,0.27,0.27,0.19)
+  widths = c(0.3,0.25,0.25,0.2)
 )
 mergedShrinkagePlot 
 ```
 
 
-```{r figMapShrinkage, fig.width=15, fig.height=5, include=TRUE, warning = FALSE, fig.cap="Shrinkage of resource when the forager moves directly the target tree is counterbalanced by tree space competitiong ! Two illustrative maps of resource distribution when an omniscient forager moving to only the target trees was let foraging in an environment for long time for when space competition between trees was low (0.05; left) or hight (0.85; right)."}
+```{r figMapShrinkage, fig.width=15, fig.height=5, include=TRUE, warning = FALSE, fig.cap="Shrinkage of resource when the forager moves directly the target tree is counterbalanced by tree space competitiong | Two illustrative maps of resource distribution when an omniscient forager moving to only the target trees was let foraging in an environment for long time for when space competition between trees was low (0.05; left) or hight (0.85; right)."}
 
 # mapOfInterest <- readRDS("../Renvironment/Plots/mapsMovingTargetSpaceTreeLoworHigh.rds")
 # mapOfInterest

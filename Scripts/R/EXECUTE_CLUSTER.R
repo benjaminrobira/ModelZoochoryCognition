@@ -17,5 +17,5 @@ setwd("/nfs1/robirab/ModelZoochoryCognition/")#Setting up the direction to the c
 # source("Scripts/R/4_RunSimu4.R")
 # source("Scripts/R/5_RunSimu5.R")
 
-source("Scripts/R/7a_SensitivityMovingRule.R")
-# source("Scripts/R/7b_SensitivitySpaceTree.R")
+# source("Scripts/R/7a_SensitivityMovingRule.R")
+source("Scripts/R/7b_SensitivitySpaceTree.R")

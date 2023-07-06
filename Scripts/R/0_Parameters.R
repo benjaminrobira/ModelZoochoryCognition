@@ -5,7 +5,7 @@
 # What does this script do?
 # This script sets up all parameters needed for running the simulations.
 
-rm(list=ls())
+#rm(list=ls())
 
 #Parameters
 
@@ -68,10 +68,10 @@ parametersValue[4,] <- c("Environment","Number of periods","Number of periods be
 parametersValue[5,] <- c("Environment","Number of trees","Number of trees hosted by the environment", numberTrees, "")
 parametersValue[6,] <- c("Environment","Fruiting length","Time duration of the fruiting period of each tree", fruitingLength, "tu")
 parametersValue[7,] <- c("Environment","Maximum food yielded at a tree","Food quantity that a tree might yield at best (peak of the triangular-shaped food distribution)", maxFoodToYield,"fu")
-parametersValue[8,] <- c("Environment","Space for tree", "Space occupied by a tree and unavailable for others", intensityCompetitionForSpace/numberTrees, "% of map area")
+parametersValue[8,] <- c("Environment","Space for tree", "Space occupied by a tree and unavailable for others", intensityCompetitionForSpace*100, "% of map area")
 parametersValue[9,] <- c("Agent","Speed","Speed at which the forager moves", speed, "su/tu")
 parametersValue[10,] <- c("Agent","Torpor time","Time duration for which the forager stops foraging in case no food is available in the environment", torporTime, "tu")
-parametersValue[11,] <- c("Agent","Perceptual range","Distance at which the forager is aware of the environment and can harvest food at no moving cost", round(perceptualRange, digits = 2), "su")
+parametersValue[11,] <- c("Agent","Perceptual range","Distance at which the forager is aware of the environment", round(perceptualRange, digits = 2), "su")
 parametersValue[12,] <- c("Agent","Knowledge rate","Proportion of trees of the environment for which the forager knows the location and prodution timing", paste0("(", paste(spatialKnowledge, collapse = ", "), ")"),"")
 parametersValue[13,] <- c("Agent","No-return time","Time delay before a forager mentally decides to target a previously visited tree", noReturnTime, "tu")
 parametersValue[14,] <- c("Agent","Dispersal time","Time duration during which seeds from a previously ingested fruit can be dispersed", timeDelayForDispersal, "tu")
@@ -90,4 +90,4 @@ parametersValue <- parametersValue[!is.na(parametersValue[,1]),]
 
 # Saving image ------------------------------------------------------------
 
-save.image("Scripts/R/Parameterisation.RData")
+#save.image("Scripts/R/Parameterisation.RData")

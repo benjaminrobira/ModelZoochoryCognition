@@ -685,7 +685,7 @@ plotMap <- function(
 ## Moving rule -------------------------------------------------------------
 
 listFiles_v <- list.files("Output/SensitivityMovingRule")
-whichlistFiles_v <- grep("CheckTest", listFiles_v)
+whichlistFiles_v <- grep("Test", listFiles_v)
 listFiles_v <- listFiles_v[whichlistFiles_v]
 whichMapFinal_v <- grep("Map_36500", listFiles_v)
 filesMapFinal_v <- listFiles_v[whichMapFinal_v]
@@ -821,7 +821,7 @@ indicesMovingRule_df$routine <- as.numeric(indicesMovingRule_df$routine)
 library(ggplot2)
 library(scales)
 
-plotPatchiness <- plotResults(
+plotPatchinessMoving <- plotResults(
   yAxisName = "Patchiness",
   xAxisName = "Moving rule",
   xVar = "movingRule",
@@ -832,7 +832,7 @@ plotPatchiness <- plotResults(
   levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)]
 )
 
-plotAlignment <- plotResults(
+plotAlignmentMoving <- plotResults(
   yAxisName = "Alignment",
   xAxisName = "Moving rule",
   xVar = "movingRule",
@@ -843,7 +843,7 @@ plotAlignment <- plotResults(
   levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)]
 )
 
-plotRoutine <- plotResults(
+plotRoutineMoving <- plotResults(
   yAxisName = "Routine",
   xAxisName = "Moving rule",
   xVar = "movingRule",
@@ -854,7 +854,7 @@ plotRoutine <- plotResults(
   levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)]
 )
 
-plotSpatAutocorr <- plotResults(
+plotSpatAutocorrMoving <- plotResults(
   yAxisName = "Spatial autocorrelation",
   xAxisName = "Moving rule",
   xVar = "movingRule",
@@ -878,10 +878,10 @@ plotShrinkageMovingRule <- plotResults(
 
 library(ggpubr)
 mergedPlot <- ggarrange(
-  plotPatchiness + rremove("xlab") + rremove("ylab"),
-  plotAlignment + rremove("xlab") + rremove("ylab"),
-  plotSpatAutocorr + rremove("xlab") + rremove("ylab"),
-  plotRoutine + rremove("xlab") + rremove("ylab"),
+  plotPatchinessMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.8,1.3)),
+  plotAlignmentMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.1,0.8)),
+  plotSpatAutocorrMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.45,0.65)),
+  plotRoutineMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.5,0.9)),
   nrow = 4, 
   ncol = 1
 )
@@ -892,7 +892,7 @@ mergedPlotMovingRule
 # Spacing tree ------------------------------------------------------------
 
 listFiles_v <- list.files("Output/SensitivitySpaceTree")
-whichlistFiles_v <- grep("CheckTest", listFiles_v)
+whichlistFiles_v <- grep("Test", listFiles_v)
 listFiles_v <- listFiles_v[whichlistFiles_v]
 whichMapFinal_v <- grep("Map_36500", listFiles_v)
 filesMapFinal_v <- listFiles_v[whichMapFinal_v]
@@ -1020,7 +1020,7 @@ colnames(indicesSpacing_df) <- c("valueSpacing", "patchiness", "alignment", "spa
 ## Quick plot --------------------------------------------------------------------
 indicesSpacing_df$shrinkage <- as.numeric(indicesSpacing_df$shrinkage)
 
-plotPatchiness <- plotResults(
+plotPatchinessSpacing <- plotResults(
   yAxisName = "Patchiness",
   xAxisName = "Spacing tree intensity",
   xVar = "valueSpacing",
@@ -1031,7 +1031,7 @@ plotPatchiness <- plotResults(
   levelsNewNameX = c("0.05", "0.45", "0.85")
 )
 
-plotAlignment <- plotResults(
+plotAlignmentSpacing <- plotResults(
   yAxisName = "Alignment",
   xAxisName = "Spacing tree intensity",
   xVar = "valueSpacing",
@@ -1042,7 +1042,7 @@ plotAlignment <- plotResults(
   levelsNewNameX = c("0.05", "0.45", "0.85")
 )
 
-plotRoutine <- plotResults(
+plotRoutineSpacing <- plotResults(
   yAxisName = "Routine",
   xAxisName = "Spacing tree intensity",
   xVar = "valueSpacing",
@@ -1053,7 +1053,7 @@ plotRoutine <- plotResults(
   levelsNewNameX = c("0.05", "0.45", "0.85")
 )
 
-plotSpatAutocorr <- plotResults(
+plotSpatAutocorrSpacing <- plotResults(
   yAxisName = "Spatial autocorrelation",
   xAxisName = "Spacing tree intensity",
   xVar = "valueSpacing",
@@ -1077,10 +1077,10 @@ plotShrinkageSpaceTree <- plotResults(
 
 library(ggpubr)
 mergedPlot <- ggarrange(
-  plotPatchiness + rremove("xlab") + rremove("ylab"),
-  plotAlignment + rremove("xlab") + rremove("ylab"),
-  plotSpatAutocorr + rremove("xlab") + rremove("ylab"),
-  plotRoutine + rremove("xlab") + rremove("ylab"),
+  plotPatchinessSpacing + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.8,2.6)),
+  plotAlignmentSpacing + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.1,0.8)),
+  plotSpatAutocorrSpacing + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.45,0.65)),
+  plotRoutineSpacing  + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.5,0.9)),
   nrow = 4, 
   ncol = 1
 )

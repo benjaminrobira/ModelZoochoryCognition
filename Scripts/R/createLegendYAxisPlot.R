@@ -35,48 +35,48 @@ rasternospcorr <- rasterGrob(image, interpolate = TRUE)
 
 #Patchiness legend
 patchinessLegend <- ggplot() +
-  geom_segment(mapping = aes(x = 0, xend = 0, y = 0.1, yend = 1),
+  geom_segment(mapping = aes(x = 0, xend = 0, y = 0.05, yend = 1),
                arrow = arrow(length = unit(0.03, "npc"), ends="last"),
                color = "black",
                size = 0.7) +
   annotation_custom(rasterheterogeneous, xmin = 0, xmax = 0.2, ymin = 0.8, ymax = 1) + 
-  annotation_custom(rasterhomogeneous, xmin = 0, xmax = 0.2, ymin = 0.1, ymax = 0.3) + 
+  annotation_custom(rasterhomogeneous, xmin = 0, xmax = 0.2, ymin = 0.05, ymax = 0.25) + 
   xlim(c(0, 0.4)) + 
   ylim(c(0, 1)) + 
   theme_void()
 
 #Alignment legend
 alignmentLegend <- ggplot() +
-  geom_segment(mapping = aes(x = 0, xend = 0, y = 0.1, yend = 1),
+  geom_segment(mapping = aes(x = 0, xend = 0, y = 0.05, yend = 1),
                arrow = arrow(length = unit(0.03, "npc"), ends="last"),
                color = "black",
                size = 0.7) +
   annotation_custom(rasterroute, xmin = 0, xmax = 0.2, ymin = 0.8, ymax = 1) + 
-  annotation_custom(rasterhomogeneous, xmin = 0, xmax = 0.2, ymin = 0.1, ymax = 0.3) + 
+  annotation_custom(rasterhomogeneous, xmin = 0, xmax = 0.2, ymin = 0.05, ymax = 0.25) + 
   xlim(c(0, 0.4)) + 
   ylim(c(0, 1)) + 
   theme_void()
 
 #Sp corr legend
 spcorrLegend <- ggplot() +
-  geom_segment(mapping = aes(x = 0, xend = 0, y = 0.1, yend = 1),
+  geom_segment(mapping = aes(x = 0, xend = 0, y = 0.05, yend = 1),
                arrow = arrow(length = unit(0.03, "npc"), ends="last"),
                color = "black",
                size = 0.7) +
   annotation_custom(rasterspcorr, xmin = 0, xmax = 0.2, ymin = 0.8, ymax = 1) + 
-  annotation_custom(rasternospcorr, xmin = 0, xmax = 0.2, ymin = 0.1, ymax = 0.3) + 
+  annotation_custom(rasternospcorr, xmin = 0, xmax = 0.2, ymin = 0.05, ymax = 0.25) + 
   xlim(c(0, 0.4)) + 
   ylim(c(0, 1)) + 
   theme_void()
 
 #Routine legend
 routineLegend <- ggplot() +
-  geom_segment(mapping = aes(x = 0, xend = 0, y = 0.1, yend = 1),
+  geom_segment(mapping = aes(x = 0, xend = 0, y = 0.05, yend = 1),
                arrow = arrow(length = unit(0.03, "npc"), ends="last"),
                color = "black",
                size = 0.7) +
   annotation_custom(rasterroutine, xmin = 0, xmax = 0.2, ymin = 0.8, ymax = 1) + 
-  annotation_custom(rasternoroutine, xmin = 0, xmax = 0.2, ymin = 0.1, ymax = 0.3) + 
+  annotation_custom(rasternoroutine, xmin = 0, xmax = 0.2, ymin = 0.05, ymax = 0.25) + 
   xlim(c(0, 0.4)) + 
   ylim(c(0, 1)) + 
   theme_void()
