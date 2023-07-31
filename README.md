@@ -41,3 +41,7 @@ To run the codes on the HPC cluster of the Edmund Mach Foundation, I used a sing
 
 I hope you find it to be of high quality (without errors)!   
 Benjamin.  
+   __    _  
+ @(..)@ (   
+  (__)  )   
+  /  \ (    
