@@ -1081,6 +1081,8 @@ bool learning = false
       ); 
     }
 
+  NumericMatrix fruitingTimes_m = fruitingTimesInit_m;
+  
   //Initialise current food available
   NumericVector foodConsumed_v = rep(0.0, numberTrees);//Null vector at first
   //NumericVector foodConsumedPrevious_v = rep(0.0, numberTrees);//Null vector at first
@@ -1144,9 +1146,9 @@ bool learning = false
     
     //Checking fruiting dates
     // if(timer >= 7206){
-    //   Rcout << fruitingTimesInit_m(_,0).size() << std::endl;
-    //   for(int mat = 0; mat < fruitingTimesInit_m(_,0).size(); mat++){
-    //     if(abs(fruitingTimesInit_m(mat,1) - fruitingTimesInit_m(mat,0)) > fruitingLength + 1 || abs(fruitingTimesInit_m(mat,1) - fruitingTimesInit_m(mat,0)) < fruitingLength - 1){
+    //   Rcout << fruitingTimes_m(_,0).size() << std::endl;
+    //   for(int mat = 0; mat < fruitingTimes_m(_,0).size(); mat++){
+    //     if(abs(fruitingTimes_m(mat,1) - fruitingTimes_m(mat,0)) > fruitingLength + 1 || abs(fruitingTimes_m(mat,1) - fruitingTimes_m(mat,0)) < fruitingLength - 1){
     //       Rcout << "ERROR WITH FRUITING DATES TREE " << mat << std::endl;
     //     }
     //   }
@@ -1166,8 +1168,8 @@ bool learning = false
     // NumericVector foodQuantityAtTree_nodepletion_v =
     //   foodTree(
     //     timer,
-    //     fruitingTimesInit_m(_,0),
-    //     fruitingTimesInit_m(_,1),
+    //     fruitingTimes_m(_,0),
+    //     fruitingTimes_m(_,1),
     //     cycleLength,
     //     nullVector,
     //     maximumFoodToYield_v,
@@ -1533,8 +1535,8 @@ bool learning = false
     //foodConsumedPrevious_v = foodConsumed_v;
     foodQuantityAtTree_v = foodTree(
       timer,
-      fruitingTimesInit_m(_,0),
-      fruitingTimesInit_m(_,1),
+      fruitingTimes_m(_,0),
+      fruitingTimes_m(_,1),
       cycleLength,
       foodConsumed_v,
       maximumFoodToYield_v,
@@ -1544,8 +1546,8 @@ bool learning = false
     //b) Update last visit, last visit with feeding and consumed food based on visited pattern (the first two) and time in the year
     NumericMatrix matrixUpdateVisitTimeAndConsumption = updateVisitTimesAndConsumptionCycle(//Triangular distribution of food quantity
       timer,
-      fruitingTimesInit_m(_,0),
-      fruitingTimesInit_m(_,1),
+      fruitingTimes_m(_,0),
+      fruitingTimes_m(_,1),
       cycleLength,
       foodConsumed_v,
       visitedTrees_v,
@@ -1573,8 +1575,8 @@ bool learning = false
     //Rcout << "Quantity food visited trees prior to update: " << sum(ifelse(visitedTrees_v == 1, foodQuantityAtTree_v, 0)) << std::endl;
     foodQuantityAtTree_v = foodTree(
       timer,
-      fruitingTimesInit_m(_,0),
-      fruitingTimesInit_m(_,1),
+      fruitingTimes_m(_,0),
+      fruitingTimes_m(_,1),
       cycleLength,
       foodConsumed_v,
       maximumFoodToYield_v,
@@ -1599,7 +1601,7 @@ bool learning = false
       }
 
       int IDTreeProblem = which_max(vectorTreeWithProblem);
-      Rcout << "Problem " << IDTreeProblem << " " << fruitingTimesInit_m(IDTreeProblem,0) << " " << fruitingTimesInit_m(IDTreeProblem,1) << " " << foodQuantityAtTree_v[IDTreeProblem] << std::endl;
+      Rcout << "Problem " << IDTreeProblem << " " << fruitingTimes_m(IDTreeProblem,0) << " " << fruitingTimes_m(IDTreeProblem,1) << " " << foodQuantityAtTree_v[IDTreeProblem] << std::endl;
       Rcout << " " << visitedTrees_v[IDTreeProblem] << " " << foodConsumed_v[IDTreeProblem] << std::endl;
       Rcout << IDpreviousTree << " " << IDcurrentTree << std::endl;
       //I have checked. Calculations are good; it is a very low number when it occurs -> certainly a problem when substraction occurs, residuals > 0.01 kept
@@ -1809,13 +1811,14 @@ bool learning = false
                  treeLocReal_m(treeToDelete, 1) = newCoordinatesAfterDispersal_v[1];
 
                  //Resample start date according to father/mother one
-                 double newStartDate = rnorm(1, fruitingTimesInit_m(DispersalLoopCount, 0), 1)[0];
+                 double newStartDate = rnorm(1, fruitingTimes_m(DispersalLoopCount, 0), 1)[0];
                  if(newStartDate < 0){
                    newStartDate = fmod(newStartDate + cycleLength*10, cycleLength);
                  }
-                 // Rcout << newStartDate << std::endl;
-                 fruitingTimesInit_m(treeToDelete, 0) = newStartDate;
-                 fruitingTimesInit_m(treeToDelete, 1) = newStartDate + fruitingLength;
+                 Rcout << "Mother tree fruiting date " << fruitingTimes_m(DispersalLoopCount, 0) << std::endl;
+                 Rcout << "New tree fruiting date " << newStartDate << std::endl;
+                 fruitingTimes_m(treeToDelete, 0) = newStartDate;
+                 fruitingTimes_m(treeToDelete, 1) = newStartDate + fruitingLength;
 
                  //Change if was disseminated to avoid redissemination
                  disseminated_v[DispersalLoopCount] = 1;
@@ -1950,8 +1953,8 @@ bool learning = false
         outputFluxMap <<
           treeLocReal_m(loopingForMapSave, 0) << " " <<
             treeLocReal_m(loopingForMapSave, 1) << " " <<
-              fruitingTimesInit_m(loopingForMapSave,0) << " " <<
-                fruitingTimesInit_m(loopingForMapSave,1) << std::endl;
+              fruitingTimes_m(loopingForMapSave,0) << " " <<
+                fruitingTimes_m(loopingForMapSave,1) << std::endl;
       }
     }
     else //If impossible to write in the file, say it

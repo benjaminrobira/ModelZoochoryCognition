@@ -753,7 +753,7 @@ indices_l <- mclapply(
       startFruitingInRadian_v,
       treeDistanceInverse_m,
       circular = TRUE,
-      index = "Geary"
+      index = "Moran"
     )
     ### Shrinkage resource ------------------------------------------------------
     
@@ -880,7 +880,7 @@ library(ggpubr)
 mergedPlot <- ggarrange(
   plotPatchinessMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.8,1.3)),
   plotAlignmentMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.1,0.8)),
-  plotSpatAutocorrMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.45,0.65)),
+  plotSpatAutocorrMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.5,0.5)),
   plotRoutineMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.5,0.9)),
   nrow = 4, 
   ncol = 1
@@ -959,7 +959,7 @@ indices_l <- mclapply(
       startFruitingInRadian_v,
       treeDistanceInverse_m,
       circular = TRUE,
-      index = "Geary"
+      index = "Moran"
     )
     
     ### Shrinkage resource ------------------------------------------------------
@@ -1079,7 +1079,7 @@ library(ggpubr)
 mergedPlot <- ggarrange(
   plotPatchinessSpacing + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.8,2.6)),
   plotAlignmentSpacing + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.1,0.8)),
-  plotSpatAutocorrSpacing + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.45,0.65)),
+  plotSpatAutocorrSpacing + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.5,0.5)),
   plotRoutineSpacing  + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.5,0.9)),
   nrow = 4, 
   ncol = 1

@@ -325,6 +325,7 @@ patchiness_f <-
 
 ### Angle variations --------------------------------------------------------
 
+
 alignmentPoints_f <- function(locations_df, buffer = 0, Npoints = NA){
   locations_df <- as.matrix(locations_df)
   alignment_v <- sapply(1:nrow(locations_df), function(row) {
@@ -770,6 +771,8 @@ spatialAutocorr
 # load("T:/Saved_PhD/Model_dispersalSeed/ModelZoochoryCognition/Renvironment/resultsTestDistance.RData")
 
 # Test index -------------------------------------------------------
+
+set.seed(42)
 
 ## Random distribution -----------------------------------------------------
 
