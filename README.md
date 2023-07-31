@@ -1,6 +1,6 @@
-# The role of seed-dispersing animals in shaping plant distributions
+# The role of seed-dispersing animal cognition in shaping plant distributions
 
-This repository contains the codes and results to reproduce the paper **"The role of seed-dispersing animals in shaping plant distributions"** by Benjamin Robira.
+This repository contains the codes and results to reproduce the paper **"The role of seed-dispersing animal cognition in shaping plant distributions"** by Benjamin Robira.
 
 It is divided into several folders:
 
@@ -41,8 +41,3 @@ To run the codes on the HPC cluster of the Edmund Mach Foundation, I used a sing
 
 I hope you find it to be of high quality (without errors)!   
 Benjamin.  
-
-\ \ \ \ \ \_\ \ \ \ \ \ \ \ \ \_     
-@(.\ .)@\ \ (      
-\ \ \ (\_\_)\ \ \ \ )      
-\ \ \ /\ \ \ \ \\\ \ \ \ (       

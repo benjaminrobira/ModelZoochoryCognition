@@ -1,5 +1,5 @@
 ---
-title: "The role of seed-dispersing animals in shaping plant distributions"
+title: "The role of seed-dispersing animal cognition in shaping plant distributions"
 # "Animal cognition as a cause and consequence of resource distribution heterogeneity"
 # "Eco-evolutionary feedback loops between animal cognition, movement and resource distribution"
 # The role of animal cognition in shaping resource distribution via zoochory
