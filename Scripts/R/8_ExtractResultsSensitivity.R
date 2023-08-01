@@ -1022,7 +1022,7 @@ indicesSpacing_df$shrinkage <- as.numeric(indicesSpacing_df$shrinkage)
 
 plotPatchinessSpacing <- plotResults(
   yAxisName = "Patchiness",
-  xAxisName = "Spacing tree intensity",
+  xAxisName = "Tree spacing intensity",
   xVar = "valueSpacing",
   yVar = "patchiness",
   df = indicesSpacing_df %>% mutate(patchiness = patchiness*(1-shrinkage)),#Normalise patchiness by shrinkage
@@ -1033,7 +1033,7 @@ plotPatchinessSpacing <- plotResults(
 
 plotAlignmentSpacing <- plotResults(
   yAxisName = "Alignment",
-  xAxisName = "Spacing tree intensity",
+  xAxisName = "Tree spacing intensity",
   xVar = "valueSpacing",
   yVar = "alignment",
   df = indicesSpacing_df,
@@ -1044,7 +1044,7 @@ plotAlignmentSpacing <- plotResults(
 
 plotRoutineSpacing <- plotResults(
   yAxisName = "Routine",
-  xAxisName = "Spacing tree intensity",
+  xAxisName = "Tree spacing intensity",
   xVar = "valueSpacing",
   yVar = "routine",
   df = indicesSpacing_df,
@@ -1055,7 +1055,7 @@ plotRoutineSpacing <- plotResults(
 
 plotSpatAutocorrSpacing <- plotResults(
   yAxisName = "Spatial autocorrelation",
-  xAxisName = "Spacing tree intensity",
+  xAxisName = "Tree spacing intensity",
   xVar = "valueSpacing",
   yVar = "spatialAutocorr",
   df = indicesSpacing_df,
@@ -1066,7 +1066,7 @@ plotSpatAutocorrSpacing <- plotResults(
 
 plotShrinkageSpaceTree <- plotResults(
   yAxisName = "Shrinkage",
-  xAxisName = "Spacing tree intensity",
+  xAxisName = "Tree spacing intensity",
   xVar = "valueSpacing",
   yVar = "shrinkage",
   df = indicesSpacing_df,
@@ -1085,7 +1085,7 @@ mergedPlot <- ggarrange(
   ncol = 1
 )
 mergedPlotSpaceTree <- annotate_figure(mergedPlot,
-                                        top = text_grob("Spacing tree intensity", face = "bold", size = 16))
+                                        top = text_grob("Tree spacing intensity", face = "bold", size = 16))
 mergedPlotSpaceTree
 
 # Save output -------------------------------------------------------------

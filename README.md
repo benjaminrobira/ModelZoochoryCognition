@@ -1,6 +1,6 @@
-# The role of seed-dispersing animal cognition in shaping plant distributions
+# The role of cognition and movement of seed-dispersing animals in shaping plant distributions
 
-This repository contains the codes and results to reproduce the paper **"The role of seed-dispersing animal cognition in shaping plant distributions"** by Benjamin Robira.
+This repository contains the codes and results to reproduce the paper **"The role of cognition and movement of seed-dispersing animals in shaping plant distributions"** by Benjamin Robira.
 
 It is divided into several folders:
 
@@ -27,6 +27,7 @@ This folder contains files that encode the simulation (Rcpp folder) or its execu
   - 6: the script that processes the output of simulations 1 to 5
   - 7a, b, c: The scripts that run the simulation for other questions (change of movement rule, distance competition, ...)
   - 8: the script that processes the output of simulations 7
+  - 9: the script to estimate the variation of fruiting dates at the beginning/end of the simulation
   
 ## [:file_folder: **LaunchCluster**](Scripts/LaunchCluster) Launch Cluster
 

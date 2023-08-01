@@ -1197,7 +1197,7 @@ plotEfficiency <- plotResults(
   levelsNewNameX = c("Null", "Intermediate", "Omniscient"),
   groupVar = "type",
   colourGroup_v = c("white", "grey80", "black"),
-  nameGroup = "Agent type",
+  nameGroup = "Forager type",
   levelOrderGroup = c("Null", "Intermediate", "Omniscient"),
   widthBox = 0.5,
   differentMeanShapePoints = TRUE
@@ -1214,7 +1214,7 @@ plotRoutine2 <- plotResults(
   levelsNewNameX = c("Null", "Intermediate", "Omniscient"),
   groupVar = "type",
   colourGroup_v = c("white", "grey80", "black"),
-  nameGroup = "Agent type",
+  nameGroup = "Forager type",
   levelOrderGroup = c("Null", "Intermediate", "Omniscient"),
   widthBox = 0.5,
   differentMeanShapePoints = TRUE

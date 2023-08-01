@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE, include=FALSE, warning = FALSE)
 ```{r}
 journal <- "Peer Community In Ecology"
 editor <- "Recommenders of PCI"
-title <- "The role of seed-dispersing animal cognition in shaping plant distributions"
+title <- "The role of cognition and movement of seed-dispersing animals in shaping plant distributions"
 listOfAuthors <- paste("Benjamin Robira", collapse = ", ")
 ```
 
