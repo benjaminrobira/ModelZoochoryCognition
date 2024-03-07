@@ -12,6 +12,7 @@ rm(list = ls())
 load("Scripts/R/Parameterisation.RData")
 
 percentForDifference = 5
+
 ## Packages ----------------------------------------------------------------
 
 library(readr)
@@ -537,8 +538,21 @@ plotResults <- function(
     nameGroup = NA,
     levelOrderGroup = NA,
     widthBox = NA,
-    differentMeanShapePoints = FALSE
+    differentMeanShapePoints = FALSE,
+    valueSegments = NA,
+    lineTypeSegments = NA,
+    colourSegments = NA,
+    nameSegments = NA
 ){
+  #For benchmark lines (added during revision)
+  dfSegments = data.frame(
+    valueSegments = valueSegments,
+    lineTypeSegments = lineTypeSegments,
+    colourSegments = colourSegments,
+    nameSegments = nameSegments
+  )
+  
+  #Main plotting
   df <- df %>% mutate(
     x = .data[[xVar]],
     y = .data[[yVar]] 
@@ -575,7 +589,12 @@ plotResults <- function(
     if(!is.na(groupVar)){
       if(differentMeanShapePoints){
         plot <- ggplot(df, aes(x = x, y = y)) +
+          geom_segment(dfSegments, mapping = aes(x = -Inf, xend = Inf, y = valueSegments, yend = valueSegments, linetype = lineTypeSegments, color = colourSegments)) +
+          geom_text(dfSegments, mapping = aes(x = Inf, y = valueSegments, label = nameSegments, colour = colourSegments), vjust = -0.5, hjust = 1, fontface = 3) +
           geom_boxplot(aes(x = x, y = y, group = interaction(x, group), fill = group), width = widthBox, notch = TRUE, position = dodge) +
+          scale_colour_manual(values = colourSegments) +
+          scale_linetype_identity() +
+          guides(linetype = "none", colour = "none") +
           stat_summary(
             #fun.data = give.n,
             geom = "text",
@@ -611,6 +630,11 @@ plotResults <- function(
           scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
       }else{
         plot <- ggplot(df, aes(x = x, y = y)) +
+          geom_segment(dfSegments, mapping = aes(x = -Inf, xend = Inf, y = valueSegments, yend = valueSegments, linetype = lineTypeSegments, color = colourSegments)) +
+          geom_text(dfSegments, mapping = aes(x = Inf, y = valueSegments, label = nameSegments, colour = colourSegments), vjust = -0.5, hjust = 1, fontface = 3) +
+          scale_colour_manual(values = colourSegments) +
+          scale_linetype_identity() +
+          guides(linetype = "none", colour = "none") +
           geom_boxplot(aes(x = x, y = y, group = interaction(x, group), fill = group), width = widthBox, notch = TRUE, position = dodge) +
           stat_summary(
             #fun.data = give.n,
@@ -648,6 +672,11 @@ plotResults <- function(
       }
     }else{
       plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_segment(dfSegments, mapping = aes(x = -Inf, xend = Inf, y = valueSegments, yend = valueSegments, linetype = lineTypeSegments, color = colourSegments)) +
+        geom_text(dfSegments, mapping = aes(x = Inf, y = valueSegments, label = nameSegments, colour = colourSegments), vjust = -0.5, hjust = 1, fontface = 3) +
+        scale_colour_manual(values = colourSegments) +
+        scale_linetype_identity() +
+        guides(linetype = "none", colour = "none") +
         geom_boxplot(aes(x = x, y = y, group = x), width = 0.25, notch = TRUE, fill = "grey90") +
         stat_summary(
           #fun.data = give.n,
@@ -682,7 +711,12 @@ plotResults <- function(
   }else{
     if(!is.na(groupVar)){
       plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_segment(dfSegments, mapping = aes(x = -Inf, xend = Inf, y = valueSegments, yend = valueSegments, linetype = lineTypeSegments, color = colourSegments)) +
+        geom_text(dfSegments, mapping = aes(x = Inf, y = valueSegments, label = nameSegments, colour = colourSegments), vjust = -0.5, hjust = 1, fontface = 3) +
         geom_violin(aes(x = x, y = y, fill = group), position = dodge) +
+        scale_colour_manual(values = colourSegments) +
+        scale_linetype_identity() +
+        guides(linetype = "none", colour = "none") +
         geom_boxplot(aes(x = x, y = y, group =  interaction(x, group)), position = dodge, width = 0.05, fill = "black") +
         stat_summary(
           #fun.data = give.n,
@@ -719,7 +753,12 @@ plotResults <- function(
         scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
     }else{
       plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_segment(dfSegments, mapping = aes(x = -Inf, xend = Inf, y = valueSegments, yend = valueSegments, linetype = lineTypeSegments, color = colourSegments)) +
+        geom_text(dfSegments, mapping = aes(x = Inf, y = valueSegments, label = nameSegments, colour = colourSegments), vjust = -0.5, hjust = 1, fontface = 3) +
         geom_violin(aes(x = x, y = y, group = x), fill = "grey90", adjust = 1) +
+        scale_colour_manual(values = colourSegments) +
+        scale_linetype_identity() +
+        guides(linetype = "none", colour = "none") +
         geom_boxplot(aes(x = x, y = y, group = x), width = 0.01, fill = "black") +
         stat_summary(
           #fun.data = give.n,
@@ -784,6 +823,61 @@ plotMap <- function(
   return(plot)
 }
 
+### Load complementary data -------------------------------------------------
+
+tableIndexSpatial <- read_delim("Renvironment/tableIndexSpatial.txt", 
+                                delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+#Patchiness
+patchinessRouteValue <- tableIndexSpatial$Value[tableIndexSpatial$Index == "Patchiness" &
+                            tableIndexSpatial$Density == "High" &
+                            tableIndexSpatial$Distribution == "Route"]
+patchinessHeterogeneousValue <- tableIndexSpatial$Value[tableIndexSpatial$Index == "Patchiness" &
+                                                        tableIndexSpatial$Density == "High" &
+                                                        tableIndexSpatial$Distribution == "Heterogeneous"]
+patchinessHomogeneousValue <- tableIndexSpatial$Value[tableIndexSpatial$Index == "Patchiness" &
+                                                        tableIndexSpatial$Density == "High" &
+                                                        tableIndexSpatial$Distribution == "Homogeneous"]
+
+#Alignment
+alignmentRouteValue <- tableIndexSpatial$Value[tableIndexSpatial$Index == "Alignment" &
+                                                  tableIndexSpatial$Density == "High" &
+                                                  tableIndexSpatial$Distribution == "Route"]
+alignmentHeterogeneousValue <- tableIndexSpatial$Value[tableIndexSpatial$Index == "Alignment" &
+                                                          tableIndexSpatial$Density == "High" &
+                                                          tableIndexSpatial$Distribution == "Heterogeneous"]
+alignmentHomogeneousValue <- tableIndexSpatial$Value[tableIndexSpatial$Index == "Alignment" &
+                                                        tableIndexSpatial$Density == "High" &
+                                                        tableIndexSpatial$Distribution == "Homogeneous"]
+
+#Spat autocorr
+
+load("Renvironment/TestSpatAutocorr.RData")
+
+spAutoCorrIndex_dflong <- pivot_longer(
+  spAutoCorrIndex_df,
+  !corr,
+  names_to = "Distribution", 
+  values_to = "Moran"
+) %>% 
+  mutate(
+    facet = ifelse(corr == 1, "atop", "bottom")
+  )
+
+spAutoCorrIndexMean_dflong <- spAutoCorrIndex_dflong %>% 
+  group_by(corr, Distribution) %>% 
+  summarise(
+    Moran = mean(Moran)
+  )
+
+moranHomoLow <- spAutoCorrIndexMean_dflong$Moran[spAutoCorrIndexMean_dflong$Distribution == "spAutoCorrHomogeneous" & spAutoCorrIndexMean_dflong$corr == 0]
+moranHomoIntermediate <- spAutoCorrIndexMean_dflong$Moran[spAutoCorrIndexMean_dflong$Distribution == "spAutoCorrHomogeneous" & spAutoCorrIndexMean_dflong$corr == 0.5]
+moranHomoHigh <- spAutoCorrIndexMean_dflong$Moran[spAutoCorrIndexMean_dflong$Distribution == "spAutoCorrHomogeneous" & spAutoCorrIndexMean_dflong$corr == 1]
+
+moranHeteroLow <- spAutoCorrIndexMean_dflong$Moran[spAutoCorrIndexMean_dflong$Distribution == "spAutoCorrHeterogeneous" & spAutoCorrIndexMean_dflong$corr == 0]
+moranHeteroIntermediate <- spAutoCorrIndexMean_dflong$Moran[spAutoCorrIndexMean_dflong$Distribution == "spAutoCorrHeterogeneous" & spAutoCorrIndexMean_dflong$corr == 0.5]
+moranHeteroHigh <- spAutoCorrIndexMean_dflong$Moran[spAutoCorrIndexMean_dflong$Distribution == "spAutoCorrHeterogeneous" & spAutoCorrIndexMean_dflong$corr == 1]
+  
 # Data extraction: consequence of cognition on resource ---------------------------------------------------------
 
 listFiles_v <- list.files("Output/Main")
@@ -1086,70 +1180,91 @@ length(indicesEfficiency_df$convergence[indicesEfficiency_df$convergence == "YES
 
 plotShrinkage <- plotResults(
   yAxisName = "Shrinkage",
-  xAxisName = "Spatio-temporal knowledge rate",
+  xAxisName = "Spatiotemporal knowledge rate",
   xVar = "knowledgeRate",
   yVar = "shrinkage",
   df = indicesMain_df %>% filter(time == 36500),
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesMain_df$knowledgeRate),
-  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1))
+  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1)),
+  valueSegments = c(0.5),
+  lineTypeSegments = c(NA),
+  colourSegments =  c(NA),
+  nameSegments = c("")
 )
 
 plotPatchiness <- plotResults(
   yAxisName = "Patchiness",
-  xAxisName = "Spatio-temporal knowledge rate",
+  xAxisName = "Spatiotemporal knowledge rate",
   xVar = "knowledgeRate",
   yVar = "patchiness",
   df = indicesMain_df %>% filter(time == 36500) %>% mutate(patchiness = patchiness*(1-shrinkage)),#Normalise patchiness by shrinkage
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesMain_df$knowledgeRate),
-  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1))
+  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1)),
+  valueSegments = c(patchinessHomogeneousValue, patchinessHeterogeneousValue, patchinessRouteValue),
+  lineTypeSegments = c("dotted", "dashed", "solid"),
+  colourSegments =  c("black", "black", "black"),
+  nameSegments = c("Homogeneous", "Heterogeneous", "Route")
 )
 
 plotAlignment <- plotResults(
   yAxisName = "Alignment",
-  xAxisName = "Spatio-temporal knowledge rate",
+  xAxisName = "Spatiotemporal knowledge rate",
   xVar = "knowledgeRate",
   yVar = "alignment",
   df = indicesMain_df %>% filter(time == 36500),
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesMain_df$knowledgeRate),
-  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1))
+  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1)),
+  valueSegments = c(alignmentHomogeneousValue, alignmentRouteValue),
+  lineTypeSegments = c("dotted", "solid"),
+  colourSegments =  c("black", "black"),
+  nameSegments = c(" Homogeneous", "Route")
 )
 
 plotRoutine <- plotResults(
   yAxisName = "Routine",
-  xAxisName = "Spatio-temporal knowledge rate",
+  xAxisName = "Spatiotemporal knowledge rate",
   xVar = "knowledgeRate",
   yVar = "routine",
   df = indicesMain_df %>% filter(time == 36500),
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesMain_df$knowledgeRate),
-  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1))
+  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1)),
+  valueSegments = c(0.5),
+  lineTypeSegments = c(NA),
+  colourSegments =  c(NA),
+  nameSegments = c("")
 )
 
 plotSpatAutocorr <- plotResults(
   yAxisName = "Spatial autocorrelation",
-  xAxisName = "Spatio-temporal knowledge rate",
+  xAxisName = "Spatiotemporal knowledge rate",
   xVar = "knowledgeRate",
   yVar = "spatialAutocorr",
   df = indicesMain_df %>% filter(time == 36500),
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesMain_df$knowledgeRate),
-  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1))
+  levelsNewNameX = as.character(c(0, 0.25, 0.5, 0.75, 1)),
+  valueSegments = c(0, moranHomoIntermediate, moranHomoHigh, moranHeteroHigh),
+  lineTypeSegments = c("longdash", "dotted", "solid", "dashed"),
+  colourSegments =  c("black", "black", "black", "black"),
+  nameSegments = c("", "Int. synchro. homo", "High. synchro. homo.", 
+                   "High. synchro. hetero.")
 )
 
 library(ggpubr)
 mergedPlot <- ggarrange(
-  plotPatchiness + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.8,1.3)),
+  plotPatchiness + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.8,1.6)),
   plotAlignment + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.1,0.8)),
-  plotSpatAutocorr + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.5,0.5)),
+  plotSpatAutocorr + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.05,0.05)),
   plotRoutine + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.5,0.9)),
   nrow = 4, 
   ncol = 1
 )
 mergedPlotMain <- annotate_figure(mergedPlot,
-                                        top = text_grob("Spatio-temporal knowledge rate", face = "bold", size = 16))
+                                        top = text_grob("Spatiotemporal knowledge rate", face = "bold", size = 16))
 mergedPlotMain
 
 ## Map along time ---------------------------------------------------------
@@ -1191,14 +1306,14 @@ plotEfficiency <- plotResults(
   xAxisName = "Initial resource condition",
   xVar = "initCondition",
   yVar = "efficiency",
-  df = indicesEfficiency_df %>% filter(initCondition %in% c(1,3,5)) %>% mutate(efficiency = efficiency*1000),
+  df = indicesEfficiency_df %>% filter(initCondition %in% c(1,3,5)) %>% mutate(efficiency = efficiency*1000) %>% mutate(type = ifelse(type == "Null", "Naive", type)),
   categoricalX = TRUE,
   levelsOldNameX = c("1", "3", "5"),
-  levelsNewNameX = c("Null", "Intermediate", "Omniscient"),
+  levelsNewNameX = c("Naive", "Intermediate", "Omniscient"),
   groupVar = "type",
   colourGroup_v = c("white", "grey80", "black"),
   nameGroup = "Forager type",
-  levelOrderGroup = c("Null", "Intermediate", "Omniscient"),
+  levelOrderGroup = c("Naive", "Intermediate", "Omniscient"),
   widthBox = 0.5,
   differentMeanShapePoints = TRUE
 )
@@ -1208,14 +1323,14 @@ plotRoutine2 <- plotResults(
   xAxisName = "Initial resource condition",
   xVar = "initCondition",
   yVar = "routine",
-  df = indicesEfficiency_df %>% filter(initCondition %in% c(1,3,5)),
+  df = indicesEfficiency_df %>% filter(initCondition %in% c(1,3,5)) %>% mutate(type = ifelse(type == "Null", "Naive", type)),
   categoricalX = TRUE,
   levelsOldNameX = c("1", "3", "5"),
-  levelsNewNameX = c("Null", "Intermediate", "Omniscient"),
+  levelsNewNameX = c("Naive", "Intermediate", "Omniscient"),
   groupVar = "type",
   colourGroup_v = c("white", "grey80", "black"),
   nameGroup = "Forager type",
-  levelOrderGroup = c("Null", "Intermediate", "Omniscient"),
+  levelOrderGroup = c("Naive", "Intermediate", "Omniscient"),
   widthBox = 0.5,
   differentMeanShapePoints = TRUE
 )
@@ -1223,6 +1338,8 @@ plotRoutine2 <- plotResults(
 # Save --------------------------------------------------------------------
 
 save.image("Renvironment/mainResults.RData")
+saveRDS(indicesMain_df, "Renvironment/mainResults_df.rds")
+
 ggsave(plot = plotPatchiness + theme(axis.title = element_text(face = "bold", size = 25),
                                              axis.text.x = element_text(size = 20),
                                              axis.text.y = element_text(size = 20),
@@ -1389,7 +1506,7 @@ saveRDS(plotRoutine2, "Renvironment/Plots/routine2Plots.rds")
 #     vectorHowManyConvergedPatchiness[knowledgeLoop] <-
 #       vectorHowManyConvergedPatchiness[knowledgeLoop] + ifelse(resultConvergence[5] == "YES", 1, 0)
 #     
-#     #### Plot result convergence in function of spatio-temporal knowledge ####
+#     #### Plot result convergence in function of Spatiotemporal knowledge ####
 #     
 #     # Analysing plant pattern difference --------------------------------------
 #     
@@ -1692,7 +1809,7 @@ saveRDS(plotRoutine2, "Renvironment/Plots/routine2Plots.rds")
 #   side = 1,
 #   line = 2.5,
 #   at = (length(temporalKnowledge) + 0.5 + 0.5) / 2,
-#   text = "Spatio-temporal knowledge rate",
+#   text = "Spatiotemporal knowledge rate",
 #   cex = 2,
 #   font = 2
 # )
@@ -1755,7 +1872,7 @@ saveRDS(plotRoutine2, "Renvironment/Plots/routine2Plots.rds")
 #   side = 1,
 #   line = 2.5,
 #   at = (length(temporalKnowledge) + 0.5 + 0.5) / 2,
-#   text = "Spatio-temporal knowledge rate",
+#   text = "Spatiotemporal knowledge rate",
 #   cex = 2,
 #   font = 2
 # )
@@ -1917,7 +2034,7 @@ saveRDS(plotRoutine2, "Renvironment/Plots/routine2Plots.rds")
 #   side = 1,
 #   line = 2.5,
 #   at = (length(temporalKnowledge) + 0.5 + 0.5) / 2,
-#   text = "Spatio-temporal knowledge rate",
+#   text = "Spatiotemporal knowledge rate",
 #   cex = 2,
 #   font = 2
 # )
@@ -1990,7 +2107,7 @@ saveRDS(plotRoutine2, "Renvironment/Plots/routine2Plots.rds")
 #   side = 1,
 #   line = 2.5,
 #   at = (length(temporalKnowledge) + 0.5 + 0.5) / 2,
-#   text = "Spatio-temporal knowledge rate",
+#   text = "Spatiotemporal knowledge rate",
 #   cex = 2,
 #   font = 2
 # )
@@ -2160,7 +2277,7 @@ saveRDS(plotRoutine2, "Renvironment/Plots/routine2Plots.rds")
 #   side = 1,
 #   line = 2.5,
 #   at = (length(temporalKnowledge) + 0.5 + 0.5) / 2,
-#   text = "Spatio-temporal knowledge rate",
+#   text = "Spatiotemporal knowledge rate",
 #   cex = 2,
 #   font = 2
 # )
@@ -2231,7 +2348,7 @@ saveRDS(plotRoutine2, "Renvironment/Plots/routine2Plots.rds")
 #   side = 1,
 #   line = 2.5,
 #   at = (length(temporalKnowledge) + 0.5 + 0.5) / 2,
-#   text = "Spatio-temporal knowledge rate",
+#   text = "Spatiotemporal knowledge rate",
 #   cex = 2,
 #   font = 2
 # )
@@ -2400,7 +2517,7 @@ saveRDS(plotRoutine2, "Renvironment/Plots/routine2Plots.rds")
 #   side = 1,
 #   line = 2.5,
 #   at = (length(temporalKnowledge) + 0.5 + 0.5) / 2,
-#   text = "Spatio-temporal knowledge rate",
+#   text = "Spatiotemporal knowledge rate",
 #   cex = 2,
 #   font = 2
 # )
@@ -2472,7 +2589,7 @@ saveRDS(plotRoutine2, "Renvironment/Plots/routine2Plots.rds")
 #   side = 1,
 #   line = 2.5,
 #   at = (length(temporalKnowledge) + 0.5 + 0.5) / 2,
-#   text = "Spatio-temporal knowledge rate",
+#   text = "Spatiotemporal knowledge rate",
 #   cex = 2,
 #   font = 2
 # )
@@ -2644,7 +2761,7 @@ saveRDS(plotRoutine2, "Renvironment/Plots/routine2Plots.rds")
 #   side = 1,
 #   line = 2.5,
 #   at = (length(temporalKnowledge) + 0.5 + 0.5) / 2,
-#   text = "Spatio-temporal knowledge rate",
+#   text = "Spatiotemporal knowledge rate",
 #   cex = 2,
 #   font = 2
 # )
@@ -2716,7 +2833,7 @@ saveRDS(plotRoutine2, "Renvironment/Plots/routine2Plots.rds")
 #   side = 1,
 #   line = 2.5,
 #   at = (length(temporalKnowledge) + 0.5 + 0.5) / 2,
-#   text = "Spatio-temporal knowledge rate",
+#   text = "Spatiotemporal knowledge rate",
 #   cex = 2,
 #   font = 2
 # )
@@ -2899,7 +3016,7 @@ saveRDS(plotRoutine2, "Renvironment/Plots/routine2Plots.rds")
 #   side = 1,
 #   line = 2.5,
 #   at = (length(temporalKnowledge) + 0.5 + 0.5) / 2,
-#   text = "Spatio-temporal knowledge rate",
+#   text = "Spatiotemporal knowledge rate",
 #   cex = 2,
 #   font = 2
 # )
@@ -2971,7 +3088,7 @@ saveRDS(plotRoutine2, "Renvironment/Plots/routine2Plots.rds")
 #   side = 1,
 #   line = 2.5,
 #   at = (length(temporalKnowledge) + 0.5 + 0.5) / 2,
-#   text = "Spatio-temporal knowledge rate",
+#   text = "Spatiotemporal knowledge rate",
 #   cex = 2,
 #   font = 2
 # )

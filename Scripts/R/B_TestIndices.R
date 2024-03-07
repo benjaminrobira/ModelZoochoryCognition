@@ -1711,7 +1711,7 @@ global.df$Density <-
 
 meanValue.df <-
   global.df %>% dplyr::group_by(across(c(-Value))) %>% dplyr::summarise(meanValue = mean(Value, na.rm =
-                                                                                           TRUE))#Check why NA
+                                                                                           TRUE))#Check why NA -> ok
 
 #function for number of observations
 give.n <- function(x){
@@ -1826,6 +1826,21 @@ global.ggplot
 save.image(
   "Renvironment/resultsTestIndex2.RData"
 )
+
+summaryIndex <- global.df_rdc %>%  
+  group_by(
+    Index, Density, Distribution
+  ) %>% 
+  summarise(
+    Value = mean(Value)
+  ) %>% 
+  mutate(
+    Distribution = as.character(Distribution),
+    Distribution = ifelse(Distribution == "Homo.", "Homogeneous", Distribution),
+    Distribution = ifelse(Distribution == "Hete.", "Heterogeneous", Distribution)
+  )
+
+write.table(x = summaryIndex, file = "Renvironment/tableIndexSpatial.txt", sep = ";", row.names = FALSE)
 
 #Ok so only patchiness and alignment to use for best identification.
 

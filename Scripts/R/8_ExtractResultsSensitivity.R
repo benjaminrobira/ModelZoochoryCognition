@@ -21,6 +21,9 @@ library(parallel)
 library(doParallel)
 library(adehabitatHR)
 library(sf)
+library(tidyr)
+library(scales)
+library(ggplot2)
 
 ## Functions ---------------------------------------------------------------
 
@@ -479,8 +482,23 @@ plotResults <- function(
     groupVar = NA,
     colourGroup_v = NA,
     nameGroup = NA,
-    levelOrderGroup = NA
+    levelOrderGroup = NA,
+    widthBox = NA,
+    differentMeanShapePoints = FALSE,
+    valueSegments = NA,
+    lineTypeSegments = NA,
+    colourSegments = NA,
+    nameSegments = NA
 ){
+  #For benchmark lines (added during revision)
+  dfSegments = data.frame(
+    valueSegments = valueSegments,
+    lineTypeSegments = lineTypeSegments,
+    colourSegments = colourSegments,
+    nameSegments = nameSegments
+  )
+  
+  #Main plotting
   df <- df %>% mutate(
     x = .data[[xVar]],
     y = .data[[yVar]] 
@@ -505,52 +523,113 @@ plotResults <- function(
     dodge <- position_dodge(width = 0.5)
   }
   
+  howManyShapes <- length(unique(df$group))
+  if(howManyShapes > 5){
+    print("Cannot deal with a groupin variable > 5 levels and different mean point shapes")
+    break
+  }
   if(boxplotOnly){
+    if(is.na(widthBox)){
+      widthBox = 0.25
+    }
     if(!is.na(groupVar)){
-      plot <- ggplot(df, aes(x = x, y = y)) +
-        geom_boxplot(aes(x = x, y = y, group = interaction(x, group), fill = group), width = 0.25, notch = TRUE, position = dodge) +
-        stat_summary(
-          #fun.data = give.n,
-          geom = "text",
-          fun.y = "mean",
-          size = 4,
-          hjust = -0.65,
-          position = dodge,
-          aes(label = round(after_stat(y), 3), group = group)
-        ) +
-        stat_summary(
-          geom = "point",
-          fun.y = "mean",
-          size = 2,
-          shape = 21,
-          fill = "white",
-          aes(group = group),
-          position = dodge,
-          colour = "black"
-        ) +
-        labs(x = xAxisName, y = yAxisName) +
-        scale_fill_manual(name = nameGroup, values = colourGroup_v) + 
-        theme_bw() +
-        theme(axis.title = element_text(face = "bold", size = 16),
-              axis.text.x = element_text(size = 12),
-              axis.text.y = element_text(size = 12),
-              legend.text = element_text(size = 10),
-              legend.title = element_text(size = 12, face = "bold"),
-              panel.grid.minor = element_line(colour = "grey93"),
-              panel.grid.major = element_line(colour = "grey93"),
-              strip.background = element_rect(colour = "white",
-                                              fill = "white"),
-              strip.text = element_text(face = "bold", size = 14)) +
-        scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+      if(differentMeanShapePoints){
+        plot <- ggplot(df, aes(x = x, y = y)) +
+          geom_segment(dfSegments, mapping = aes(x = -Inf, xend = Inf, y = valueSegments, yend = valueSegments, linetype = lineTypeSegments, color = colourSegments)) +
+          geom_text(dfSegments, mapping = aes(x = Inf, y = valueSegments, label = nameSegments, colour = colourSegments), vjust = -0.5, hjust = 1, fontface = 3) +
+          geom_boxplot(aes(x = x, y = y, group = interaction(x, group), fill = group), width = widthBox, notch = TRUE, position = dodge) +
+          scale_colour_manual(values = colourSegments) +
+          scale_linetype_identity() +
+          guides(linetype = "none", colour = "none") +
+          stat_summary(
+            #fun.data = give.n,
+            geom = "text",
+            fun.y = "mean",
+            size = 4,
+            hjust = -0.55,
+            position = dodge,
+            aes(label = round(after_stat(y), 3), group = group)
+          ) +
+          stat_summary(
+            geom = "point",
+            fun.y = "mean",
+            size = 2,
+            fill = "white",
+            aes(group = group, shape = group),
+            position = dodge,
+            colour = "black"
+          ) +
+          scale_shape_manual(name = nameGroup,values = c(24, 21, 25, 22, 23)[1:howManyShapes]) +
+          labs(x = xAxisName, y = yAxisName) +
+          scale_fill_manual(name = nameGroup, values = colourGroup_v) + 
+          theme_bw() +
+          theme(axis.title = element_text(face = "bold", size = 16),
+                axis.text.x = element_text(size = 12),
+                axis.text.y = element_text(size = 12),
+                legend.text = element_text(size = 10),
+                legend.title = element_text(size = 12, face = "bold"),
+                panel.grid.minor = element_line(colour = "grey93"),
+                panel.grid.major = element_line(colour = "grey93"),
+                strip.background = element_rect(colour = "white",
+                                                fill = "white"),
+                strip.text = element_text(face = "bold", size = 14)) +
+          scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+      }else{
+        plot <- ggplot(df, aes(x = x, y = y)) +
+          geom_segment(dfSegments, mapping = aes(x = -Inf, xend = Inf, y = valueSegments, yend = valueSegments, linetype = lineTypeSegments, color = colourSegments)) +
+          geom_text(dfSegments, mapping = aes(x = Inf, y = valueSegments, label = nameSegments, colour = colourSegments), vjust = -0.5, hjust = 1, fontface = 3) +
+          scale_colour_manual(values = colourSegments) +
+          scale_linetype_identity() +
+          guides(linetype = "none", colour = "none") +
+          geom_boxplot(aes(x = x, y = y, group = interaction(x, group), fill = group), width = widthBox, notch = TRUE, position = dodge) +
+          stat_summary(
+            #fun.data = give.n,
+            geom = "text",
+            fun.y = "mean",
+            size = 4,
+            hjust = -0.55,
+            position = dodge,
+            aes(label = round(after_stat(y), 3), group = group)
+          ) +
+          stat_summary(
+            geom = "point",
+            fun.y = "mean",
+            size = 2,
+            fill = "white",
+            shape = 21,
+            aes(group = group),
+            position = dodge,
+            colour = "black"
+          ) +
+          labs(x = xAxisName, y = yAxisName) +
+          scale_fill_manual(name = nameGroup, values = colourGroup_v) + 
+          theme_bw() +
+          theme(axis.title = element_text(face = "bold", size = 16),
+                axis.text.x = element_text(size = 12),
+                axis.text.y = element_text(size = 12),
+                legend.text = element_text(size = 10),
+                legend.title = element_text(size = 12, face = "bold"),
+                panel.grid.minor = element_line(colour = "grey93"),
+                panel.grid.major = element_line(colour = "grey93"),
+                strip.background = element_rect(colour = "white",
+                                                fill = "white"),
+                strip.text = element_text(face = "bold", size = 14)) +
+          scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
+      }
     }else{
       plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_segment(dfSegments, mapping = aes(x = -Inf, xend = Inf, y = valueSegments, yend = valueSegments, linetype = lineTypeSegments, color = colourSegments)) +
+        geom_text(dfSegments, mapping = aes(x = Inf, y = valueSegments, label = nameSegments, colour = colourSegments), vjust = -0.5, hjust = 1, fontface = 3) +
+        scale_colour_manual(values = colourSegments) +
+        scale_linetype_identity() +
+        guides(linetype = "none", colour = "none") +
         geom_boxplot(aes(x = x, y = y, group = x), width = 0.25, notch = TRUE, fill = "grey90") +
         stat_summary(
           #fun.data = give.n,
           geom = "text",
           fun.y = "mean",
           size = 4,
-          hjust = -0.65,
+          hjust = -0.55,
           aes(label = round(after_stat(y), 3))
         ) +
         stat_summary(
@@ -578,14 +657,19 @@ plotResults <- function(
   }else{
     if(!is.na(groupVar)){
       plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_segment(dfSegments, mapping = aes(x = -Inf, xend = Inf, y = valueSegments, yend = valueSegments, linetype = lineTypeSegments, color = colourSegments)) +
+        geom_text(dfSegments, mapping = aes(x = Inf, y = valueSegments, label = nameSegments, colour = colourSegments), vjust = -0.5, hjust = 1, fontface = 3) +
         geom_violin(aes(x = x, y = y, fill = group), position = dodge) +
+        scale_colour_manual(values = colourSegments) +
+        scale_linetype_identity() +
+        guides(linetype = "none", colour = "none") +
         geom_boxplot(aes(x = x, y = y, group =  interaction(x, group)), position = dodge, width = 0.05, fill = "black") +
         stat_summary(
           #fun.data = give.n,
           geom = "text",
           fun.y = "mean",
           size = 4,
-          hjust = -0.65,
+          hjust = -0.55,
           position = dodge,
           aes(label = round(after_stat(y), 3), group = group)
         ) +
@@ -615,14 +699,19 @@ plotResults <- function(
         scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4))
     }else{
       plot <- ggplot(df, aes(x = x, y = y)) +
+        geom_segment(dfSegments, mapping = aes(x = -Inf, xend = Inf, y = valueSegments, yend = valueSegments, linetype = lineTypeSegments, color = colourSegments)) +
+        geom_text(dfSegments, mapping = aes(x = Inf, y = valueSegments, label = nameSegments, colour = colourSegments), vjust = -0.5, hjust = 1, fontface = 3) +
         geom_violin(aes(x = x, y = y, group = x), fill = "grey90", adjust = 1) +
+        scale_colour_manual(values = colourSegments) +
+        scale_linetype_identity() +
+        guides(linetype = "none", colour = "none") +
         geom_boxplot(aes(x = x, y = y, group = x), width = 0.01, fill = "black") +
         stat_summary(
           #fun.data = give.n,
           geom = "text",
           fun.y = "mean",
           size = 4,
-          hjust = -0.65,
+          hjust = -0.55,
           aes(label = round(after_stat(y), 3))
         ) +
         stat_summary(
@@ -680,6 +769,61 @@ plotMap <- function(
   return(plot)
 }
 
+### Load complementary data -------------------------------------------------
+
+tableIndexSpatial <- read_delim("Renvironment/tableIndexSpatial.txt", 
+                                delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+#Patchiness
+patchinessRouteValue <- tableIndexSpatial$Value[tableIndexSpatial$Index == "Patchiness" &
+                                                  tableIndexSpatial$Density == "High" &
+                                                  tableIndexSpatial$Distribution == "Route"]
+patchinessHeterogeneousValue <- tableIndexSpatial$Value[tableIndexSpatial$Index == "Patchiness" &
+                                                          tableIndexSpatial$Density == "High" &
+                                                          tableIndexSpatial$Distribution == "Heterogeneous"]
+patchinessHomogeneousValue <- tableIndexSpatial$Value[tableIndexSpatial$Index == "Patchiness" &
+                                                        tableIndexSpatial$Density == "High" &
+                                                        tableIndexSpatial$Distribution == "Homogeneous"]
+
+alignmentRouteValue <- tableIndexSpatial$Value[tableIndexSpatial$Index == "Alignment" &
+                                                 tableIndexSpatial$Density == "High" &
+                                                 tableIndexSpatial$Distribution == "Route"]
+alignmentHeterogeneousValue <- tableIndexSpatial$Value[tableIndexSpatial$Index == "Alignment" &
+                                                         tableIndexSpatial$Density == "High" &
+                                                         tableIndexSpatial$Distribution == "Heterogeneous"]
+alignmentHomogeneousValue <- tableIndexSpatial$Value[tableIndexSpatial$Index == "Alignment" &
+                                                       tableIndexSpatial$Density == "High" &
+                                                       tableIndexSpatial$Distribution == "Homogeneous"]
+
+
+#Spat autocorr
+
+load("Renvironment/TestSpatAutocorr.RData")
+
+spAutoCorrIndex_dflong <- pivot_longer(
+  spAutoCorrIndex_df,
+  !corr,
+  names_to = "Distribution", 
+  values_to = "Moran"
+) %>% 
+  mutate(
+    facet = ifelse(corr == 1, "atop", "bottom")
+  )
+
+spAutoCorrIndexMean_dflong <- spAutoCorrIndex_dflong %>% 
+  group_by(corr, Distribution) %>% 
+  summarise(
+    Moran = mean(Moran)
+  )
+
+moranHomoLow <- spAutoCorrIndexMean_dflong$Moran[spAutoCorrIndexMean_dflong$Distribution == "spAutoCorrHomogeneous" & spAutoCorrIndexMean_dflong$corr == 0]
+moranHomoIntermediate <- spAutoCorrIndexMean_dflong$Moran[spAutoCorrIndexMean_dflong$Distribution == "spAutoCorrHomogeneous" & spAutoCorrIndexMean_dflong$corr == 0.5]
+moranHomoHigh <- spAutoCorrIndexMean_dflong$Moran[spAutoCorrIndexMean_dflong$Distribution == "spAutoCorrHomogeneous" & spAutoCorrIndexMean_dflong$corr == 1]
+
+moranHeteroLow <- spAutoCorrIndexMean_dflong$Moran[spAutoCorrIndexMean_dflong$Distribution == "spAutoCorrHeterogeneous" & spAutoCorrIndexMean_dflong$corr == 0]
+moranHeteroIntermediate <- spAutoCorrIndexMean_dflong$Moran[spAutoCorrIndexMean_dflong$Distribution == "spAutoCorrHeterogeneous" & spAutoCorrIndexMean_dflong$corr == 0.5]
+moranHeteroHigh <- spAutoCorrIndexMean_dflong$Moran[spAutoCorrIndexMean_dflong$Distribution == "spAutoCorrHeterogeneous" & spAutoCorrIndexMean_dflong$corr == 1]
+
 # Results extraction ------------------------------------------------------
 
 ## Moving rule -------------------------------------------------------------
@@ -699,7 +843,7 @@ indices_l <- mclapply(
   mc.cores = 5,
   function(whatFile){
     #print(whatFile)
-    system(as.character(whatFile))
+    system(paste("echo '", as.character(whatFile), "'"))
     fileOfInterest <- filesMapFinal_v[whatFile]
     if(grepl("MovingNot", fileOfInterest)){
       whatRule <- "MovingAllTrees"
@@ -829,7 +973,11 @@ plotPatchinessMoving <- plotResults(
   df = indicesMovingRule_df %>% mutate(patchiness = patchiness*(1-shrinkage)),#Normalise patchiness by shrinkage
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesMovingRule_df$movingRule)[c(2,1,3)],
-  levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)]
+  levelsNewNameX = c("Only\nfruiting plants", "All plants", "Only target plants")[c(2,1,3)],
+  valueSegments = c(patchinessHomogeneousValue, patchinessHeterogeneousValue, patchinessRouteValue),
+  lineTypeSegments = c("dotted", "dashed", "solid"),
+  colourSegments =  c("black", "black", "black"),
+  nameSegments = c("Homogeneous", "Heterogeneous", "Route")
 )
 
 plotAlignmentMoving <- plotResults(
@@ -840,7 +988,11 @@ plotAlignmentMoving <- plotResults(
   df = indicesMovingRule_df,
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesMovingRule_df$movingRule)[c(2,1,3)],
-  levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)]
+  levelsNewNameX = c("Only\nfruiting plants", "All plants", "Only target plants")[c(2,1,3)],
+  valueSegments = c(alignmentHomogeneousValue, alignmentRouteValue),
+  lineTypeSegments = c("dotted", "solid"),
+  colourSegments =  c("black","black"),
+  nameSegments = c("Homogeneous",  "Route")
 )
 
 plotRoutineMoving <- plotResults(
@@ -851,7 +1003,11 @@ plotRoutineMoving <- plotResults(
   df = indicesMovingRule_df,
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesMovingRule_df$movingRule)[c(2,1,3)],
-  levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)]
+  levelsNewNameX = c("Only\nfruiting plants", "All plants", "Only target plants")[c(2,1,3)],
+  valueSegments = c(0.5),
+  lineTypeSegments = c(NA),
+  colourSegments =  c(NA),
+  nameSegments = c("")
 )
 
 plotSpatAutocorrMoving <- plotResults(
@@ -862,7 +1018,12 @@ plotSpatAutocorrMoving <- plotResults(
   df = indicesMovingRule_df,
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesMovingRule_df$movingRule)[c(2,1,3)],
-  levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)]
+  levelsNewNameX = c("Only\nfruiting plants", "All plants", "Only target plants")[c(2,1,3)],
+  valueSegments = c(0, moranHomoIntermediate, moranHomoHigh, moranHeteroHigh),
+  lineTypeSegments = c("longdash", "dotted", "solid", "dashed"),
+  colourSegments =  c("black", "black", "black", "black"),
+  nameSegments = c("", "Int. synchro. homo", "High. synchro. homo.", 
+                   "High. synchro. hetero.")
 )
 
 plotShrinkageMovingRule <- plotResults(
@@ -873,14 +1034,18 @@ plotShrinkageMovingRule <- plotResults(
   df = indicesMovingRule_df,
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesMovingRule_df$movingRule)[c(2,1,3)],
-  levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)]
+  levelsNewNameX = c("Only\nfruiting plants", "All plants", "Only target plants")[c(2,1,3)],
+  valueSegments = c(0.5),
+  lineTypeSegments = c(NA),
+  colourSegments =  c(NA),
+  nameSegments = c("")
 )
 
 library(ggpubr)
 mergedPlot <- ggarrange(
-  plotPatchinessMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.8,1.3)),
+  plotPatchinessMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.8,1.6)),
   plotAlignmentMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.1,0.8)),
-  plotSpatAutocorrMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.5,0.5)),
+  plotSpatAutocorrMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.05,0.05)),
   plotRoutineMoving + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.5,0.9)),
   nrow = 4, 
   ncol = 1
@@ -908,7 +1073,7 @@ indices_l <- mclapply(
   1:length(filesMapFinal_v),
   mc.cores = 5,
   function(whatFile){
-    system(as.character(whatFile))
+    system(paste("echo '", as.character(whatFile), "'"))
     fileOfInterest <- filesMapFinal_v[whatFile]
 
     valueSpacing <- spacingValue_v[
@@ -1022,79 +1187,617 @@ indicesSpacing_df$shrinkage <- as.numeric(indicesSpacing_df$shrinkage)
 
 plotPatchinessSpacing <- plotResults(
   yAxisName = "Patchiness",
-  xAxisName = "Tree spacing intensity",
+  xAxisName = "Plant spacing intensity",
   xVar = "valueSpacing",
   yVar = "patchiness",
   df = indicesSpacing_df %>% mutate(patchiness = patchiness*(1-shrinkage)),#Normalise patchiness by shrinkage
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesSpacing_df$valueSpacing),
-  levelsNewNameX = c("0.05", "0.45", "0.85")
+  levelsNewNameX = c("0.05", "0.45", "0.85"),
+  valueSegments = c(patchinessHomogeneousValue, patchinessHeterogeneousValue, patchinessRouteValue),
+  lineTypeSegments = c("dotted", "dashed", "solid"),
+  colourSegments =  c("black", "black", "black"),
+  nameSegments = c("Homogeneous", "Heterogeneous", "Route")
 )
 
 plotAlignmentSpacing <- plotResults(
   yAxisName = "Alignment",
-  xAxisName = "Tree spacing intensity",
+  xAxisName = "Plant spacing intensity",
   xVar = "valueSpacing",
   yVar = "alignment",
   df = indicesSpacing_df,
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesSpacing_df$valueSpacing),
-  levelsNewNameX = c("0.05", "0.45", "0.85")
+  levelsNewNameX = c("0.05", "0.45", "0.85"),
+  valueSegments = c(alignmentHomogeneousValue, alignmentRouteValue),
+  lineTypeSegments = c("dotted", "solid"),
+  colourSegments =  c("black", "black"),
+  nameSegments = c("Homogeneous", "Route")
 )
 
 plotRoutineSpacing <- plotResults(
   yAxisName = "Routine",
-  xAxisName = "Tree spacing intensity",
+  xAxisName = "Plant spacing intensity",
   xVar = "valueSpacing",
   yVar = "routine",
   df = indicesSpacing_df,
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesSpacing_df$valueSpacing),
-  levelsNewNameX = c("0.05", "0.45", "0.85")
+  levelsNewNameX = c("0.05", "0.45", "0.85"),
+  valueSegments = c(0.5),
+  lineTypeSegments = c(NA),
+  colourSegments =  c(NA),
+  nameSegments = c("")
 )
 
 plotSpatAutocorrSpacing <- plotResults(
   yAxisName = "Spatial autocorrelation",
-  xAxisName = "Tree spacing intensity",
+  xAxisName = "Plant spacing intensity",
   xVar = "valueSpacing",
   yVar = "spatialAutocorr",
   df = indicesSpacing_df,
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesSpacing_df$valueSpacing),
-  levelsNewNameX = c("0.05", "0.45", "0.85")
+  levelsNewNameX = c("0.05", "0.45", "0.85"),
+  valueSegments = c(0, moranHomoIntermediate, moranHomoHigh, moranHeteroHigh),
+  lineTypeSegments = c("longdash", "dotted", "solid", "dashed"),
+  colourSegments =  c("black", "black", "black", "black"),
+  nameSegments = c("", "Int. synchro. homo", "High. synchro. homo.", 
+                   "High. synchro. hetero.")
 )
 
 plotShrinkageSpaceTree <- plotResults(
   yAxisName = "Shrinkage",
-  xAxisName = "Tree spacing intensity",
+  xAxisName = "Plant spacing intensity",
   xVar = "valueSpacing",
   yVar = "shrinkage",
   df = indicesSpacing_df,
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesSpacing_df$valueSpacing),
-  levelsNewNameX = c("0.05", "0.45", "0.85")
+  levelsNewNameX = c("0.05", "0.45", "0.85"),
+  valueSegments = c(0.5),
+  lineTypeSegments = c(NA),
+  colourSegments =  c(NA),
+  nameSegments = c("")
 )
 
 library(ggpubr)
 mergedPlot <- ggarrange(
   plotPatchinessSpacing + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.8,2.6)),
   plotAlignmentSpacing + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.1,0.8)),
-  plotSpatAutocorrSpacing + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.5,0.5)),
+  plotSpatAutocorrSpacing + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.05,0.05)),
   plotRoutineSpacing  + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.5,0.9)),
   nrow = 4, 
   ncol = 1
 )
 mergedPlotSpaceTree <- annotate_figure(mergedPlot,
-                                        top = text_grob("Tree spacing intensity", face = "bold", size = 16))
+                                        top = text_grob("Plant spacing intensity", face = "bold", size = 16))
 mergedPlotSpaceTree
 
-# Save output -------------------------------------------------------------
+# Save output moving spacing -------------------------------------------------------------
 
 save.image("Renvironment/outputSensitivityMovingRuleAndSpaceTree.RData")
 saveRDS(mergedPlotMovingRule, "Renvironment/Plots/movingRulePlots.rds")
 saveRDS(mergedPlotSpaceTree, "Renvironment/Plots/spacingTreePlots.rds")
 saveRDS(plotShrinkageMovingRule, "Renvironment/Plots/movingRuleShrinkage.rds")
 saveRDS(plotShrinkageSpaceTree, "Renvironment/Plots/spacingTreeShrinkage.rds")
+
+
+load("Renvironment/outputSensitivityMovingRuleAndSpaceTree.RData")
+
+# Sensitivity speed -------------------------------------------------------
+
+listFiles_v <- list.files("Output/SensitivitySpeed")
+whichlistFiles_v <- grep("Test", listFiles_v)
+listFiles_v <- listFiles_v[whichlistFiles_v]
+whichMapFinal_v <- grep("Map_36500", listFiles_v)
+filesMapFinal_v <- listFiles_v[whichMapFinal_v]
+whichRoutine_v <- grep("Routine", listFiles_v)
+filesRoutine_v <- listFiles_v[whichRoutine_v]
+
+length(filesMapFinal_v)
+
+indices_l <- mclapply(
+  1:length(filesMapFinal_v),
+  mc.cores = 3,
+  function(whatFile){
+    #print(whatFile)
+    system(paste("echo '", as.character(whatFile), "'"))
+    fileOfInterest <- filesMapFinal_v[whatFile]
+    if(grepl("SpeedLow", fileOfInterest)){
+      whatRule <- "Low speed"
+    }else{
+      whatRule <- "High speed"
+    }
+    
+    outputMapFinal <- read_table2(paste0("Output/SensitivitySpeed/", fileOfInterest)) %>% as.data.frame() 
+    #plot(outputMapFinal[,1], outputMapFinal[,2])
+    
+    ### Patchiness ---------------------------------------------------------------
+    
+    patchiness = patchiness_f(outputMapFinal,
+                              0,
+                              0,
+                              mapSize,
+                              mapSize,
+                              quadratSize)
+    
+    ### Alignment ---------------------------------------------------------------
+    
+    alignment = alignmentPoints_f(
+      outputMapFinal
+    )
+    
+    ### Spatial autocorr --------------------------------------------------------
+    
+    #Create distance matrix
+    treeDistance_m <- as.matrix(dist(outputMapFinal[, 1:2]))
+    #Use the inverse of distance as weight
+    treeDistanceInverse_m <- 1 / (treeDistance_m)
+    #Remove pb with self distance
+    diag(treeDistanceInverse_m) <- 0
+    
+    #Moran/Geary Index considering circular data: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5870747/
+    startFruitingInRadian_v <-
+      as.data.frame(outputMapFinal)[, 3] * 2 * pi / 365
+    
+    #Transform to -pi pi interval
+    startFruitingInRadian_v <-
+      ifelse(
+        startFruitingInRadian_v > pi,
+        startFruitingInRadian_v - 2 * pi,
+        startFruitingInRadian_v
+      )
+    
+    #Calcul spatial autocorr
+    spatialAutocorr = autocorrSp(
+      startFruitingInRadian_v,
+      treeDistanceInverse_m,
+      circular = TRUE,
+      index = "Moran"
+    )
+    ### Shrinkage resource ------------------------------------------------------
+    
+    boundary <- SpatialLines(
+      list(
+        cbind(c(0,0,1000,1000,0), c(0,1000,1000,0,0)) %>% 
+          Line() %>% 
+          Lines(ID = "boundary")
+      )
+    )
+    
+    #Get the necessary extend to have 95%
+    outputTry = "KEEP GOING"
+    extentUse = -0.05
+    while(outputTry == "KEEP GOING"){
+      print(extentUse)
+      extentUse = extentUse + 0.05
+      outputTry <- tryCatch(
+        {
+          UD <- kernelUD(xy = SpatialPoints(outputMapFinal[, 1:2]), h = 50,
+                         boundary = boundary, extent = extentUse)
+          shrinkage <- 1 - getverticeshr(UD, percent = 95, unin = "m", unout = "m2")@data$area/((mapSize + extentUse * mapSize)**2)
+          "STOP"
+        }, error = function(e){
+          return("KEEP GOING")
+        }
+      )
+    }
+    
+    UD <- kernelUD(xy = SpatialPoints(outputMapFinal[, 1:2]), h = 50,
+                   boundary = boundary, extent = extentUse)
+    shrinkage <- 1 - getverticeshr(UD, percent = 95, unin = "m", unout = "m2")@data$area/((mapSize + extentUse * mapSize)**2)
+    
+    ### Routine ---------------------------------------------------------------
+    
+    seqVisits <- read_csv(paste0("Output/SensitivitySpeed/",  filesRoutine_v[whatFile]), 
+                          col_names = FALSE)
+    seqVisits <- separate(seqVisits, col = "X1", into = c("seq", "time"), sep = " timer ")
+    seqVisits_1 <- sapply(seqVisits[,1], function(x){substr(x, 1, 1)})
+    whichRandom_v <- seqVisits[,1] == "r-1000"
+    seqVisits_2 <- as.numeric(sapply(seqVisits[,1], function(x){gsub("[^0-9]", "", x)}))
+    #Reput if -1000
+    seqVisits_2[whichRandom_v] <- "-1000"
+    seqVisits <- cbind(seqVisits_1, seqVisits_2) %>% as.data.frame
+    seqVisits[,2] <- as.numeric(seqVisits[,2])
+    colnames(seqVisits) <- c("moveType", "targetID")
+    seqVisits <- seqVisits[seqVisits$targetID != -1000,]
+    
+    routine <- 1 - entropy_O1(seqVisits[,2])
+    
+    return(c(whatRule, patchiness, alignment, spatialAutocorr, routine, shrinkage))
+  }
+)
+
+indicesSpeed_df <- do.call("rbind", indices_l) %>% as.data.frame()
+colnames(indicesSpeed_df) <- c("valueSpeed", "patchiness", "alignment", "spatialAutocorr", "routine", "shrinkage")
+indicesSpeed_df$patchiness <- as.numeric(indicesSpeed_df$patchiness)
+indicesSpeed_df$shrinkage <- as.numeric(indicesSpeed_df$shrinkage)
+indicesSpeed_df$alignment <- as.numeric(indicesSpeed_df$alignment)
+indicesSpeed_df$spatialAutocorr <- as.numeric(indicesSpeed_df$spatialAutocorr)
+indicesSpeed_df$routine <- as.numeric(indicesSpeed_df$routine)
+
+#Add the intermediate (= tested ref) speed
+indicesMain_df <- readRDS("Renvironment/mainResults_df.rds")
+
+toBind <- indicesMain_df %>% 
+  filter(knowledgeRate == 1 & time == 36500) %>% 
+  mutate(valueSpeed = "Intermediate speed") %>% 
+  dplyr::select(valueSpeed, patchiness, alignment, spatialAutocorr, routine, shrinkage)
+
+indicesSpeedMerged_df <- rbind(toBind, indicesSpeed_df)
+  
+## Quick plot --------------------------------------------------------------
+
+plotPatchinessSpeed <- plotResults(
+  yAxisName = "Patchiness",
+  xAxisName = "Speed",
+  xVar = "valueSpeed",
+  yVar = "patchiness",
+  df = indicesSpeedMerged_df %>% mutate(patchiness = patchiness*(1-shrinkage)),#Normalise patchiness by shrinkage
+  categoricalX = TRUE,
+  levelsOldNameX = c("Low speed", "Intermediate speed", "High speed"),
+  levelsNewNameX = c("Low", "Intermediate", "High"),
+  valueSegments = c(patchinessHomogeneousValue, patchinessHeterogeneousValue, patchinessRouteValue),
+  lineTypeSegments = c("dotted", "dashed", "solid"),
+  colourSegments =  c("black", "black", "black"),
+  nameSegments = c("Homogeneous", "Heterogeneous", "Route")
+)
+
+plotAlignmentSpeed <- plotResults(
+  yAxisName = "Alignment",
+  xAxisName = "Speed",
+  xVar = "valueSpeed",
+  yVar = "alignment",
+  df = indicesSpeedMerged_df,
+  categoricalX = TRUE,
+  levelsOldNameX = c("Low speed", "Intermediate speed", "High speed"),
+  levelsNewNameX = c("Low", "Intermediate", "High"),
+  valueSegments = c(alignmentHomogeneousValue, alignmentRouteValue),
+  lineTypeSegments = c("dotted", "solid"),
+  colourSegments =  c("black", "black"),
+  nameSegments = c("Homogeneous", "Route")
+)
+
+plotRoutineSpeed <- plotResults(
+  yAxisName = "Routine",
+  xAxisName = "Speed",
+  xVar = "valueSpeed",
+  yVar = "routine",
+  df = indicesSpeedMerged_df,
+  categoricalX = TRUE,
+  levelsOldNameX = c("Low speed", "Intermediate speed", "High speed"),
+  levelsNewNameX = c("Low", "Intermediate", "High"),
+  valueSegments = c(0.5),
+  lineTypeSegments = c(NA),
+  colourSegments =  c(NA),
+  nameSegments = c("")
+)
+
+plotSpatAutocorrSpeed <- plotResults(
+  yAxisName = "Spatial autocorrelation",
+  xAxisName = "Speed",
+  xVar = "valueSpeed",
+  yVar = "spatialAutocorr",
+  df = indicesSpeedMerged_df,
+  categoricalX = TRUE,
+  levelsOldNameX = c("Low speed", "Intermediate speed", "High speed"),
+  levelsNewNameX = c("Low", "Intermediate", "High"),
+  valueSegments = c(0, moranHomoIntermediate, moranHomoHigh, moranHeteroHigh),
+  lineTypeSegments = c("longdash", "dotted", "solid", "dashed"),
+  colourSegments =  c("black", "black", "black", "black"),
+  nameSegments = c("", "Int. synchro. homo", "High. synchro. homo.", 
+                   "High. synchro. hetero.")
+)
+
+library(ggpubr)
+mergedPlot <- ggarrange(
+  plotPatchinessSpeed + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.8,2.6)),
+  plotAlignmentSpeed + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.1,0.8)),
+  plotSpatAutocorrSpeed + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.05,0.05)),
+  plotRoutineSpeed  + rremove("xlab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.5,0.9)),
+  nrow = 4, 
+  ncol = 1
+)
+mergedPlotSpeed <- annotate_figure(mergedPlot,
+                                       top = text_grob("Speed", face = "bold", size = 16))
+mergedPlotSpeed
+
+# Save output speed -------------------------------------------------------------
+
+save.image("Renvironment/outputSensitivityMovingRuleAndSpaceTreeandSpeed.RData")
+saveRDS(mergedPlotSpeed, "Renvironment/Plots/speedPlots.rds")
+saveRDS(indicesSpeedMerged_df, "Renvironment/Plots/speedData.rds")
+
+# Sensitivity learning ----------------------------------------------------
+
+listFiles_v <- list.files("Output/SensitivityLearning")
+listFiles_v <- listFiles_v[grep("TestLearning", listFiles_v)]
+
+whichMapFinal_v <- grep("Map", listFiles_v)
+filesMapFinal_v <- listFiles_v[whichMapFinal_v]
+
+#order for being aligned with routine which will only be taken for the last
+filesMapFinalStart_v <- filesMapFinal_v[grep("36500", filesMapFinal_v)]
+filesMapFinalEnd_v <- filesMapFinal_v[!(filesMapFinal_v %in% filesMapFinalStart_v)]
+filesMapFinal_v <- c(filesMapFinalStart_v, filesMapFinalEnd_v)
+
+whichRoutine_v <- grep("Routine", listFiles_v)
+filesRoutine_v <- listFiles_v[whichRoutine_v]
+
+length(filesMapFinal_v)
+length(filesRoutine_v)
+
+# whichContinuous_v <- grep("SensitivityLearning_Continuous", listFiles_v)
+# filesContinuous_v <- listFiles_v[whichContinuous_v]
+
+library(qdapRegex)
+library(doParallel)
+library(parallel)
+
+indices_l <- mclapply(
+  1:length(filesMapFinal_v),
+  mc.cores = 5,
+  function(whatFile){
+    system(paste("echo '", as.character(whatFile), "'"))
+    tryCatch(
+      {
+        fileOfInterest <- filesMapFinal_v[whatFile]
+        
+        time <- qdapRegex::ex_between(fileOfInterest, 
+                                      "Map_", 
+                                      ".txt", 
+                                      extract = TRUE)
+        time <- as.numeric(time[[1]][1])
+        if(time == 36500){
+          lastMap = TRUE
+        }else{
+          lastMap = FALSE
+        }
+        
+        cognitionLevel <- qdapRegex::ex_between(fileOfInterest, 
+                                                "_s", 
+                                                "_", 
+                                                extract = TRUE)
+        cognitionLevel <- as.numeric(cognitionLevel[[1]][1])
+        
+        outputMapFinal <- read_table2(paste0("Output/SensitivityLearning/", fileOfInterest)) %>% as.data.frame() 
+        #plot(outputMapFinal[,1], outputMapFinal[,2])
+        
+        ### Patchiness ---------------------------------------------------------------
+        
+        patchiness = patchiness_f(outputMapFinal,
+                                  0,
+                                  0,
+                                  mapSize,
+                                  mapSize,
+                                  quadratSize)
+        
+        ### Alignment ---------------------------------------------------------------
+        
+        alignment = alignmentPoints_f(
+          outputMapFinal
+        )
+        
+        ### Spatial autocorr --------------------------------------------------------
+        
+        #Create distance matrix
+        treeDistance_m <- as.matrix(dist(outputMapFinal[, 1:2]))
+        #Use the inverse of distance as weight
+        treeDistanceInverse_m <- 1 / (treeDistance_m)
+        #Remove pb with self distance
+        diag(treeDistanceInverse_m) <- 0
+        
+        #Moran/Geary Index considering circular data: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5870747/
+        startFruitingInRadian_v <-
+          as.data.frame(outputMapFinal)[, 3] * 2 * pi / 365
+        
+        #Transform to -pi pi interval
+        startFruitingInRadian_v <-
+          ifelse(
+            startFruitingInRadian_v > pi,
+            startFruitingInRadian_v - 2 * pi,
+            startFruitingInRadian_v
+          )
+        
+        #Calcul spatial autocorr
+        spatialAutocorr = autocorrSp(
+          startFruitingInRadian_v,
+          treeDistanceInverse_m,
+          circular = TRUE,
+          index = "Moran"
+        )
+        
+        ### Shrinkage resource ------------------------------------------------------
+        
+        boundary <- SpatialLines(
+          list(
+            cbind(c(0,0,1000,1000,0), c(0,1000,1000,0,0)) %>% 
+              Line() %>% 
+              Lines(ID = "boundary")
+          )
+        )
+        
+        #Get the necessary extend to have 95%
+        outputTry = "KEEP GOING"
+        extentUse = -0.05
+        while(outputTry == "KEEP GOING"){
+          print(extentUse)
+          extentUse = extentUse + 0.05
+          outputTry <- tryCatch(
+            {
+              UD <- kernelUD(xy = SpatialPoints(outputMapFinal[, 1:2]), h = 50,
+                             boundary = boundary, extent = extentUse)
+              shrinkage <- 1 - getverticeshr(UD, percent = 95, unin = "m", unout = "m2")@data$area/((mapSize + extentUse * mapSize)**2)
+              "STOP"
+            }, error = function(e){
+              return("KEEP GOING")
+            }
+          )
+        }
+        
+        UD <- kernelUD(xy = SpatialPoints(outputMapFinal[, 1:2]), h = 50,
+                       boundary = boundary, extent = extentUse)
+        shrinkage <- 1 - getverticeshr(UD, percent = 95, unin = "m", unout = "m2")@data$area/(mapSize*mapSize)
+        
+        ### Routine ---------------------------------------------------------------
+        if(lastMap){
+          seqVisits <- read_csv(paste0("Output/SensitivityLearning/",  filesRoutine_v[whatFile]), 
+                                col_names = FALSE)
+          seqVisits <- separate(seqVisits, col = "X1", into = c("seq", "time"), sep = " timer ")
+          seqVisits_1 <- sapply(seqVisits[,1], function(x){substr(x, 1, 1)})
+          whichRandom_v <- seqVisits[,1] == "r-1000"
+          seqVisits_2 <- as.numeric(sapply(seqVisits[,1], function(x){gsub("[^0-9]", "", x)}))
+          #Reput if -1000
+          seqVisits_2[whichRandom_v] <- "-1000"
+          seqVisits <- cbind(seqVisits_1, seqVisits_2) %>% as.data.frame
+          seqVisits[,2] <- as.numeric(seqVisits[,2])
+          colnames(seqVisits) <- c("moveType", "targetID")
+          seqVisits <- seqVisits[seqVisits$targetID != -1000,]
+          
+          routine <- 1 - entropy_O1(seqVisits[,2])
+          
+          return(c(cognitionLevel, time, patchiness, alignment, spatialAutocorr, routine, shrinkage))
+        }else{
+          return(c(cognitionLevel, time, patchiness, alignment, spatialAutocorr, NA, shrinkage))
+        }
+      },
+      error = function(e){return(NA)})
+  }
+)
+
+indices_l <- indices_l[sapply(indices_l, length) > 1]
+
+indicesLearning_df <- do.call("rbind", indices_l) %>% as.data.frame()
+colnames(indicesLearning_df) <- c("knowledgeRate", "time", "patchiness", "alignment", "spatialAutocorr", "routine", "shrinkage")
+indicesLearning_df$knowledgeRate <- as.numeric(indicesLearning_df$knowledgeRate)
+indicesLearning_df$time <- as.numeric(indicesLearning_df$time)
+indicesLearning_df$patchiness <- as.numeric(indicesLearning_df$patchiness)
+indicesLearning_df$alignment <- as.numeric(indicesLearning_df$alignment)
+indicesLearning_df$spatialAutocorr <- as.numeric(indicesLearning_df$spatialAutocorr)
+indicesLearning_df$routine <- as.numeric(indicesLearning_df$routine)
+
+#Add the learning type
+indicesLearning_df$Learning <- "Grown plants"
+
+#Match with "standard" simulations
+
+indicesMain_df <- readRDS("Renvironment/mainResults_df.rds")
+
+toBind <- indicesMain_df %>% 
+  filter(knowledgeRate %in% c(0.25, 0.5, 0.75) & time == 36500) %>% 
+  mutate(Learning = "Seedling") %>% 
+  dplyr::select(Learning, knowledgeRate, patchiness, alignment, spatialAutocorr, routine, shrinkage)
+
+indicesLearningMerged_df <- rbind(toBind, indicesLearning_df %>% dplyr::select(-time))
+
+## Quick plot --------------------------------------------------------------
+
+plotPatchinessLearning <- plotResults(
+  yAxisName = "Patchiness",
+  xAxisName = "Spatiotemporal knowledge rate",
+  xVar = "knowledgeRate",
+  yVar = "patchiness",
+  df = indicesLearningMerged_df %>% mutate(patchiness = patchiness*(1-shrinkage)),#Normalise patchiness by shrinkage
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesLearningMerged_df$knowledgeRate),
+  levelsNewNameX = as.character(c(0.25, 0.5, 0.75)),
+  valueSegments = c(patchinessHomogeneousValue, patchinessHeterogeneousValue, patchinessRouteValue),
+  lineTypeSegments = c("dotted", "dashed", "solid"),
+  colourSegments =  c("black", "black", "black"),
+  nameSegments = c("Homogeneous", "Heterogeneous", "Route"),
+  groupVar = "Learning",
+  colourGroup_v = c("white", "black"),
+  nameGroup = "Learning",
+  levelOrderGroup = c("Grown plants", "Seedling"),
+  widthBox = 0.4,
+  differentMeanShapePoints = TRUE
+)
+
+plotAlignmentLearning <- plotResults(
+  yAxisName = "Alignment",
+  xAxisName = "Spatiotemporal knowledge rate",
+  xVar = "knowledgeRate",
+  yVar = "alignment",
+  df = indicesLearningMerged_df,
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesLearningMerged_df$knowledgeRate),
+  levelsNewNameX = as.character(c(0.25, 0.5, 0.75)),
+  valueSegments = c(alignmentHomogeneousValue, alignmentRouteValue),
+  lineTypeSegments = c("dotted", "solid"),
+  colourSegments =  c("black", "black"),
+  nameSegments = c("Homogeneous", "Route"),
+  groupVar = "Learning",
+  colourGroup_v = c("white", "black"),
+  nameGroup = "Learning",
+  levelOrderGroup = c("Grown plants", "Seedling"),
+  widthBox = 0.4,
+  differentMeanShapePoints = TRUE
+)
+
+plotRoutineLearning <- plotResults(
+  yAxisName = "Routine",
+  xAxisName = "Spatiotemporal knowledge rate",
+  xVar = "knowledgeRate",
+  yVar = "routine",
+  df = indicesLearningMerged_df,
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesLearningMerged_df$knowledgeRate),
+  levelsNewNameX = as.character(c(0.25, 0.5, 0.75)),
+  valueSegments = c(0.5),
+  lineTypeSegments = c(NA),
+  colourSegments =  c(NA),
+  nameSegments = c(""),
+  groupVar = "Learning",
+  colourGroup_v = c("white", "black"),
+  nameGroup = "Learning",
+  levelOrderGroup = c("Grown plants", "Seedling"),
+  widthBox = 0.4,
+  differentMeanShapePoints = TRUE
+)
+
+plotSpatAutocorrLearning <- plotResults(
+  yAxisName = "Spatial autocorrelation",
+  xAxisName = "Spatiotemporal knowledge rate",
+  xVar = "knowledgeRate",
+  yVar = "spatialAutocorr",
+  df = indicesLearningMerged_df,
+  categoricalX = TRUE,
+  levelsOldNameX = unique(indicesLearningMerged_df$knowledgeRate),
+  levelsNewNameX = as.character(c(0.25, 0.5, 0.75)),
+  valueSegments = c(0, moranHomoIntermediate, moranHomoHigh, moranHeteroHigh),
+  lineTypeSegments = c("longdash", "dotted", "solid", "dashed"),
+  colourSegments =  c("black", "black", "black", "black"),
+  nameSegments = c("", "Int. synchro. homo", "High. synchro. homo.", 
+                   "High. synchro. hetero."),
+  groupVar = "Learning",
+  colourGroup_v = c("white", "black"),
+  nameGroup = "Learning",
+  levelOrderGroup = c("Grown plants", "Seedling"),
+  widthBox = 0.4,
+  differentMeanShapePoints = TRUE
+)
+
+
+library(ggpubr)
+mergedPlot <- ggarrange(
+  plotPatchinessLearning + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.8,2.6)),
+  plotAlignmentLearning + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.1,0.8)),
+  plotSpatAutocorrLearning + rremove("xlab") + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(-0.05,0.05)),
+  plotRoutineLearning  + rremove("ylab") + scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.5,0.9)),
+  nrow = 4, 
+  ncol = 1
+)
+mergedPlotLearning <- annotate_figure(mergedPlot,
+                                   top = text_grob("Learning", face = "bold", size = 16))
+mergedPlotLearning
+
+# Save output learning -------------------------------------------------------------
+
+save.image("Renvironment/outputSensitivityMovingRuleAndSpaceTreeandSpeedandLearning.RData")
+saveRDS(mergedPlotLearning, "Renvironment/Plots/learningPlots.rds")
+saveRDS(indicesLearningMerged_df, "Renvironment/Plots/learningData.rds")
+
 
 # Garbage -----------------------------------------------------------------
 

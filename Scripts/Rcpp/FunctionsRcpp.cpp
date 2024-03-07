@@ -1666,7 +1666,7 @@ bool learning = false
        //Update distribution after seed dispersal
        if(timer > 0.01){
 
-         //Modify if Dispersal realised
+         //Modify if dispersal realised
          int counterDispersedTrees(0);
          for(int DispersalLoopCount = 0; DispersalLoopCount < numberTrees; DispersalLoopCount++){
            double probaDispersalRealised = runif(1, 0, 1)[0];
@@ -1787,7 +1787,7 @@ bool learning = false
                  //If the trees was previously visited, with fruits, and seed "effectively" digested/transported and germinated (i.e. probability of Dispersal realised), then change coordinates:
 
                  //^^^^^^^^^^
-                 // IN CASE NEW TREE REMPLACES FATHER/MOTHER TREE
+                 // IN CASE NEW TREE REPLACES FATHER/MOTHER TREE
                  //^^^^^^^^^^
 
                  // treeLocReal_m(DispersalLoopCount, 0) = newCoordinatesAfterDispersal_m(DispersalLoopCount, 0);
@@ -1798,7 +1798,7 @@ bool learning = false
                  // lastTimeVisitTrees_v[DispersalLoopCount] = timer;
 
                  //^^^^^^^^^^
-                 // IN CASE NEW TREE REMPLACES RANDOMLY ANOTHER TREE
+                 // IN CASE NEW TREE REPLACES RANDOMLY ANOTHER TREE
                  //^^^^^^^^^^
 
                  //Randomly chose tree that dies and is replaced by new one
@@ -1815,8 +1815,8 @@ bool learning = false
                  if(newStartDate < 0){
                    newStartDate = fmod(newStartDate + cycleLength*10, cycleLength);
                  }
-                 Rcout << "Mother tree fruiting date " << fruitingTimes_m(DispersalLoopCount, 0) << std::endl;
-                 Rcout << "New tree fruiting date " << newStartDate << std::endl;
+                 // Rcout << "Mother tree fruiting date " << fruitingTimes_m(DispersalLoopCount, 0) << std::endl;
+                 // Rcout << "New tree fruiting date " << newStartDate << std::endl;
                  fruitingTimes_m(treeToDelete, 0) = newStartDate;
                  fruitingTimes_m(treeToDelete, 1) = newStartDate + fruitingLength;
 
@@ -2057,6 +2057,1138 @@ bool learning = false
   //Close connection to output file
   outputFluxEfficiency.close();
   }
+  }
+  //Close connection to output file routine
+  outputRoutine.close();
+}
+
+// This function changes the memory changes due to seed dispersal: if a known tree dies, it is replaced by the last fruiting tree encountered not present in memory
+// [[Rcpp::export]]
+void runSimulationMemoryRevised(
+    const int cycleLimitNumber, 
+    const int repetitionNumber, 
+    const double timeDelayForDispersal,
+    const double torporTime, 
+    const bool saveTreeMap, 
+    IntegerVector samplingMapTime_v,
+    std::string nameInit,
+    const int mapSize, 
+    const int quadratSize,
+    const int numberTrees,
+    const bool homogeneousDistribution,
+    const int treeClusterNumber,
+    const int treeClusterSpread,
+    NumericMatrix treeLocInit_m,
+    NumericMatrix fruitingTimesInit_m,
+    const NumericVector maximumFoodToYield_v, 
+    const double cycleLength, 
+    const int fruitingLength,
+    const double noReturnTime, 
+    const double whatValueUnknownTemporal, 
+    std::string whatRule, 
+    const double exponentialRate,
+    double perceptualRange,
+    double spatialKnowledgeRate,
+    double temporalKnowledgeRate,
+    const double speed, 
+    const double DispersalProbability,
+    const bool useProvidedMap,
+    double intensityCompetitionForSpace = 0.85,
+    bool moveOnlyToFruitingTrees = false,
+    bool moveOnlyToTarget = false,
+    bool linear = true,
+    bool learning = false
+){
+  ////----------------------------------------------------
+  //// INITIALISATION
+  ////----------------------------------------------------
+  
+  set_seed(42);
+  // for(int loopingForMapSave = 0; loopingForMapSave < numberTrees; loopingForMapSave++){
+  //   Rcout << loopingForMapSave << " " << treeLocInit_m(loopingForMapSave, 0) << " " <<  treeLocInit_m(loopingForMapSave, 1) << std::endl;
+  // }
+  
+  //---- General
+  //List of parameters
+  
+  double timer(0.0);
+  double timerPrevious(timer);
+  int eventsWithNoFood(0);
+  
+  //File for final record of foraging efficiency (cumulated)
+  std::string pathOfTheFileOutputInit(nameInit);
+  pathOfTheFileOutputInit.append("_p");
+  pathOfTheFileOutputInit.append(std::to_string(perceptualRange));
+  pathOfTheFileOutputInit.append("_s");
+  pathOfTheFileOutputInit.append(std::to_string(spatialKnowledgeRate));
+  pathOfTheFileOutputInit.append("_t");
+  pathOfTheFileOutputInit.append(std::to_string(temporalKnowledgeRate));
+  pathOfTheFileOutputInit.append("_r");
+  pathOfTheFileOutputInit.append(std::to_string(repetitionNumber));
+  
+  //File for routine records (i.e. sequence of trees)
+  std::string pathOfTheFileOutputRoutine = pathOfTheFileOutputInit;
+  pathOfTheFileOutputRoutine.append("_Routine.txt");
+  std::ofstream outputRoutine;
+  //Open connection to output file
+  outputRoutine.open(pathOfTheFileOutputRoutine.c_str(), std::ios::out | std::ios::trunc);//c_str() convert it to a string category understandable for the ofstream function, first creates file or blanks existing one
+  
+  //File for output of continuous foraging efficiency monitoring
+  std::string pathOfTheFileOutputInitEfficiencyContinuous = pathOfTheFileOutputInit;
+  pathOfTheFileOutputInitEfficiencyContinuous.append("_EfficiencyContinuous.txt");
+  std::ofstream outputFluxEfficiencyContinuous;
+  //Open connection to output file
+  outputFluxEfficiencyContinuous.open(pathOfTheFileOutputInitEfficiencyContinuous.c_str(), std::ios::out | std::ios::trunc);//c_str() convert it to a string category understandable for the ofstream function, first creates file or blanks existing one
+  if(outputFluxEfficiencyContinuous)  // Write the file only if correctly opened
+  {
+    outputFluxEfficiencyContinuous <<
+      "Time" << " " <<
+        "Efficiency" << std::endl;//" " <<
+    // "Nearest_neighbour_mean" << " " <<
+    //   "Nearest_neighbour_sd" << " " <<
+    //     "meanCrowding" << " " <<
+    //       "patchinessIndex" << std::endl;
+  }else //If impossible to write in the file, say it
+  {
+    Rcout << "ERROR: Impossible to open the output file about continuous efficiency" << std::endl;
+  }
+  
+  int hasSavedFinalResults(0);
+  
+  //---- Environment related
+  int lowerBorder(0); //Lower border of a coordinate (x or y)
+  int upperBorder(mapSize); //Upper border of a coordinate (x or y)
+  
+  NumericMatrix treeLocReal_m = treeLocInit_m;
+  
+  double spaceTreeSq = intensityCompetitionForSpace * intensityCompetitionForSpace * mapSize * mapSize / (numberTrees * 3.14159265358979323846);//(perceptualRange - 0.10 * perceptualRange)*(perceptualRange - 0.10 * perceptualRange);//(perceptualRange/2)*(perceptualRange/2);//The space expected to be occupied by the tree: considering a circular buffer, area of non-overlapping trees should be equal to that of the map//
+  //Rcout << spaceTreeSq << std::endl;
+  //Change according to whether to use provided map or not
+  if(useProvidedMap){
+    //Let initial settings;
+  }else{
+    //Distribute trees
+    treeLocInit_m = distributionTree(
+      numberTrees,
+      lowerBorder,
+      upperBorder,
+      true,
+      treeClusterNumber,
+      treeClusterSpread
+    );
+    //Resample fruiting dates
+    fruitingTimesInit_m = dateTree(
+      numberTrees,
+      cycleLength,
+      fruitingLength
+    ); 
+  }
+  
+  NumericMatrix fruitingTimes_m = fruitingTimesInit_m;
+  
+  //Initialise current food available
+  NumericVector foodConsumed_v = rep(0.0, numberTrees);//Null vector at first
+  //NumericVector foodConsumedPrevious_v = rep(0.0, numberTrees);//Null vector at first
+  NumericVector foodQuantityAtTree_v = foodTree(
+    0,
+    fruitingTimesInit_m(_,0),
+    fruitingTimesInit_m(_,1),
+    cycleLength,
+    foodConsumed_v,
+    maximumFoodToYield_v,
+    linear
+  );
+  
+  //---- Agent-related
+  //Initialise location
+  NumericVector agentCurrentLocation = NumericVector::create(runif(1, 0, mapSize)[0], runif(1, 0, mapSize)[0]);
+  //Rcout << agentCurrentLocation[0] << " " << agentCurrentLocation[1] << std::endl;
+  NumericVector agentPreviousLocation = agentCurrentLocation;
+  
+  //Initialise visited trees
+  NumericVector lastTimeVisitTrees_v = rep(0.0, numberTrees);
+  NumericVector lastTimeVisitTreesWithFruit_v = rep(0.0, numberTrees);
+  IntegerVector visitedTrees_v = rep(0, numberTrees);//Null vector
+  IntegerVector disseminated_v = rep(1, numberTrees);//Null vector
+  NumericVector lastTimeDispersal_v = rep(0.0, numberTrees);
+  
+  //Initialise knowledge on trees
+  IntegerMatrix spatiotemporalKnowledge_m = whichDistanceAndFoodKnown(
+    numberTrees,
+    spatialKnowledgeRate,
+    temporalKnowledgeRate
+  );
+  
+  NumericMatrix treeLoc_knowledge_m = filterKnowledge(
+    treeLocReal_m,
+    foodQuantityAtTree_v,
+    spatiotemporalKnowledge_m,
+    lastTimeVisitTrees_v,
+    timer,
+    noReturnTime,
+    whatValueUnknownTemporal,
+    mapSize
+  );
+  
+  // Rcout << "Food knowledge: " << sum(ifelse(treeLoc_knowledge_m(_,2) >= 0, treeLoc_knowledge_m(_,2), 0)) << std::endl;
+  // 
+  //Results: distance travelled and food consumed,
+  double totDistanceTravelled(0);
+  double totFoodEaten(0);
+  int samplingMapCounter(0);
+  int IDcurrentTree = NA_INTEGER;
+  int IDpreviousTree = NA_INTEGER;
+  //bool compVec = compareVectors(treeLocInit_m(_,1), treeLocReal_m(_,1));
+  
+  ////----------------------------------------------------
+  //// RUN SIMULATION
+  ////----------------------------------------------------
+  
+  while(timer < (cycleLimitNumber * cycleLength + 5 * cycleLength)){//last five cycles will be to analyse routine
+    //Rcout << timer << std::endl;
+    
+    //Checking fruiting dates
+    // if(timer >= 7206){
+    //   Rcout << fruitingTimes_m(_,0).size() << std::endl;
+    //   for(int mat = 0; mat < fruitingTimes_m(_,0).size(); mat++){
+    //     if(abs(fruitingTimes_m(mat,1) - fruitingTimes_m(mat,0)) > fruitingLength + 1 || abs(fruitingTimes_m(mat,1) - fruitingTimes_m(mat,0)) < fruitingLength - 1){
+    //       Rcout << "ERROR WITH FRUITING DATES TREE " << mat << std::endl;
+    //     }
+    //   }
+    // }
+    
+    // compVec = compareVectors(treeLocInit_m(_,1), treeLocReal_m(_,1));
+    // if(compVec){
+    //   Rcout << "Comparison tree loc with init 1: DIFFERENT " << timer << std::endl;
+    // }else{
+    //   Rcout << "Comparison tree loc with init 1: SAME " << timer << std::endl;
+    // }
+    // 
+    
+    //Update knowledge matrix
+    //a) Discard depletion, which is unknown
+    // NumericVector nullVector = rep(0.0, numberTrees);
+    // NumericVector foodQuantityAtTree_nodepletion_v =
+    //   foodTree(
+    //     timer,
+    //     fruitingTimes_m(_,0),
+    //     fruitingTimes_m(_,1),
+    //     cycleLength,
+    //     nullVector,
+    //     maximumFoodToYield_v,
+    //     linear
+    //   );
+    
+    //b) Update matrix: use foodQuantityTree_nodepletion_v if you don't want to account for depletion
+    treeLoc_knowledge_m = filterKnowledge(
+      treeLocReal_m,
+      foodQuantityAtTree_v,
+      spatiotemporalKnowledge_m,
+      lastTimeVisitTrees_v,
+      timer,
+      noReturnTime,
+      whatValueUnknownTemporal,
+      mapSize
+    );
+    
+    //Adjust knowledge based on perception
+    
+    IntegerVector whichTreeInPerceptualRange = whichPerceived(
+      treeLocReal_m,
+      agentCurrentLocation,
+      perceptualRange
+    );
+    
+    //Rcout << "Knowledge spatial and temporal " << sum(spatiotemporalKnowledge_m(_,0)) << " " << sum(spatiotemporalKnowledge_m(_,1)) << std::endl;
+    //Rcout << "Food in vision " << sum(ifelse(whichTreeInPerceptualRange == 1, foodQuantityAtTree_v, 0)) << std::endl; //Food in perception: should be 0 after first move
+    //Rcout << "Food knowledge prior vision " << sum(treeLoc_knowledge_m(_,2)) << std::endl; //Food in perception: should be 0 after first move
+    
+    for(int mat = 0; mat < whichTreeInPerceptualRange.size(); mat++){
+      if((whichTreeInPerceptualRange[mat] == 1) && 
+         (foodQuantityAtTree_v[mat] > 0.01) &&
+         (lastTimeVisitTrees_v[mat] <= (timer - noReturnTime))
+      ){
+        treeLoc_knowledge_m(mat,0) = treeLocReal_m(mat,0);
+        treeLoc_knowledge_m(mat,1) = treeLocReal_m(mat,1);
+        treeLoc_knowledge_m(mat,2) = foodQuantityAtTree_v[mat];//I use > 0.01 to not change those recently visited
+      }
+    }
+    
+    NumericVector targetCoordinates = NumericVector::create(0,0);//runif(2, 0, mapSize);
+    
+    //*****************
+    // 1) MOVE
+    //*****************
+    
+    int targetIDInit = -1000;
+    
+    //Enter torpor if no food, otherwise move
+    bool enterTorpor(false);
+    double distanceTravelled(0);
+    if(sum(foodQuantityAtTree_v) <= 1){
+      enterTorpor = true;
+    }
+    
+    if(enterTorpor){
+      //Rcout << "Torpor" << std::endl;
+      timer += torporTime;
+      eventsWithNoFood += 1;
+      //Rcout << timer << std::endl;
+    }else{
+      //Move to target
+      //a) Chose target
+      agentPreviousLocation = agentCurrentLocation;
+      
+      //Calculate amount of food estimated: depletion not accounted because recently visited trees are not visited again, otherwise they are considered as unvisited, thus with no depletion
+      
+      //c)Move agent randomly if no food known/perceived
+      // NumericVector targetCoordinates = agentCurrentLocation;
+      // if(timer >= 7206){
+      //   Rcout << "Food quantity " << sum(foodQuantityAtTree_v) << std::endl;
+      //   Rcout << "Food knowledge " << sum(ifelse(treeLoc_knowledge_m(_,2) > 0.001, treeLoc_knowledge_m(_,2), 0)) << std::endl;
+      //   Rcout << "Food knowledge " << sum(ifelse(treeLoc_knowledge_m(_,2) > 0.001, 1, 0)) << std::endl;
+      //   Rcout << "ID max food " << which_maxRcpp(treeLoc_knowledge_m(_,2))[0] << std::endl;
+      // }
+      bool forageBasedOnMemory(false);
+      if(sum(ifelse(treeLoc_knowledge_m(_,2) > 0.001, 1, 0)) > 0){
+        forageBasedOnMemory = true;
+      }
+      
+      // if(timer >= 7206){
+      //   Rcout << forageBasedOnMemory << std::endl;
+      //   Rcout << "Max food is " << max(treeLoc_knowledge_m(_,2)) << std::endl;
+      //   Rcout << "Max food tree id " << which_maxRcpp(treeLoc_knowledge_m(_,2)) << std::endl;
+      // }
+      
+      if(forageBasedOnMemory){
+        // Rcout << "I move based on cognition" << std::endl;
+        
+        //Select the initial long distance target
+        NumericVector outputMovement = moveAgentKnowledgeBased(
+          agentCurrentLocation,
+          treeLoc_knowledge_m(_,Range(0,1)),
+          treeLoc_knowledge_m(_,2),
+          "closest",//Should be "closest" or "farthest"
+          IDcurrentTree = IDcurrentTree
+        );
+        
+        targetCoordinates[0] = outputMovement[0];
+        targetCoordinates[1] = outputMovement[1];
+        targetIDInit = outputMovement[2];
+        
+        // if(timer >= 7206){
+        //   Rcout << "Time is " << timer << " Last time visit is " << lastTimeVisitTrees_v[outputMovement[2]] << std::endl;
+        //   Rcout << "Current tree is " << IDcurrentTree << std::endl;
+        //   Rcout << "Target is tree " << outputMovement[2] << std::endl;
+        //   Rcout << "Food at target is " << foodQuantityAtTree_v[outputMovement[2]] << std::endl;
+        //   Rcout << "No return time " << noReturnTime << " Target last visited " << timer - lastTimeVisitTrees_v[outputMovement[2]] << std::endl;
+        // }
+        
+        if(moveOnlyToTarget){
+          //Rcout << "Moving target" << std::endl;
+          IDpreviousTree = IDcurrentTree;
+          IDcurrentTree = targetIDInit;
+        }else{
+          //Rcout << "Moving not target" << std::endl;
+          //Assess all the trees on the way
+          IntegerVector expectedVisitedTrees_v = visitedTrees(
+            agentCurrentLocation,
+            targetCoordinates,
+            treeLocReal_m,
+            perceptualRange
+          );
+          // if(timer >= 7206){
+          //   Rcout << "Worked up here" << std::endl;
+          // }
+          
+          //Assess all the trees which were visited sufficiently a long time ago
+          IntegerVector visitedLongTimeAgo_v = rep(0, expectedVisitedTrees_v.size());
+          for(int v = 0; v < visitedLongTimeAgo_v.size(); v++){
+            if(lastTimeVisitTrees_v[v] <= (timer - noReturnTime)){
+              visitedLongTimeAgo_v[v] = 1;
+            }
+          }
+          // if(timer >= 7206){
+          //   Rcout << "Worked up here 2" << std::endl;
+          // }
+          //Reconsider trees because of no return memory
+          expectedVisitedTrees_v = expectedVisitedTrees_v * visitedLongTimeAgo_v;
+          
+          // if(timer >= 7206){
+          //   Rcout << "Worked up here 3" << std::endl;
+          // }
+          
+          //Assess all the trees with food
+          IntegerVector treesWithFood_v = rep(0, expectedVisitedTrees_v.size());
+          if(moveOnlyToFruitingTrees){
+            for(int v = 0; v < treesWithFood_v.size(); v++){
+              if(foodQuantityAtTree_v[v] > 0.001){
+                treesWithFood_v[v] = 1;
+              }
+            }
+            //Reconsider trees as will be visited if had food
+            expectedVisitedTrees_v = expectedVisitedTrees_v * treesWithFood_v;
+          }
+          //Have the theoretical sequence of visits
+          IntegerVector whatVisitedTrees_v = visitedTreesSequence(
+            treeLocReal_m,
+            expectedVisitedTrees_v,
+            agentCurrentLocation
+          );
+          //if(timer >= 364.8 & timer < 365.3){
+          //   // Rcout << "Target status: seen  " << expectedVisitedTrees_v[outputMovement[2]] << std::endl;
+          //   // Rcout << "Target status: visited long time " << visitedLongTimeAgo_v[outputMovement[2]] << std::endl;
+          //   // Rcout << "Target status: with food " << treesWithFood_v[outputMovement[2]] << std::endl;
+          // Rcout << "Current position is " << agentCurrentLocation[0] << " " << agentCurrentLocation[1] << std::endl;
+          //   for(int visit = 0; visit < whatVisitedTrees_v.size(); visit++){
+          //     Rcout << "Tree to be visited in order: " << whatVisitedTrees_v[visit] << std::endl;
+          //   }
+          //    Rcout << "Initial target was " << outputMovement[2] << std::endl;
+          //    Rcout << "Last tree expected to be visited " << whatVisitedTrees_v[whatVisitedTrees_v.size() - 1] << std::endl;
+          //    Rcout << "First tree expected to be visited " << whatVisitedTrees_v[0] << std::endl;
+          //    Rcout << "Was visited long time ago " << visitedLongTimeAgo_v[whatVisitedTrees_v[0]] << std::endl;
+          //    Rcout << "Time ast visit " << lastTimeVisitTrees_v[whatVisitedTrees_v[0]] << std::endl;
+          //    Rcout << "Size of vector visited" << whatVisitedTrees_v.size() << std::endl;
+          //}
+          
+          // if(timer >=2 && timer <= 2.1){
+          //   Rcout << "Agent loc " << agentCurrentLocation[0] << " " << agentCurrentLocation[1] << std::endl;
+          //   Rcout << "306 " << treeLocReal_m(306,0) << " " << treeLocReal_m(306,1) << " " << foodQuantityAtTree_v [306] << std::endl;
+          //   Rcout << "450 " << treeLocReal_m(450,0) << " " << treeLocReal_m(450,1) << " " << foodQuantityAtTree_v [450] << std::endl;
+          // }
+          
+          if(whatVisitedTrees_v.size() > 0){
+            // Consider target as the closest tree with food that should have been seen en route to the target
+            IDpreviousTree = IDcurrentTree;
+            IDcurrentTree = whatVisitedTrees_v[0];
+            targetCoordinates[0] = treeLocReal_m(whatVisitedTrees_v[0],0);
+            targetCoordinates[1] = treeLocReal_m(whatVisitedTrees_v[0],1);
+          }else{
+            //Here, the target can eventually be less than 0.001, as it is the best ratio which is chosen, so the "else" takes care of it, as the target is now "not expected to be visited"
+            IDpreviousTree = IDcurrentTree;
+            IDcurrentTree = outputMovement[2];
+            targetCoordinates[0] = treeLocReal_m(outputMovement[2],0);
+            targetCoordinates[1] = treeLocReal_m(outputMovement[2],1);
+          }
+        }
+      }else{
+        //Rcout << "I move randomly" << std::endl;
+        targetCoordinates = moveAgentRandom(
+          agentCurrentLocation,
+          mapSize,
+          exponentialRate
+        );
+        if(moveOnlyToTarget){
+          IDpreviousTree = IDcurrentTree;
+          IDcurrentTree = -1000;//NA_INTEGER;
+        }else{
+          IntegerVector expectedVisitedTrees_v = visitedTrees(
+            agentCurrentLocation,
+            targetCoordinates,
+            treeLocReal_m,
+            perceptualRange
+          );
+          //Assess all the trees which were visited sufficiently a long time ago
+          IntegerVector visitedLongTimeAgo_v = rep(0, expectedVisitedTrees_v.size());
+          for(int v = 0; v < visitedLongTimeAgo_v.size(); v++){
+            if(lastTimeVisitTrees_v[v] <= (timer - noReturnTime)){
+              visitedLongTimeAgo_v[v] = 1;
+            }
+          }
+          
+          expectedVisitedTrees_v = expectedVisitedTrees_v * visitedLongTimeAgo_v;
+          
+          //Assess all the trees with food
+          IntegerVector treesWithFood_v = rep(0, expectedVisitedTrees_v.size());
+          if(moveOnlyToFruitingTrees){
+            for(int v = 0; v < treesWithFood_v.size(); v++){
+              if(foodQuantityAtTree_v[v] > 0.001){
+                treesWithFood_v[v] = 1;
+              }
+            }
+            //Reconsider trees as will be visited if had food
+            expectedVisitedTrees_v = expectedVisitedTrees_v * treesWithFood_v;
+          }
+          //Have the theoretical sequence of visits
+          IntegerVector whatVisitedTrees_v = visitedTreesSequence(
+            treeLocReal_m,
+            expectedVisitedTrees_v,
+            agentCurrentLocation
+          );
+          //If trees of interest along path, stop there
+          if(whatVisitedTrees_v.size() > 0){
+            IDpreviousTree = IDcurrentTree;
+            IDcurrentTree = whatVisitedTrees_v[0];
+            targetCoordinates[0] = treeLocReal_m(whatVisitedTrees_v[0],0);
+            targetCoordinates[1] = treeLocReal_m(whatVisitedTrees_v[0],1);
+          }else{
+            IDpreviousTree = IDcurrentTree;
+            IDcurrentTree = -1000;//NA_INTEGER;
+          }
+        }
+      }
+      
+      // if(timer >=2 && timer <= 10 && IDcurrentTree  != -1000){
+      //   Rcout << timer << " ID Target " << IDcurrentTree << std::endl;
+      //   Rcout << "Food previous " << foodQuantityAtTree_v[IDpreviousTree] << std::endl;
+      //   Rcout << "Food target " << foodQuantityAtTree_v[IDcurrentTree] << std::endl;
+      //   Rcout << "Food knowledge target " << treeLoc_knowledge_m(IDcurrentTree,2) << std::endl;
+      //   Rcout << "Food knowledge target " << max(treeLoc_knowledge_m(_,2)) << std::endl;
+      //   Rcout << "Coordinates agent " << agentCurrentLocation[0] << " " << agentCurrentLocation[1] << std::endl;
+      //   Rcout << "Coordinates target " << targetCoordinates[0] << " " << targetCoordinates[1] << std::endl;
+      // }
+      
+      // UPDATE ROUTINE
+      if(timer >= cycleLimitNumber * cycleLength){
+        if(enterTorpor){
+          
+        }else{
+          //Save routine: it will be when dispersal does not occur
+          if(outputRoutine){
+            // Write the file only if correctly opened
+            //Add some labels to be able to retrieve: points revisited because random movements
+            if(forageBasedOnMemory){
+              if(IDcurrentTree == targetIDInit){
+                outputRoutine << "T" << IDcurrentTree << " timer " << timer << std::endl;
+              }else{
+                outputRoutine << "t" << IDcurrentTree << " timer " << timer << std::endl;//Now moving from tree to tree progressively, should not be present anymore
+              }
+            }else{
+              outputRoutine << "r" << IDcurrentTree << " timer " << timer << std::endl;
+            }
+          }
+        }
+        // if(timer >= 7206){
+        //   Rcout << "Routine updated" << std::endl;
+        // }
+      }
+      
+      agentCurrentLocation = targetCoordinates;
+      // if(timer >= 365 & timer < 365.1){
+      //   Rcout << "Tree target " << IDcurrentTree << std::endl;
+      //   Rcout << "Previous tree " << IDpreviousTree << std::endl;
+      //   Rcout << "Location target " << agentCurrentLocation[0] << " " << agentCurrentLocation[1] << std::endl;
+      // }
+      
+      //b) Update visited trees in memory and food depletion
+      
+      // The following rule was only valid in case of telescopic arms
+      // visitedTrees_v = visitedTrees(
+      //   agentPreviousLocation,
+      //   agentCurrentLocation,
+      //   treeLocReal_m,
+      //   perceptualRange
+      // );
+      // Now this is the true rule: is moving from tree to tree (either just to the target, all trees encountered on the way, just the fruiting trees encountered on the way)
+      visitedTrees_v = rep(0, visitedTrees_v.size());
+      if(IntegerVector::is_na(IDcurrentTree) || IDcurrentTree == -1000){
+        
+      }else{
+        visitedTrees_v[IDcurrentTree] = 1;
+      }
+      if(IntegerVector::is_na(IDpreviousTree) || IDpreviousTree == -1000){
+        
+      }else{
+        visitedTrees_v[IDpreviousTree] = 1;
+      }
+      
+      // Rcout << sum(visitedTrees_v) << " trees were visited at this round!" << std::endl;
+      // Rcout << visitedTrees_v[IDcurrentTree] << std::endl;
+      
+      //Update Distance travelled and timing
+      distanceTravelled = distanceTravelledCalculation(
+        agentPreviousLocation,
+        agentCurrentLocation
+      );
+      
+      // if(timer >= 7206){
+      //   Rcout << "Distance travelled of " << distanceTravelled  << std::endl;
+      // }
+      if(distanceTravelled <= 0){
+        
+        std::string pathOfTheFileOutputError = pathOfTheFileOutputInit;
+        pathOfTheFileOutputError.append("_Error.txt");
+        std::ofstream outputFluxError;
+        //Open connection to output file
+        outputFluxError.open(pathOfTheFileOutputError.c_str(), std::ios::out | std::ios::trunc);//c_str() convert it to a string category understandable for the ofstream function, first creates file or blanks existing one
+        outputFluxError << "Time is " << timer << std::endl;
+        outputFluxError << "Target is " << IDcurrentTree << std::endl;
+        outputFluxError << "Previous tree was " << IDpreviousTree << std::endl;
+        outputFluxError << "Target coordinates are " << agentCurrentLocation[0] << " " << agentCurrentLocation[1] << std::endl;
+        outputFluxError << "Previous coordinates were " << agentPreviousLocation[0] << " " << agentPreviousLocation[1] << std::endl;
+        outputFluxError << "Distance to travel is " << distanceTravelled << std::endl;
+        outputFluxError << "Foraged based on memory " << forageBasedOnMemory << std::endl;
+        Rcpp::stop("Problem, negative or null distance");
+        outputFluxError.close();
+        // Rcout << "Previous target ID: " << IDpreviousTree << " Current target ID: " << IDcurrentTree << std::endl;
+      }
+      
+      totDistanceTravelled += distanceTravelled;
+      // Rcout << "Distance travelled " << distanceTravelled << std::endl;
+      // Update time
+      timerPrevious = timer;
+      timer += distanceTravelled/speed;
+    }
+    
+    //*****************
+    // 2) UPDATE ENVIRONMENT: food depletion/growth
+    //*****************
+    
+    //a) Update food due to time increase
+    //foodConsumedPrevious_v = foodConsumed_v;
+    foodQuantityAtTree_v = foodTree(
+      timer,
+      fruitingTimes_m(_,0),
+      fruitingTimes_m(_,1),
+      cycleLength,
+      foodConsumed_v,
+      maximumFoodToYield_v,
+      linear
+    );
+    
+    //b) Update last visit, last visit with feeding and consumed food based on visited pattern (the first two) and time in the year
+    NumericMatrix matrixUpdateVisitTimeAndConsumption = updateVisitTimesAndConsumptionCycle(//Triangular distribution of food quantity
+      timer,
+      fruitingTimes_m(_,0),
+      fruitingTimes_m(_,1),
+      cycleLength,
+      foodConsumed_v,
+      visitedTrees_v,
+      lastTimeVisitTrees_v,
+      lastTimeVisitTreesWithFruit_v,
+      foodQuantityAtTree_v
+    );
+    
+    lastTimeVisitTrees_v = matrixUpdateVisitTimeAndConsumption(_,0);
+    // if(timer >= 7206){
+    //   Rcout << "Number visited trees at bout " << sum(visitedTrees_v) << std::endl;
+    //   Rcout << "Number visited trees in memory " << sum(ifelse(timer - lastTimeVisitTrees_v < noReturnTime, 1, 0)) << std::endl;
+    // }
+    lastTimeVisitTreesWithFruit_v = matrixUpdateVisitTimeAndConsumption(_,1);
+    foodConsumed_v = matrixUpdateVisitTimeAndConsumption(_,2);
+    
+    //c) Save eaten food after increase
+    //Rcout << "Quantity food " << sum(foodQuantityAtTree_v) << std::endl;
+    NumericVector foodEatenDuringBout_v = foodQuantityAtTree_v * as<NumericVector>(visitedTrees_v);
+    //Rcout << "Food eaten " << sum(foodEatenDuringBout_v) << std::endl;
+    totFoodEaten += sum(foodEatenDuringBout_v);
+    //Rcout << "Distance and food tot " << totDistanceTravelled << " " << totFoodEaten << std::endl;
+    
+    //d) Update food at tree after depletion
+    //Rcout << "Quantity food visited trees prior to update: " << sum(ifelse(visitedTrees_v == 1, foodQuantityAtTree_v, 0)) << std::endl;
+    foodQuantityAtTree_v = foodTree(
+      timer,
+      fruitingTimes_m(_,0),
+      fruitingTimes_m(_,1),
+      cycleLength,
+      foodConsumed_v,
+      maximumFoodToYield_v,
+      linear
+    );
+    
+    // if(timer >= 7206){
+    //   for(int tree = 0; tree < numberTrees; tree++){
+    //     if(visitedTrees_v[tree] == 1){
+    //       Rcout << "Was visited " << visitedTrees_v[tree] << " Food presence " << foodQuantityAtTree_v[tree] << std::endl;
+    //     }
+    //   }
+    // }
+    //Rcout << "Quantity food visited trees after update: " << sum(ifelse(visitedTrees_v == 1, foodQuantityAtTree_v, 0)) << std::endl;
+    
+    if((sum(ifelse(visitedTrees_v == 1, foodQuantityAtTree_v, 0)) > 0.01)){
+      IntegerVector vectorTreeWithProblem = rep(0, visitedTrees_v.size());
+      for(int vec = 0; vec < vectorTreeWithProblem.size(); vec++){
+        if(visitedTrees_v[vec] == 1 && foodQuantityAtTree_v[vec] > 0.01){
+          vectorTreeWithProblem[vec] = 1;
+        }
+      }
+      
+      int IDTreeProblem = which_max(vectorTreeWithProblem);
+      Rcout << "Problem " << IDTreeProblem << " " << fruitingTimes_m(IDTreeProblem,0) << " " << fruitingTimes_m(IDTreeProblem,1) << " " << foodQuantityAtTree_v[IDTreeProblem] << std::endl;
+      Rcout << " " << visitedTrees_v[IDTreeProblem] << " " << foodConsumed_v[IDTreeProblem] << std::endl;
+      Rcout << IDpreviousTree << " " << IDcurrentTree << std::endl;
+      //I have checked. Calculations are good; it is a very low number when it occurs -> certainly a problem when substraction occurs, residuals > 0.01 kept
+    }
+    
+    // if(timer >= 7206){
+    //  Rcout << "Everything updated but memory" << std::endl;
+    //  for(int tree = 0; tree < numberTrees; tree++){
+    //    if(visitedTrees_v[tree] == 1){
+    //      Rcout << "Was visited " << visitedTrees_v[tree] << " Last time visit " << lastTimeVisitTrees_v[tree] - timer << std::endl;
+    //    }
+    //  }
+    // }
+    
+    //*****************
+    // 3) UPDATE AGENT KNOWLEDGE
+    //*****************
+    
+    if(learning){
+      //Update memory: visited fruiting trees can be memorised to the detriment of trees visited the longest time ago
+      for(int updateMemoryCount = 0; updateMemoryCount < numberTrees; updateMemoryCount++){
+        if(spatialKnowledgeRate > 0.01){
+          if(lastTimeVisitTreesWithFruit_v[updateMemoryCount] == timer & spatiotemporalKnowledge_m(updateMemoryCount, 0) == 0){//if dead tree not known
+            //lastTimeVisitTrees_v[updateMemoryCount]
+            //Change the time of last visit of unknown trees not to take them into account for memory lapse
+            NumericVector lastTimeVisitTrees_v_memorisedTrees = ifelse(spatiotemporalKnowledge_m(_, 0) == 0, timer + 1, lastTimeVisitTrees_v);
+            int treeOldestInMemory = which_minRcpp(lastTimeVisitTrees_v_memorisedTrees - timer)[0];
+            // Rcout << treeOldestInMemory << std::endl;
+            // Rcout << lastTimeVisitTrees_v[treeOldestInMemory] << std::endl;
+            // Rcout << treeLocReal_m(updateMemoryCount, 0) << " " << treeLocReal_m(updateMemoryCount, 1) << std::endl;
+            
+            if(lastTimeVisitTreesWithFruit_v[treeOldestInMemory] != timer){
+              //lastTimeVisitTreesWithFruit_v[updateMemoryCount]
+              //Memorise seedling
+              spatiotemporalKnowledge_m(updateMemoryCount, 0) = 1;
+              spatiotemporalKnowledge_m(updateMemoryCount, 1) = spatiotemporalKnowledge_m(treeOldestInMemory, 1);//In case you have a tree memorised spatially but not temporally, temporality is only memorised if that was the case of the tree visited the longest time ago. For the moment useless since spatial and temporal memory are equivalent.
+              
+              //Erase tree visited the longest time ago
+              spatiotemporalKnowledge_m(treeOldestInMemory, 0) = 0;
+              spatiotemporalKnowledge_m(treeOldestInMemory, 1) = 0;
+            }else{
+              Rcout << "Problem in attributing new memorised tree" << std::endl;
+            }
+          }
+        } else{
+          //Do nothing
+        }
+      }
+    }
+    
+    //*****************
+    // 4) DISPERSAL
+    //*****************
+    
+    if(timer < cycleLimitNumber * cycleLength){//Dispersal only occur in the "true" simulation but not the last run, meant to analyse routine
+      if(enterTorpor){
+        
+      }else{
+        //Re-update if already dispersed binary vector
+        disseminated_v = ifelse(lastTimeDispersal_v < timer - timeDelayForDispersal, 0, disseminated_v);
+        
+        //Update distribution after seed dispersal
+        if(timer > 0.01){
+          
+          //Modify if dispersal realised
+          int counterDispersedTrees(0);
+          for(int DispersalLoopCount = 0; DispersalLoopCount < numberTrees; DispersalLoopCount++){
+            double probaDispersalRealised = runif(1, 0, 1)[0];
+            if((lastTimeVisitTreesWithFruit_v[DispersalLoopCount] >= timer - timeDelayForDispersal) & // Tree visited with fruit
+               (probaDispersalRealised <= DispersalProbability * (timer - timerPrevious)/timeDelayForDispersal) & //Proba Dispersal realised
+               (disseminated_v[DispersalLoopCount] == 0) //Was not already disseminated
+            ){
+              if(samplingMapCounter==0){
+                Rcout << "ERROR: Dispersal occurs at start" << std::endl;
+              }
+              // if(timer >= 7206){
+              //  Rcout << "ID " << DispersalLoopCount << " dispersed" << std::endl;
+              // }
+              if(distanceTravelled > sqrt(spaceTreeSq)){//No dispersal if movement is insufficient for a free space to be available
+                //~~~~~~~~
+                // IF RANGE DISPERSAL IS NULL: Dispersal on the path line
+                //~~~~~~~~
+                // In case dispersal occur only on the path line, find the "available" space using a systemic approach to speed up
+                
+                double angleToTarget = atan2((agentCurrentLocation[1] - agentPreviousLocation[1]),(agentCurrentLocation[0] - agentPreviousLocation[0]));
+                NumericVector stepTravel_v = rcpp_seq(0, distanceTravelled, 1);//A unitary step of travel to create coordinates along the way.
+                // Rcout << distanceTravelled << std::endl;
+                // Rcout << "Seq travel " << min(stepTravel_v) << " " << max(stepTravel_v) << std::endl;
+                // Rcout << "Angle " << angleToTarget << std::endl;
+                // Rcout << "Loc start " << agentPreviousLocation[0] << " " << agentPreviousLocation[1]  << std::endl;
+                // Rcout << "Loc end " << agentCurrentLocation[0] << " " <<  agentCurrentLocation[1] << std::endl;
+                
+                //Sequence of all coordinates
+                NumericVector possibleCoordinatesX_v = agentPreviousLocation[0] + stepTravel_v * cos(angleToTarget);//rcpp_seq(agentPreviousLocation[0], agentCurrentLocation[0], cos(angleToTarget));
+                NumericVector possibleCoordinatesY_v = agentPreviousLocation[1] + stepTravel_v * sin(angleToTarget);//rcpp_seq(agentPreviousLocation[1], agentCurrentLocation[1], sin(angleToTarget));
+                
+                // Rcout << "X coord " << min(possibleCoordinatesX_v) << " " << max(possibleCoordinatesY_v) << std::endl;
+                
+                //The coordinates for the seedling: will only be effective once (and if) free space is found (in that case coordinates are changed)
+                bool hasChangedInitialCoordinates(false);
+                NumericVector newCoordinatesAfterDispersal_v = rep(0.0, 2);//will only be used if coordinates change
+                
+                //Sample only among those that are at sufficient distance of other trees
+                NumericVector distanceClosestTree_v = rep(0.0, possibleCoordinatesX_v.size());
+                IntegerVector isAboveDistance = rep(0, possibleCoordinatesX_v.size());
+                //Rcout << "Worked up to here" << std::endl;
+                IntegerVector whichToChoose_v;
+                
+                for(int loc = 0; loc < possibleCoordinatesX_v.size(); loc++){
+                  distanceClosestTree_v[loc] = min(
+                    pow(treeLocReal_m(_,0) - possibleCoordinatesX_v[loc],2) +
+                      pow(treeLocReal_m(_,1) - possibleCoordinatesY_v[loc],2)
+                  );
+                  if(distanceClosestTree_v[loc] > spaceTreeSq){
+                    isAboveDistance[loc] = 1;
+                    whichToChoose_v.push_back(loc);
+                  }
+                }
+                
+                // Rcout << sum(isAboveDistance) << std::endl;
+                //Sample one set of coordinates for those that are not too close
+                if(sum(isAboveDistance) >= 1){
+                  int whichLocToChoose = sample(whichToChoose_v, 1)[0];
+                  newCoordinatesAfterDispersal_v[0] = possibleCoordinatesX_v[whichLocToChoose];
+                  newCoordinatesAfterDispersal_v[1] = possibleCoordinatesY_v[whichLocToChoose];
+                  hasChangedInitialCoordinates = true;
+                  // if(timer >= 7206){
+                  //   Rcout << "Found dispersal location" << std::endl;
+                  // }
+                }else{
+                  //No dispersal
+                  // if(timer >= 7206){
+                  //  Rcout << "FAILED DISPERSAL" << std::endl;
+                  // }
+                }
+                
+                //~~~~~~~~
+                // IF RANGE DISPERSAL IS NOT NULL
+                //~~~~~~~~
+                // //Get the new coordinates:only if space is empty, otherwise sprout does not grow and dispersal not considered
+                // int trials(0);
+                // NumericVector newCoordinatesAfterDispersal_v = rep(0.0, 2);
+                // bool isTreeNearby(true);
+                // bool hasChangedInitialCoordinates(false);
+                //
+                // while(isTreeNearby && trials < 999){//Control if range dispersal is not 0
+                //   //Rcout << "Trying to find empty space " << trials << std::endl;
+                //   if(trials ==1){
+                //     Rcout << "Difficulty to find empty space" << std::endl;
+                //   }
+                //  if(trials == 998){
+                //    Rcout << "Empty space not found" << std::endl;
+                //  }
+                //   trials += 1;
+                //   newCoordinatesAfterDispersal_v = newCoordinatesAfterDispersal(
+                //     agentCurrentLocation,
+                //     agentPreviousLocation,
+                //     0,
+                //     mapSize
+                //   );
+                //
+                //   NumericVector distanceClosestTree_v =
+                //     (pow(treeLocReal_m(_, 0) - newCoordinatesAfterDispersal_v[0], 2) +
+                //     pow(treeLocReal_m(_, 1) - newCoordinatesAfterDispersal_v[1], 2));
+                //
+                //   int whichMinDistanceTree = which_minRcpp(distanceClosestTree_v)[0];
+                //   // Rcout << whichMinDistanceTree << std::endl;
+                //   // if(trials == 1){
+                //   //   Rcout << "Coord x " << newCoordinatesAfterDispersal_v[0] << std::endl;
+                //   //   Rcout << "Coord y " << newCoordinatesAfterDispersal_v[1] << std::endl;
+                //   //   Rcout << "Dist closest " << distanceClosestTree_v[whichMinDistanceTree] << std::endl;
+                //   // }
+                //   if(distanceClosestTree_v[whichMinDistanceTree] > (spaceTreeSq * spaceTreeSq)){
+                //     isTreeNearby = false;
+                //     hasChangedInitialCoordinates = true;
+                //     Rcout << "Distance is " << distanceClosestTree_v[whichMinDistanceTree] << std::endl;
+                //     Rcout << "Should be superior to " << spaceTreeSq * spaceTreeSq << std::endl;
+                //   }
+                // }
+                
+                if(hasChangedInitialCoordinates){
+                  
+                  //If the trees was previously visited, with fruits, and seed "effectively" digested/transported and germinated (i.e. probability of Dispersal realised), then change coordinates:
+                  
+                  //^^^^^^^^^^
+                  // IN CASE NEW TREE REPLACES FATHER/MOTHER TREE
+                  //^^^^^^^^^^
+                  
+                  // treeLocReal_m(DispersalLoopCount, 0) = newCoordinatesAfterDispersal_m(DispersalLoopCount, 0);
+                  // treeLocReal_m(DispersalLoopCount, 1) = newCoordinatesAfterDispersal_m(DispersalLoopCount, 1);
+                  // //Change if was disseminated to avoid redissemination
+                  // disseminated_v[DispersalLoopCount] = 1;
+                  // lastTimeDispersal_v[DispersalLoopCount] = timer;
+                  // lastTimeVisitTrees_v[DispersalLoopCount] = timer;
+                  
+                  //^^^^^^^^^^
+                  // IN CASE NEW TREE REPLACES RANDOMLY ANOTHER TREE
+                  //^^^^^^^^^^
+                  
+                  //Randomly chose tree that dies and is replaced by new one
+                  int treeToDelete = floor(runif(1, 0, numberTrees)[0]);
+                  while(treeToDelete == IDcurrentTree | treeToDelete == IDpreviousTree){
+                    treeToDelete = floor(runif(1, 0, numberTrees)[0]);
+                  }
+                  
+                  //Rcout << "I changed tree number: " << treeToDelete << std::endl;
+                  treeLocReal_m(treeToDelete, 0) = newCoordinatesAfterDispersal_v[0];
+                  treeLocReal_m(treeToDelete, 1) = newCoordinatesAfterDispersal_v[1];
+                  
+                  //////////////////////////////////
+                  //Added after revision: if the tree to replace is known, then choose the last unknown fruiting tree to be memorised
+                  if(spatiotemporalKnowledge_m(treeToDelete, 0) == 1 & spatialKnowledgeRate != 1){
+                    //Seed is now unknown
+                    spatiotemporalKnowledge_m(treeToDelete, 0) = 0;
+                    spatiotemporalKnowledge_m(treeToDelete, 1) = 0;
+                    //Choose new tree to be known
+                    //Fake the time of last visit of trees known and/or last seen not fruiting to be sure they are not the ones memorised: add a the minimum number 0 - timer, as it means this will be the least recently visited, and the treelearned is the most recently visited
+                    NumericVector lastTimeVisitTrees_v_notMemorisedFruitingTrees = ifelse(
+                      spatiotemporalKnowledge_m(_, 0) == 1 | 
+                      foodConsumed_v < 0.01,
+                      0, lastTimeVisitTrees_v);
+                    int treeToLearn = which_maxRcpp(lastTimeVisitTrees_v_notMemorisedFruitingTrees - timer)[0];
+                    //At initialisation, or for the first steps, you may have only non-visited trees. To keep memory size constant, it is important that the new tree memorised (although not visited while fruiting, it is the initialisation) is not known.
+                    int toSelect(0);
+                    while(spatiotemporalKnowledge_m(treeToLearn, 0) == 1){
+                      toSelect += 1;
+                      treeToLearn = which_maxRcpp(lastTimeVisitTrees_v_notMemorisedFruitingTrees - timer)[toSelect];
+                    }
+                    // Rcout << "New tree to learn " << treeToLearn << " had known label: " << spatiotemporalKnowledge_m(treeToLearn, 0) << std::endl;
+                    spatiotemporalKnowledge_m(treeToLearn, 0) = 1;
+                    spatiotemporalKnowledge_m(treeToLearn, 1) = 1;
+                    // IntegerVector vectorKnowledge = spatiotemporalKnowledge_m(_, 0);
+                    // Rcout << std::accumulate(vectorKnowledge.begin(), vectorKnowledge.end(), 0) << std::endl;
+                  }
+                  
+                  //////////////////////////////////
+                  
+                  //Resample start date according to father/mother one
+                  double newStartDate = rnorm(1, fruitingTimes_m(DispersalLoopCount, 0), 1)[0];
+                  if(newStartDate < 0){
+                    newStartDate = fmod(newStartDate + cycleLength*10, cycleLength);
+                  }
+                  Rcout << "Mother tree fruiting date " << fruitingTimes_m(DispersalLoopCount, 0) << std::endl;
+                  Rcout << "New tree fruiting date " << newStartDate << std::endl;
+                  fruitingTimes_m(treeToDelete, 0) = newStartDate;
+                  fruitingTimes_m(treeToDelete, 1) = newStartDate + fruitingLength;
+                  
+                  //Change if was disseminated to avoid redissemination
+                  disseminated_v[DispersalLoopCount] = 1;
+                  lastTimeDispersal_v[DispersalLoopCount] = timer;
+                  lastTimeVisitTrees_v[DispersalLoopCount] = timer;
+                  
+                  disseminated_v[treeToDelete] = 1;
+                  lastTimeDispersal_v[treeToDelete] = timer;
+                  lastTimeVisitTrees_v[treeToDelete] = timer;
+                  
+                  //Fake food consumption to avoid visit based on memory if new date is posterior to current time
+                  foodConsumed_v[treeToDelete] = 1;
+                  
+                  if(learning){
+                    //Update memory
+                    //If the now "dead" tree was memorised, so is the seedling. Otherwise, the tree visited the longest time ago will be. The subsequent lines deal with this case.
+                    if(spatiotemporalKnowledge_m(treeToDelete, 0) == 0){//if dead tree not known
+                      
+                      //Change the time of last visit of unknown trees not to take them into account for memory lapse
+                      NumericVector lastTimeVisitTrees_v_memorisedTrees = ifelse(spatiotemporalKnowledge_m(_, 0) == 0, timer + 1, lastTimeVisitTrees_v);
+                      int treeOldestInMemory = which_minRcpp(lastTimeVisitTrees_v_memorisedTrees - timer)[0];
+                      
+                      //Memorise seedling
+                      spatiotemporalKnowledge_m(treeToDelete, 0) = 1;
+                      spatiotemporalKnowledge_m(treeToDelete, 1) = spatiotemporalKnowledge_m(treeOldestInMemory, 1);//In case you have a tree memorised spatially but not temporally, temporality is only memorised if that was the case of the tree visited the longest time ago. For the moment useless since spatial and temporal memory are equivalent.
+                      
+                      //Erase tree visited the longest time ago
+                      spatiotemporalKnowledge_m(treeOldestInMemory, 0) = 0;
+                      spatiotemporalKnowledge_m(treeOldestInMemory, 1) = 0;
+                    }
+                  }
+                  counterDispersedTrees += 1;
+                }
+              }
+            }
+            //Rcout << counterDispersedTrees << " trees have dispersed!" << std::endl;
+          }
+        }else{
+          
+        }
+        // if(timer >= 7206){
+        //  Rcout << "Everything updated" << std::endl;
+        // }
+        // if(timer >= 7206){
+        //   //Check whether a) number of known trees is kept constant b) spatial = temporal knowledge. If so, it means that replacement above, and due to seed dispersal, is correctly done.
+        //   Rcout << "Memorised trees " << sum(spatiotemporalKnowledge_m(_, 0)) << " " << sum(spatiotemporalKnowledge_m(_, 1)) << std::endl;
+        //
+        //   //Chek if IDs known trees change: should indicate new memorisation
+        //   int sumIDKnown = 0;
+        //   for(int counter = 0; counter < numberTrees; counter++){
+        //     if(spatiotemporalKnowledge_m(counter, 0)==1){
+        //       sumIDKnown += 1;
+        //     }
+        //  }
+        //   Rcout << "Trees known sum ID " << sumIDKnown << std::endl;
+        // }
+      }
+    }
+    
+    ////------
+    // Saving efficiency results: semi continuous, each cycle length / 5 tu, up to end of normal run (i.e. when there is dispersal)
+    ////------
+    
+    if(outputFluxEfficiencyContinuous){
+      // NumericVector nearestNeighbourMeanSd = nearestNeighbourDistance(
+      //   treeLocReal_m,
+      //   mapSize + 1
+      // );
+      //
+      // NumericVector lloydIndices = lloydIndex(
+      //   treeLocReal_m,
+      //   mapSize,
+      //   quadratSize
+      // );
+      //
+      // Rcout << "Calculate spatial metrics" << std::endl;
+      
+      //Rcout << timer << " " << fmod(timer, cycleLength/5) << " " << fmod(timerPrevious, cycleLength/5) << std::endl;
+      if(fmod(timer, cycleLength/5) < fmod(timerPrevious, cycleLength/5)){
+        //Rcout << "I should save" << std::endl;
+        outputFluxEfficiencyContinuous <<
+          timer << " " <<
+            totFoodEaten/totDistanceTravelled << std::endl;//" " <<
+        // nearestNeighbourMeanSd[0] << " " <<
+        //   nearestNeighbourMeanSd[1] << " " <<
+        //     lloydIndices[0] << " " <<
+        //       lloydIndices[1] << std::endl;
+      }
+      // if(timer >= 7206){
+      //   Rcout << "Continuous output updated" << std::endl;
+      // }
+    }
+    
+    //----------------
+    //Save results map
+    //----------------
+    
+    if(saveTreeMap){
+      if(
+        (samplingMapCounter == 0) |
+          ((floor(timer) >= samplingMapTime_v[samplingMapCounter]) & (floor(timerPrevious) <= samplingMapTime_v[samplingMapCounter]))
+      ){
+        // Rcout << "Saving map " << samplingMapTime_v[samplingMapCounter] << std::endl;
+        // Rcout << timer << std::endl;
+        //Update counter to avoid resampling map multiple times
+        samplingMapCounter += 1;
+        
+        ////------
+        // Saving tree map
+        ////------
+        
+        std::string pathOfTheFileOutputInitMap = pathOfTheFileOutputInit;
+        pathOfTheFileOutputInitMap.append("_Map_");
+        pathOfTheFileOutputInitMap.append(std::to_string(samplingMapTime_v[samplingMapCounter - 1]));
+        pathOfTheFileOutputInitMap.append(".txt");
+        
+        std::ofstream outputFluxMap;
+        //Open connection to output file
+        outputFluxMap.open(pathOfTheFileOutputInitMap.c_str(), std::ios::out | std::ios::trunc);//c_str() convert it to a string category understandable for the ofstream function, first creates file or blanks existing one
+        if(outputFluxMap)  // Write the file only if correctly opened
+        {
+          //Column names
+          outputFluxMap <<
+            "x" << " " <<
+              "y" << " " <<
+                "startFruit" << " " <<
+                  "endFruit" << std::endl;
+          
+          //Values
+          for(int loopingForMapSave = 0; loopingForMapSave < numberTrees; loopingForMapSave++){
+            //Rcout << loopingForMapSave << std::endl;
+            outputFluxMap <<
+              treeLocReal_m(loopingForMapSave, 0) << " " <<
+                treeLocReal_m(loopingForMapSave, 1) << " " <<
+                  fruitingTimes_m(loopingForMapSave,0) << " " <<
+                    fruitingTimes_m(loopingForMapSave,1) << std::endl;
+          }
+        }
+        else //If impossible to write in the file, say it
+        {
+          Rcout << "ERROR: Impossible to open the output file about mapping" << std::endl;
+        }
+        
+        //Close connection to output file
+        outputFluxMap.close();
+      }
+    }
+    
+    // Rcout << "End bout" << std::endl;
+    
+    ////------
+    // Saving efficiency results: end only
+    ////------
+    
+    if(timer >= cycleLimitNumber * cycleLength && hasSavedFinalResults == 0){
+      hasSavedFinalResults = 1;
+      //Close connection to output file
+      outputFluxEfficiencyContinuous.close();
+      
+      std::string pathOfTheFileOutputInitEfficiency = pathOfTheFileOutputInit;
+      pathOfTheFileOutputInitEfficiency.append("_Efficiency.txt");
+      
+      std::ofstream outputFluxEfficiency;
+      //Open connection to output file
+      outputFluxEfficiency.open(pathOfTheFileOutputInitEfficiency.c_str(), std::ios::out | std::ios::trunc);//c_str() convert it to a string category understandable for the ofstream function, first creates file or blanks existing one
+      if(outputFluxEfficiency)  // Write the file only if correctly opened
+      {
+        //Column names
+        outputFluxEfficiency <<
+          "Run_simulation" << " " <<
+            "Length_run" << " " <<
+              "Cycle_length" << " " <<
+                "Fruiting_length" << " " <<
+                  "Map_size" << " " <<
+                    "Ntrees" << " " <<
+                      "Distribution_homogeneous_at_start" << " " <<
+                        "Nclusters_trees" << " " <<
+                          "Spread_clusters_trees" << " " <<
+                            "Maxyieldfood" << " " <<
+                              "Speed" << " " <<
+                                "Torpor_duration" << " " <<
+                                  "No_return_time" << " " <<
+                                    "Value_if_unknown_temporality" << " " <<
+                                      "What_rule_to_move" << " " <<
+                                        "intensityCompetitionForSpace" << " " <<
+                                          "moveOnlyToFruitingTrees" << " " <<
+                                            "moveOnlyToTarget" << " " <<
+                                              "linear" << " " <<
+                                                "learning" << " " <<
+                                                  "Dispersal_probability" << " " <<
+                                                    "Time_delay_Dispersal" << " " <<
+                                                      "Perception_range" << " " <<
+                                                        "Temporal_knowledge_rate" << " " <<
+                                                          "Spatial_knoledge_rate" << " " <<
+                                                            "Number_events_with_no_food" << " " <<
+                                                              "Tot_food_eaten" << " " <<
+                                                                "Tot_distance_travelled" << std::endl;
+        
+        //Values
+        outputFluxEfficiency <<
+          repetitionNumber << " " <<
+            timer << " " <<
+              cycleLength << " " <<
+                fruitingLength << " " <<
+                  mapSize << " " <<
+                    numberTrees << " " <<
+                      homogeneousDistribution << " " <<
+                        treeClusterNumber << " " <<
+                          treeClusterSpread << " " <<
+                            max(maximumFoodToYield_v) << " " <<
+                              speed << " " <<
+                                torporTime << " " <<
+                                  noReturnTime << " " <<
+                                    whatValueUnknownTemporal << " " <<
+                                      whatRule << " " <<
+                                        intensityCompetitionForSpace << " " <<
+                                          moveOnlyToFruitingTrees << " " <<
+                                            moveOnlyToTarget << " " <<
+                                              linear << " " <<
+                                                learning << " " <<
+                                                  DispersalProbability << " " <<
+                                                    timeDelayForDispersal << " " <<
+                                                      perceptualRange << " " <<
+                                                        temporalKnowledgeRate << " " <<
+                                                          spatialKnowledgeRate << " " <<
+                                                            eventsWithNoFood << " " <<
+                                                              totFoodEaten << " " <<
+                                                                totDistanceTravelled << std::endl;
+        
+      }
+      else //If impossible to write in the file, say it
+      {
+        Rcout << "ERROR: Impossible to open the output file about foraging efficiency" << std::endl;
+      }
+      
+      //Close connection to output file
+      outputFluxEfficiency.close();
+    }
   }
   //Close connection to output file routine
   outputRoutine.close();

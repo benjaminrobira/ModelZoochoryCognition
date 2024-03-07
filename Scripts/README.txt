@@ -8,7 +8,7 @@ It is important to note that these are WORKING scripts, intended to facilitate v
   -> A: a script testing the Rcpp functions
   -> B: a script testing the spatial point distribution quantification indices
   -> 0: the script listing all parameters (and their values)
--> 1 to 5: the scripts that run the simulation for different spatio-temporal knowledge
+  -> 1 to 5: the scripts that run the simulation for different spatio-temporal knowledge
   -> 6: the script that processes the output of simulations 1 to 5
   -> 7a, b, c: The scripts that run the simulation for other questions (change of movement rule, distance competition, ...)
   -> 8: the script that processes the output of the simulations of 7

@@ -3,7 +3,7 @@
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # What does this script do?
-# This script tests the different Rcpp function used for running the simulation in order to see whether those were doing what intended.
+# This script runs the simulations modifying the moving rule followed by the agent.
 
 # Setting up environment --------------------------------------------------
 

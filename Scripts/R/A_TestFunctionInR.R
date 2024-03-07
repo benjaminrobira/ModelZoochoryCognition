@@ -673,310 +673,44 @@ plot(map[,1], map[,2], pch=19, col="green")
 map <- as.data.frame(read_table2(paste0(path,"_Map_", 85, ".txt")))
 points(map[,1], map[,2], pch=19, col="red")
 
-
 map <- as.data.frame(read_table2(paste0(path,"_Map_", 120, ".txt")))
 points(map[,1], map[,2], pch=1, col="blue")
 
+# Run simulation test: new replacement memory due to seed dispersal -------
 
-################ !!!!!!!!!!!!!!!!!!!!
-# Some changes made:
-# The fruiting status of trees is now binary (in fruit or not). Dispersal proba was one, to be sure they eventually disperse. I redid the random distribution of fruiting date, because putting the same one changed nothing.
-# I constructed a new index of reticulation. It is the mean/variance ratio of the t
-################ !!!!!!!!!!!!!!!!!!!!
-
-
-###~~~~~~
-## RUN SIMULATION: DIFFERENT FRUITING DATE, BINARY FRUITING
-###~~~~~~
-rm(list=ls())
-library(Rcpp)
-Rcpp::sourceCpp("Script/Rcpp/FunctionsRcpp.cpp")
-
-#Load parameters
-load("T:/Saved_PhD/Model_dispersalSeed/ModelZoochoryCognition/Script/R/Parameterisation.RData")
-
-spatialKnowledge <- c(0, 0.25, 0.5, 0.75, 1)
-temporalKnowledge <- c(0, 0.25, 0.5, 0.75, 1)
-samplingMapTime_v <- seq(from = 0, to = 15, by = 1)
-  
-for(s in 1:length(spatialKnowledge)){
-  for(r in 1:30){
-    set.seed(r) #Unique random seed for reproducibility
-    locTree <- as.matrix(cbind(runif(numberTrees, 0, 1000), runif(numberTrees, 0, 1000)))
-    dateStart <- runif(numberTrees, 0, 60)#I reduced to two months, to go faster and mimick the fact that it happens "during a fruiting period". 
-    #The 30 days fruiting time only mimick asynchrony between trees (i.e. each tree fruits for a lesser time than at the species level).
-    runSimulation(
-      cycleLimitNumber = cycleLimitNumber,
-      repetitionNumber = r,
-      timeDelayForDispersal = timeDelayForDispersal,
-      torporTime = torporTime,
-      saveTreeMap = saveTreeMap,
-      samplingMapTime_v = samplingMapTime_v,
-      nameInit = "Output/BinaryFruitDifferentFruitingDates/WithDispersal/WithDispersal",
-      mapSize = mapSize,
-      quadratSize = quadratSize,
-      numberTrees = numberTrees,
-      #Wont be used
-      treeLocInit_m = locTree,
-      fruitingTimesInit_m = cbind(dateStart, dateStart + fruitingLength),
-      homogeneousDistribution = homogeneousDistribution,
-      treeClusterNumber = treeClusterNumber,
-      treeClusterSpread = treeClusterSpread,
-      maximumFoodToYield_v = maximumFoodToYield_v,
-      cycleLength = cycleLength,
-      fruitingLength = fruitingLength,
-      noReturnTime = noReturnTime,
-      whatValueUnknownTemporal = whatValueUnknownTemporal,
-      whatRule = whatRule,
-      exponentialRate = exponentialRate,
-      perceptualRange = perceptualRange,
-      spatialKnowledgeRate = spatialKnowledge[s],
-      temporalKnowledgeRate = temporalKnowledge[s],
-      speed = speed,
-      DispersalProbability = 1,#It implies that, on average, trees are sure to disperse. Because it means that it will disperse with a proba 1/timeDelayForDispersal by tu, for a timeDelayForDispersal period.
-      useProvidedMap = FALSE,
-      linear = FALSE
-    )
-  }
-}
-
-
-# ###~~~~~~
-# ## RUN SIMULATION: SAME TIMING DATE
-# ###~~~~~~
-# 
-# library(Rcpp)
-# Rcpp::sourceCpp("Script/Rcpp/FunctionsRcpp.cpp")
-# 
-# #Load parameters
-# load("T:/Saved_PhD/Model_dispersalSeed/ModelZoochoryCognition/Script/R/Parameterisation.RData")
-# 
-# # dateStart <- runif(numberTrees, 0, 365)
-# 
-# spatialKnowledge <- c(0, 0.25, 0.5, 0.75, 1)
-# temporalKnowledge <- c(0, 0.25, 0.5, 0.75, 1)
-# 
-# for(s in 1:length(spatialKnowledge)){
-#   for(r in 1:30){
-#     set.seed(r) #Unique random seed for reproducibility
-#     locTree <- as.matrix(cbind(runif(numberTrees, 0, 1000), runif(numberTrees, 0, 1000)))
-#     runSimulation(
-#       cycleLimitNumber = cycleLimitNumber,
-#       repetitionNumber = r,
-#       timeDelayForDispersal = timeDelayForDispersal,
-#       torporTime = torporTime,
-#       saveTreeMap = saveTreeMap,
-#       samplingMapTime_v = samplingMapTime_v,
-#       nameInit = "Output/TestSameFruitingDate/WithDispersalUniqueFruitingDateAllYear",
-#       mapSize = mapSize,
-#       quadratSize = quadratSize,
-#       numberTrees = numberTrees,
-#       #Wont be used
-#       treeLocInit_m = locTree,
-#       fruitingTimesInit_m = cbind(rep(0, times=numberTrees), rep(cycleLength, times=numberTrees)),
-#       homogeneousDistribution = homogeneousDistribution,
-#       treeClusterNumber = treeClusterNumber,
-#       treeClusterSpread = treeClusterSpread,
-#       maximumFoodToYield_v = maximumFoodToYield_v,
-#       cycleLength = cycleLength,
-#       fruitingLength = fruitingLength,
-#       noReturnTime = noReturnTime,
-#       whatValueUnknownTemporal = whatValueUnknownTemporal,
-#       whatRule = whatRule,
-#       exponentialRate = exponentialRate,
-#       perceptualRange = perceptualRange,
-#       spatialKnowledgeRate = spatialKnowledge[s],
-#       temporalKnowledgeRate = temporalKnowledge[s],
-#       speed = speed,
-#       DispersalProbability = DispersalProbability,
-#       useProvidedMap = FALSE
-#     )
-#   }
-# }
-
-###~~~~~~
-# Simulations are ran in Simu1, 2, 3, 4, 5 = the different knowledge rate
-###~~~~~~
-
-# library(parallel)
-# library(doParallel)
-
-# setwd("T:/Saved_PhD/Model_DispersalSeed/ModelZoochoryCognition")
-# Rcpp::sourceCpp("Script/Rcpp/FunctionsRcpp.cpp")
-# 
-# ### ---- Testing the simulation
-# 
-# spatialKnowledge <- c(0, 0.25, 0.5, 0.75, 1)
-# temporalKnowledge <- c(0, 0.25, 0.5, 0.75, 1)
-# 
-# #Parallelising #https://www.r-bloggers.com/2017/09/a-guide-to-parallelism-in-r/
-# library(parallel)
-# library(doParallel)
-# 
-# #Trick to parallel loop despite using C++ which otherwise causes problem: task 1 failed - "valeur NULL passée comme adresse symbolique"
-# #https://stackoverflow.com/questions/18245193/doparallel-issue-with-inline-function-on-windows-7-works-on-linux
-# #https://stackoverflow.com/questions/25062383/cant-run-rcpp-function-in-foreach-null-value-passed-as-symbol-address
-# #You should create a package for it to work. No time for now to learn to do that.
-# 
-# #Compare change in distribution
-# # for(s in 1:length(spatialKnowledge)){
-#   print(s)
-#   #Parallelising
-#   cores=detectCores()
-#   cl <- makeCluster(cores[1]-4) #not to overload your computer
-#   registerDoParallel(cl)
-#   registerDoSEQ() #if you opt not to run parallelising -> C++ can't be exported with parallelisation apparently. I tried 
-#   environmentPath <- getwd()
-#   
-#   foreach(r=1:30, .packages=c('Rcpp'), .inorder = TRUE) %dopar% { #for(r in 1:30){
-#     cycleLimitN = 2#50
-#     cycleLength = 365
-#     Ntrees = 1000
-#     #print(r)
-#     set.seed(r) #Unique random seed for reproducibility
-#     dateStart <- runif(Ntrees, 0, 365)
-#     locTree <- as.matrix(cbind(runif(Ntrees, 0, 1000), runif(Ntrees, 0, 1000)))
-#     runSimulation(
-#       cycleLimitNumber = cycleLimitN,
-#       repetitionNumber = r,
-#       timeDelayForDispersal = 0.5,
-#       torporTime = 1,
-#       saveTreeMap = TRUE,
-#       samplingMapTime_v = seq(from=0, to=cycleLimitN*cycleLength, length.out = 5),
-#       nameInit = "Output/WithDispersalRandomReplacement",
-#       mapSize = 1000,
-#       quadratSize = 50,
-#       numberTrees = Ntrees,
-#       treeLocInit_m = locTree,
-#       fruitingTimesInit_m = cbind(dateStart, dateStart + 30),
-#       homogeneousDistribution = TRUE,
-#       treeClusterNumber = 0,
-#       treeClusterSpread = 0,
-#       maximumFoodToYield_v = rep(1, times=Ntrees),
-#       cycleLength = cycleLength,
-#       fruitingLength = 30,
-#       noReturnTime = 5,
-#       whatValueUnknownTemporal = 0.000,
-#       whatRule = "closest",
-#       exponentialRate = 0.01,
-#       perceptualRange = 10,
-#       spatialKnowledgeRate = spatialKnowledge[s],
-#       temporalKnowledgeRate = temporalKnowledge[s],
-#       speed = 1000,
-#       DispersalProbability = 0.1
-#     )
-#     
-#     ##Compare agent efficiency
-#     path <- paste0(
-#       "Output/WithDispersalRandomReplacement",
-#       "_p10.000000",
-#       "_s",
-#       format(spatialKnowledge[s], nsmall=2),
-#       "0000_t",
-#       format(temporalKnowledge[s], nsmall=2),
-#       "0000_r",
-#       r
-#     )
-#     locTree <- matrix(unlist(matrix(read_table2(paste0(path,"_Map_",cycleLimitN*cycleLength,".txt")))), nrow = Ntrees, ncol = 4)
-#     set.seed(r) #Unique random seed for reproducibility
-#     #Null agent
-#     runSimulation(
-#       cycleLimitNumber = cycleLimitN/5,
-#       repetitionNumber = r,
-#       timeDelayForDispersal = 0.5,
-#       torporTime = 1,
-#       saveTreeMap = TRUE,
-#       samplingMapTime_v = c(0),
-#       nameInit = paste0("Output/NoDispersalNULL",s),
-#       mapSize = 1000,
-#       quadratSize = 50,
-#       numberTrees = Ntrees,
-#       treeLocInit_m = locTree[,1:2],
-#       fruitingTimesInit_m = locTree[,3:4],
-#       homogeneousDistribution = TRUE,
-#       treeClusterNumber = 0,
-#       treeClusterSpread = 0,
-#       maximumFoodToYield_v = rep(1, times=Ntrees),
-#       cycleLength = cycleLength,
-#       fruitingLength = 30,
-#       noReturnTime = 5,
-#       whatValueUnknownTemporal = 0.000,
-#       whatRule = "closest",
-#       exponentialRate = 0.01,
-#       perceptualRange = 10,
-#       spatialKnowledgeRate = 0,
-#       temporalKnowledgeRate = 0,
-#       speed = 1000,
-#       DispersalProbability = 0
-#     )
-#     set.seed(r) #Unique random seed for reproducibility
-#     #Intermediate agent
-#     runSimulation(
-#       cycleLimitNumber = cycleLimitN/5,
-#       repetitionNumber = r,
-#       timeDelayForDispersal = 0.5,
-#       torporTime = 1,
-#       saveTreeMap = TRUE,
-#       samplingMapTime_v = c(0),
-#       nameInit = paste0("Output/NoDispersalINTERMEDIATE",s),
-#       mapSize = 1000,
-#       quadratSize = 50,
-#       numberTrees = Ntrees,
-#       treeLocInit_m = locTree[,1:2],
-#       fruitingTimesInit_m = locTree[,3:4],
-#       homogeneousDistribution = TRUE,
-#       treeClusterNumber = 0,
-#       treeClusterSpread = 0,
-#       maximumFoodToYield_v = rep(1, times=Ntrees),
-#       cycleLength = cycleLength,
-#       fruitingLength = 30,
-#       noReturnTime = 5,
-#       whatValueUnknownTemporal = 0.000,
-#       whatRule = "closest",
-#       exponentialRate = 0.01,
-#       perceptualRange = 10,
-#       spatialKnowledgeRate = 0.5,
-#       temporalKnowledgeRate = 0.5,
-#       speed = 1000, 
-#       DispersalProbability = 0
-#     )
-#     set.seed(r) #Unique random seed for reproducibility
-#     #Omniscient/prescient agent
-#     runSimulation(
-#       cycleLimitNumber = cycleLimitN/5,
-#       repetitionNumber = r,
-#       timeDelayForDispersal = 0.5,
-#       torporTime = 1,
-#       saveTreeMap = TRUE,
-#       samplingMapTime_v = c(0),
-#       nameInit = paste0("Output/NoDispersalOMNISCIENT",s),
-#       mapSize = 1000,
-#       quadratSize = 50,
-#       numberTrees = Ntrees,
-#       treeLocInit_m = locTree[,1:2],
-#       fruitingTimesInit_m = locTree[,3:4],
-#       homogeneousDistribution = TRUE,
-#       treeClusterNumber = 0,
-#       treeClusterSpread = 0,
-#       maximumFoodToYield_v = rep(1, times=Ntrees),
-#       cycleLength = cycleLength,
-#       fruitingLength = 30,
-#       noReturnTime = 5,
-#       whatValueUnknownTemporal = 0.000,
-#       whatRule = "closest",
-#       exponentialRate = 0.01,
-#       perceptualRange = 10,
-#       spatialKnowledgeRate = 1,
-#       temporalKnowledgeRate = 1,
-#       speed = 1000, 
-#       DispersalProbability = 0
-#     )
-#     
-#     gc()
-#     memory.size()
-#   }
-#   # Stop cluster
-#   stopCluster(cl)
-#   gc()
-#   memory.size()
-# # }  
+dateStart <- runif(numberTrees, 0, 365)
+locTree <- as.matrix(cbind(runif(numberTrees, 0, 1000), runif(numberTrees, 0, 1000)))
+runSimulationMemoryRevised(
+  cycleLimitNumber = cycleLimitNumber,
+  repetitionNumber = 1,
+  timeDelayForDispersal = timeDelayForDispersal,
+  torporTime = torporTime,
+  saveTreeMap = saveTreeMap,
+  samplingMapTime_v = samplingMapTime_v,
+  nameInit = "Output/TestSimulationNewMemorySeedDispersal",
+  mapSize = mapSize,
+  quadratSize = quadratSize,
+  numberTrees = numberTrees,
+  #Wont be used
+  treeLocInit_m = locTree,
+  fruitingTimesInit_m = cbind(dateStart, dateStart + fruitingLength),
+  homogeneousDistribution = homogeneousDistribution,
+  treeClusterNumber = treeClusterNumber,
+  treeClusterSpread = treeClusterSpread,
+  maximumFoodToYield_v = maximumFoodToYield_v,
+  cycleLength = cycleLength,
+  fruitingLength = fruitingLength,
+  noReturnTime = noReturnTime,
+  whatValueUnknownTemporal = whatValueUnknownTemporal,
+  whatRule = whatRule,
+  exponentialRate = exponentialRate,
+  perceptualRange = perceptualRange,
+  spatialKnowledgeRate = 0.5,
+  temporalKnowledgeRate = 0.5,
+  speed = speed,
+  DispersalProbability = DispersalProbability, 
+  useProvidedMap = TRUE,
+  moveOnlyToFruitingTrees = FALSE,
+  moveOnlyToTarget = FALSE,
+  intensityCompetitionForSpace = intensityCompetitionForSpace
+)

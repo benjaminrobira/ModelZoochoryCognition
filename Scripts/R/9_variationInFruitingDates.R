@@ -19,7 +19,6 @@ library(qdapRegex)
 
 # Function
 
-
 plotResults <- function(
     yAxisName,
     xAxisName,
@@ -273,8 +272,7 @@ indices_l <- mclapply(
   1:length(filesMapFinal_v),
   mc.cores = 5,
   function(whatFile){
-    #print(whatFile)
-    system(as.character(whatFile))
+    print(whatFile)
     fileOfInterest <- filesMapFinal_v[whatFile]
     if(grepl("MovingNot", fileOfInterest)){
       whatRule <- "MovingAllTrees"
@@ -288,13 +286,13 @@ indices_l <- mclapply(
     outputMapFinal <- read_table2(paste0("Output/SensitivityMovingRule/", fileOfInterest)) %>% as.data.frame() 
     dateAngle_v <- (outputMapFinal$startFruit * (2*pi) / 365) %% (2*pi)
     #Taken from trajr
-    meanVectorLengthFinal <- Mod(mean(complex(modulus = 1, argument = dateAngle_v)))
+    meanVectorLengthFinal <- 1 - Mod(mean(complex(modulus = 1, argument = dateAngle_v)))
     
     fileOfInterest <- filesMapInit_v[whatFile]
     outputMapInit <- read_table2(paste0("Output/SensitivityMovingRule/", fileOfInterest)) %>% as.data.frame() 
     dateAngle_v <- (outputMapInit$startFruit * (2*pi) / 365) %% (2*pi)
     #Taken from trajr
-    meanVectorLengthInit <- Mod(mean(complex(modulus = 1, argument = dateAngle_v)))
+    meanVectorLengthInit <- 1 - Mod(mean(complex(modulus = 1, argument = dateAngle_v)))
     
     return(c(meanVectorLengthInit, meanVectorLengthFinal, whatRule))
   }
@@ -320,7 +318,7 @@ plotVariationDateMoving <- plotResults(
   df = indicesMoving,
   categoricalX = TRUE,
   levelsOldNameX = unique(indicesMoving$movingRule)[c(2,1,3)],
-  levelsNewNameX = c("Only fruit trees", "All trees", "Only target trees")[c(2,1,3)],
+  levelsNewNameX = c("Only fruiting plants", "All plants", "Only target plants")[c(2,1,3)],
   groupVar = "whatMap",
   colourGroup_v = c("white", "black"),
   nameGroup = "Conditions",
@@ -346,8 +344,7 @@ indices_l <- mclapply(
   1:length(filesMapFinal_v),
   mc.cores = 5,
   function(whatFile){
-    #print(whatFile)
-    system(as.character(whatFile))
+    print(whatFile)
     fileOfInterest <- filesMapFinal_v[whatFile]
     valueSpacing <- spacingValue_v[
       which(sapply(simuID_v, function(x){grepl(x, fileOfInterest)}))[1]
@@ -357,13 +354,13 @@ indices_l <- mclapply(
     outputMapFinal <- read_table2(paste0("Output/SensitivitySpaceTree/", fileOfInterest)) %>% as.data.frame() 
     dateAngle_v <- (outputMapFinal$startFruit * (2*pi) / 365) %% (2*pi)
     #Taken from trajr
-    meanVectorLengthFinal <- Mod(mean(complex(modulus = 1, argument = dateAngle_v)))
+    meanVectorLengthFinal <- 1 - Mod(mean(complex(modulus = 1, argument = dateAngle_v)))
     
     fileOfInterest <- filesMapInit_v[whatFile]
     outputMapInit <- read_table2(paste0("Output/SensitivitySpaceTree/", fileOfInterest)) %>% as.data.frame() 
     dateAngle_v <- (outputMapInit$startFruit * (2*pi) / 365) %% (2*pi)
     #Taken from trajr
-    meanVectorLengthInit <- Mod(mean(complex(modulus = 1, argument = dateAngle_v)))
+    meanVectorLengthInit <- 1 - Mod(mean(complex(modulus = 1, argument = dateAngle_v)))
     
     return(c(meanVectorLengthInit, meanVectorLengthFinal, valueSpacing))
   }
@@ -371,7 +368,7 @@ indices_l <- mclapply(
 indicesSpacing <- do.call("rbind", indices_l) %>% 
   as.data.frame() %>% 
   mutate(
-    experience = "Spacing tree intensity"
+    experience = "Plant spacing intensity"
   ) %>% 
   rename(
     Initial = "V1",
@@ -380,10 +377,9 @@ indicesSpacing <- do.call("rbind", indices_l) %>%
   pivot_longer(cols = Initial:Final, values_to = "varianceDate", names_to = "whatMap")
 colnames(indicesSpacing)[1] <- c("valueSpacing")
 
-
 plotVariationDateSpacing <- plotResults(
   yAxisName = "Variation in fruiting date",
-  xAxisName = "Tree spacing intensity",
+  xAxisName = "Plant spacing intensity",
   xVar = "valueSpacing",
   yVar = "varianceDate",
   df = indicesSpacing,
@@ -398,7 +394,6 @@ plotVariationDateSpacing <- plotResults(
   differentMeanShapePoints = TRUE
 )
 
-
 # Spatio-temporal knowledge -----------------------------------------------
 listFiles_v <- list.files("Output/Main")
 listFiles_v <- listFiles_v[grep("Main", listFiles_v)]
@@ -411,8 +406,7 @@ indices_l <- mclapply(
   1:length(filesMapFinal_v),
   mc.cores = 5,
   function(whatFile){
-    #print(whatFile)
-    system(as.character(whatFile))
+    print(whatFile)
     fileOfInterest <- filesMapFinal_v[whatFile]
     cognitionLevel <- qdapRegex::ex_between(fileOfInterest, 
                                             "_s", 
@@ -425,13 +419,13 @@ indices_l <- mclapply(
     outputMapFinal <- read_table2(paste0("Output/Main/", fileOfInterest)) %>% as.data.frame() 
     dateAngle_v <- (outputMapFinal$startFruit * (2*pi) / 365) %% (2*pi)
     #Taken from trajr
-    meanVectorLengthFinal <- Mod(mean(complex(modulus = 1, argument = dateAngle_v)))
+    meanVectorLengthFinal <- 1 - Mod(mean(complex(modulus = 1, argument = dateAngle_v)))
     
     fileOfInterest <- filesMapInit_v[whatFile]
     outputMapInit <- read_table2(paste0("Output/Main/", fileOfInterest)) %>% as.data.frame() 
     dateAngle_v <- (outputMapInit$startFruit * (2*pi) / 365) %% (2*pi)
     #Taken from trajr
-    meanVectorLengthInit <- Mod(mean(complex(modulus = 1, argument = dateAngle_v)))
+    meanVectorLengthInit <- 1 - Mod(mean(complex(modulus = 1, argument = dateAngle_v)))
     
     return(c(meanVectorLengthInit, meanVectorLengthFinal, cognitionLevel))
   }
@@ -439,7 +433,7 @@ indices_l <- mclapply(
 indicesMain <- do.call("rbind", indices_l) %>% 
   as.data.frame() %>% 
   mutate(
-    experience = "Spatio-temporal knowledge rate"
+    experience = "Spatiotemporal knowledge rate"
   ) %>% 
   rename(
     Initial = "V1",
@@ -450,7 +444,7 @@ colnames(indicesMain)[1] <- c("knowledgeRate")
   
 plotVariationDateMain <- plotResults(
   yAxisName = "Variation in fruiting date",
-  xAxisName = "Spatio-temporal knowledge rate",
+  xAxisName = "Spatiotemporal knowledge rate",
   xVar = "knowledgeRate",
   yVar = "varianceDate",
   df = indicesMain,
@@ -469,15 +463,15 @@ mergedPlot <- ggarrange(
   plotVariationDateMain +  
     theme(legend.text = element_text(size = 18), 
           legend.title = element_text(size = 22)) +
-    scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0, 0.3)),
+    scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.7, 1)),
   plotVariationDateMoving + rremove("ylab") + 
     theme(legend.text = element_text(size = 18), 
           legend.title = element_text(size = 22)) +
-    scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0, 0.3)),
+    scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.7, 1)),
   plotVariationDateSpacing + rremove("ylab") + 
     theme(legend.text = element_text(size = 18), 
           legend.title = element_text(size = 22)) +
-    scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0, 0.3)),
+    scale_y_continuous(breaks = extended_breaks(n = 4), minor_breaks = extended_breaks(n = 6*4), limits = c(0.7, 1)),
   nrow = 1, 
   ncol = 3,
   common.legend = TRUE,
