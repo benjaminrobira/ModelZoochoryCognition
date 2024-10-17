@@ -1315,7 +1315,11 @@ plotEfficiency <- plotResults(
   nameGroup = "Forager type",
   levelOrderGroup = c("Naive", "Intermediate", "Omniscient"),
   widthBox = 0.5,
-  differentMeanShapePoints = TRUE
+  differentMeanShapePoints = TRUE,
+  valueSegments = c(0.5),
+  lineTypeSegments = c(NA),
+  colourSegments =  c(NA),
+  nameSegments = c("")
 )
 
 plotRoutine2 <- plotResults(
@@ -1332,7 +1336,11 @@ plotRoutine2 <- plotResults(
   nameGroup = "Forager type",
   levelOrderGroup = c("Naive", "Intermediate", "Omniscient"),
   widthBox = 0.5,
-  differentMeanShapePoints = TRUE
+  differentMeanShapePoints = TRUE,
+  valueSegments = c(0.5),
+  lineTypeSegments = c(NA),
+  colourSegments =  c(NA),
+  nameSegments = c("")
 )
 
 # Save --------------------------------------------------------------------
