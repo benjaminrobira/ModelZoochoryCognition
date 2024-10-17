@@ -1,6 +1,6 @@
-# The role of cognition and movement of seed-dispersing animals in shaping plant distributions
+# How spatiotemporal cognition and movement of seed-dispersing animals influence plant distribution
 
-This repository contains the codes and results to reproduce the paper **"The role of cognition and movement of seed-dispersing animals in shaping plant distributions"** by Benjamin Robira.
+This repository contains the codes and results to reproduce the paper **"How spatiotemporal cognition and movement of seed-dispersing animals influence plant distribution"** by Benjamin Robira, now published in Oikos.
 
 It is divided into several folders:
 
@@ -20,15 +20,20 @@ This folder contains files that encode the simulation (Rcpp folder) or its execu
   `FunctionsRcpp.cpp` : This script contains all the Rcpp code that executes the simulations (independent functions and then the wrap up).
 
 * [:file_folder: **R**](Scripts/R) The *R* to actually run the simulation, extract the results, etc.
-  - A: a script to test the Rcpp functions
-  - B: a script testing the spatial point distribution quantification indices
-  - C: a script testing the spatiotemporal point distribution quantification indices
-  - 0: the script that lists all the parameters (and their values)
+  - A: the script testing the Rcpp functions
+  - B: the script testing the spatial point distribution quantification indices (to set up benchmarks)
+  - C: the script testing the quantification of autocorrelation in fruiting date (to set up benchmarks)
+  - 0: the script listing all parameters (and their values)
   - 1 to 5: the scripts that run the simulation for different spatio-temporal knowledge
   - 6: the script that processes the output of simulations 1 to 5
-  - 7a, b, c, d, e: The scripts that run the simulation for other questions (change of movement rule, distance competition, ...)
-  - 8: the script that processes the output of simulations 7
-  - 9: the script to estimate the variation of fruiting dates at the beginning/end of the simulation
+  - 7a, b, c, d, e: the scripts that run the simulation for other questions (change of movement rule, distance competition, ...)
+  - 8: the script that processes the output of the simulations of 7
+  - 9: the script to access the variance in fruiting dates over the course of simulations
+  - 10: the script that runs the sensitivity test on sensory range 
+  - toolbox: my private toolbox which contains various useful functions for data processing. Any reuse should include a request to me at benjamin.robira@normalesup.org (and it will surely be answered positively!). I just want to know how it is distributed. I also update it regularly, so this may become an outdated version).
+  - the script that creates the graphic legend (i.e. the black circles) on the Y-axis of some plots
+  - RiotteLambert_2017_f: Functions adapted (or simply copied) from Riotte-Lambert, Louise, Simon Benhamou, and Simon Chamaillé-Jammes. "From randomness to traplining: a framework for the study of routine movement behavior." Behavioral Ecology (2016): arw154. Their use is acknowledged in the manuscript by referring to the paper. I also contacted the first author for this.
+
   
 ## [:file_folder: **LaunchCluster**](Scripts/LaunchCluster) Launch Cluster
 

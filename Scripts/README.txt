@@ -4,7 +4,7 @@ This README file explains how the scripts are organised.
 You have two folders: one containing files related to the Rcpp language, the other to the R language. Each contains the script in Rcpp or R.
 It is important to note that these are WORKING scripts, intended to facilitate verification, which means that their cleanup is not complete. Therefore, the scripts may contain code not used in the present analyses (e.g. some spatial indices tested but not finally used). If you find an error, that would be a shame, but I would be glad to be aware. Please contact me at benjamin.robira@normalesup.org
 
-- R folder:
+- R scripts:
   -> A: the script testing the Rcpp functions
   -> B: the script testing the spatial point distribution quantification indices (to set up benchmarks)
   -> C: the script testing the quantification of autocorrelation in fruiting date (to set up benchmarks)
@@ -20,5 +20,5 @@ It is important to note that these are WORKING scripts, intended to facilitate v
   -> RiotteLambert_2017_f: Functions adapted (or simply copied) from Riotte-Lambert, Louise, Simon Benhamou, and Simon Chamaillé-Jammes. "From randomness to traplining: a framework for the study of routine movement behavior." Behavioral Ecology (2016): arw154. Their use is acknowledged in the manuscript by referring to the paper. I also contacted the first author for this.
 
 
-- Rcpp folder:
+- Rcpp scripts:
  -> FunctionsRcpp.cpp : This script contains all the Rcpp code that executes the simulations (independent functions and then the wrap up).
